@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Upload, FileText } from "lucide-react";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import type { Product, ProductCategory, Company } from "@/types";
 import { useProductCategories } from "@/hooks/useProductCategories";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -159,39 +159,27 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="process">Proceso</Label>
-              <Textarea
-                id="process"
-                value={formData.process}
-                onChange={(e) => setFormData({ ...formData, process: e.target.value })}
-                rows={4}
-                placeholder="Describe el proceso..."
-              />
-            </div>
+          <div className="space-y-6">
+            <RichTextEditor
+              label="Proceso"
+              value={formData.process}
+              onChange={(value) => setFormData({ ...formData, process: value })}
+              placeholder="Describe el proceso del producto..."
+            />
 
-            <div>
-              <Label htmlFor="strengths">Fortalezas</Label>
-              <Textarea
-                id="strengths"
-                value={formData.strengths}
-                onChange={(e) => setFormData({ ...formData, strengths: e.target.value })}
-                rows={4}
-                placeholder="Describe las fortalezas..."
-              />
-            </div>
+            <RichTextEditor
+              label="Fortalezas"
+              value={formData.strengths}
+              onChange={(value) => setFormData({ ...formData, strengths: value })}
+              placeholder="Describe las fortalezas del producto..."
+            />
 
-            <div>
-              <Label htmlFor="observations">Observaciones</Label>
-              <Textarea
-                id="observations"
-                value={formData.observations}
-                onChange={(e) => setFormData({ ...formData, observations: e.target.value })}
-                rows={4}
-                placeholder="Añade observaciones..."
-              />
-            </div>
+            <RichTextEditor
+              label="Observaciones"
+              value={formData.observations}
+              onChange={(value) => setFormData({ ...formData, observations: value })}
+              placeholder="Añade observaciones sobre el producto..."
+            />
           </div>
 
           <div className="flex justify-end gap-2">

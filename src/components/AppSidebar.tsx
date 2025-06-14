@@ -21,7 +21,7 @@ const navigationItems = [
   { title: "Delegaciones", url: "/delegations", icon: User },
   { title: "Compañías", url: "/companies", icon: Link },
   { title: "Productos", url: "/products", icon: Edit },
-  { title: "Contenido por Departamento", url: "/department-content", icon: Image },
+  { title: "Departamentos", url: "/department-content", icon: Image },
   { title: "Noticias", url: "/news", icon: Newspaper },
 ];
 
