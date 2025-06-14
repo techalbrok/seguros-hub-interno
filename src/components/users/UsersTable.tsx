@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -12,12 +11,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Delegation } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
+import { Checkbox } from "../ui/checkbox";
 
 interface UsersTableProps {
   users: User[];
   delegations: Delegation[];
   onViewUser: (user: User) => void;
   onEditUser: (user: User) => void;
+  selectedUserIds: string[];
+  onSelectUser: (userId: string, selected: boolean) => void;
+  onSelectAll: (selected: boolean) => void;
+  areAllOnPageSelected: boolean;
 }
 
 const getInitials = (name: string) => {
@@ -28,13 +32,21 @@ const getRoleColor = (role: string) => {
   return role === 'admin' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground';
 };
 
-export const UsersTable = ({ users, delegations, onViewUser, onEditUser }: UsersTableProps) => {
+export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selectedUserIds, onSelectUser, onSelectAll, areAllOnPageSelected }: UsersTableProps) => {
   const { isAdmin } = useAuth();
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-[40px]">
+            <Checkbox
+              checked={areAllOnPageSelected}
+              onCheckedChange={(checked) => onSelectAll(Boolean(checked))}
+              aria-label="Seleccionar todo"
+              disabled={users.length === 0}
+            />
+          </TableHead>
           <TableHead>Usuario</TableHead>
           <TableHead>Rol</TableHead>
           <TableHead>Delegación</TableHead>
@@ -45,8 +57,16 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser }: Users
       <TableBody>
         {users.map((user) => {
           const delegation = delegations.find(d => d.id === user.delegationId);
+          const isSelected = selectedUserIds.includes(user.id);
           return (
-            <TableRow key={user.id} className="hover:bg-muted/50">
+            <TableRow key={user.id} className="hover:bg-muted/50" data-state={isSelected ? 'selected' : undefined}>
+              <TableCell>
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={(checked) => onSelectUser(user.id, Boolean(checked))}
+                  aria-label={`Seleccionar ${user.name}`}
+                />
+              </TableCell>
               <TableCell className="font-medium">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">

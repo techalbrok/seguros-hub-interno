@@ -58,6 +58,12 @@ const Users = () => {
     }
   };
 
+  const handleBulkDelete = async (userIds: string[]) => {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar ${userIds.length} usuarios?`)) {
+      await Promise.all(userIds.map(id => deleteUser(id)));
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -114,6 +120,7 @@ const Users = () => {
       onViewUser={handleViewUser}
       onEditUser={handleEditUser}
       onDeleteUser={handleDeleteUser}
+      onBulkDelete={handleBulkDelete}
     />
   );
 };

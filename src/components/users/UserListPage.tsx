@@ -14,6 +14,7 @@ interface UserListPageProps {
   onViewUser: (user: User) => void;
   onEditUser: (user: User) => void;
   onDeleteUser: (userId: string) => void;
+  onBulkDelete: (userIds: string[]) => void;
 }
 
 export const UserListPage = ({
@@ -24,6 +25,7 @@ export const UserListPage = ({
   onViewUser,
   onEditUser,
   onDeleteUser,
+  onBulkDelete,
 }: UserListPageProps) => {
   const { isAdmin } = useAuth();
 
@@ -56,6 +58,7 @@ export const UserListPage = ({
         onViewUser={onViewUser}
         onEditUser={onEditUser}
         onDeleteUser={onDeleteUser}
+        onBulkDelete={onBulkDelete}
       />
     </div>
   );
