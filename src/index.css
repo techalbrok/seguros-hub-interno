@@ -84,6 +84,7 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 210 50% 25%;
     --sidebar-ring: 0 100% 50%;
+    --header-color-dark: var(--foreground);
   }
 }
 
@@ -98,7 +99,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply text-sidebar-primary dark:text-white;
+    @apply text-sidebar-primary dark:text-[hsl(var(--header-color-dark))];
   }
 }
 
