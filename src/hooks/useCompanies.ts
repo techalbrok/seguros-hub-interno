@@ -16,6 +16,18 @@ interface UpdateCompanyData extends CreateCompanyData {
   id: string;
 }
 
+// Transform database row to Company interface
+const transformDbRowToCompany = (row: any): Company => ({
+  id: row.id,
+  name: row.name,
+  commercialWebsite: row.commercial_website,
+  brokerAccess: row.broker_access,
+  commercialManager: row.commercial_manager,
+  managerEmail: row.manager_email,
+  createdAt: new Date(row.created_at),
+  updatedAt: new Date(row.updated_at),
+});
+
 export const useCompanies = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,7 +59,7 @@ export const useCompanies = () => {
       }
 
       console.log("Companies fetched successfully:", data);
-      return data;
+      return data.map(transformDbRowToCompany);
     },
   });
 
@@ -78,7 +90,7 @@ export const useCompanies = () => {
         throw error;
       }
 
-      return data;
+      return transformDbRowToCompany(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
@@ -114,7 +126,7 @@ export const useCompanies = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return transformDbRowToCompany(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
