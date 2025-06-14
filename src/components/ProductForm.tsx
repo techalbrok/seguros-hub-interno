@@ -46,6 +46,16 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
     setDocuments(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleCategoryChange = (value: string) => {
+    const categoryId = value === "no-category" ? "" : value;
+    setFormData({ ...formData, categoryId });
+  };
+
+  const handleCompanyChange = (value: string) => {
+    const companyId = value === "no-company" ? "" : value;
+    setFormData({ ...formData, companyId });
+  };
+
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
@@ -68,13 +78,14 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
               <div>
                 <Label htmlFor="categoryId">Categoría</Label>
                 <Select
-                  value={formData.categoryId}
-                  onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
+                  value={formData.categoryId || "no-category"}
+                  onValueChange={handleCategoryChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar categoría" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="no-category">Sin categoría</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {"—".repeat(category.level - 1)} {category.name}
@@ -87,13 +98,14 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
               <div>
                 <Label htmlFor="companyId">Compañía</Label>
                 <Select
-                  value={formData.companyId}
-                  onValueChange={(value) => setFormData({ ...formData, companyId: value })}
+                  value={formData.companyId || "no-company"}
+                  onValueChange={handleCompanyChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar compañía" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="no-company">Sin compañía</SelectItem>
                     {companies.map((company) => (
                       <SelectItem key={company.id} value={company.id}>
                         {company.name}

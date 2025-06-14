@@ -58,6 +58,12 @@ export const CategoryForm = ({ category, onSubmit, onCancel, isLoading }: Catego
     setDocuments(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleParentChange = (value: string) => {
+    // Handle the special "no-parent" value
+    const parentId = value === "no-parent" ? "" : value;
+    setFormData({ ...formData, parentId });
+  };
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -79,14 +85,14 @@ export const CategoryForm = ({ category, onSubmit, onCancel, isLoading }: Catego
             <div>
               <Label htmlFor="parentId">Categoría Padre</Label>
               <Select
-                value={formData.parentId}
-                onValueChange={(value) => setFormData({ ...formData, parentId: value })}
+                value={formData.parentId || "no-parent"}
+                onValueChange={handleParentChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar categoría padre (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sin categoría padre</SelectItem>
+                  <SelectItem value="no-parent">Sin categoría padre</SelectItem>
                   {availableParentCategories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {"—".repeat(cat.level - 1)} {cat.name}
