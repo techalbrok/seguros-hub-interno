@@ -4,6 +4,7 @@ export interface User {
   email: string;
   role: 'admin' | 'user';
   delegationId?: string;
+  avatarUrl?: string;
   permissions: {
     canCreate: boolean;
     canEdit: boolean;
@@ -137,6 +138,7 @@ export interface Profile {
   delegationId?: string;
   createdAt: Date;
   updatedAt: Date;
+  avatarUrl?: string;
 }
 
 export interface UserRole {

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -5,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
   name: string;
+  avatarUrl?: string;
 }
 
 type UserRole = 'admin' | 'user' | null;
@@ -20,7 +22,7 @@ export const useAuth = () => {
   const fetchProfile = useCallback(async (userId: string) => {
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
-      .select('name')
+      .select('name, avatar_url')
       .eq('id', userId)
       .single();
     
@@ -28,7 +30,7 @@ export const useAuth = () => {
       console.error('Error fetching profile:', profileError.message);
       setProfile(null);
     } else if (profileData) {
-      setProfile(profileData as Profile);
+      setProfile({ name: profileData.name, avatarUrl: profileData.avatar_url });
     }
 
     const { data: roleData, error: roleError } = await supabase

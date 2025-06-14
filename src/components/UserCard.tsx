@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Building, Edit, Trash2, Eye } from 'lucide-react';
 import { User as UserType, Delegation } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 interface UserCardProps {
   user: UserType;
@@ -31,6 +31,10 @@ export const UserCard: React.FC<UserCardProps> = ({
     }
   };
 
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
   return (
     <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/50 flex flex-col h-full animate-fade-in group">
       <CardHeader>
@@ -40,9 +44,12 @@ export const UserCard: React.FC<UserCardProps> = ({
             </Badge>
         </div>
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <User className="h-6 w-6 text-primary" />
-          </div>
+          <Avatar>
+            <AvatarImage src={user.avatarUrl} alt={user.name} />
+            <AvatarFallback className="bg-primary/10 text-primary">
+              <User className="h-6 w-6" />
+            </AvatarFallback>
+          </Avatar>
           <CardTitle className="text-xl font-bold text-sidebar-primary dark:text-white leading-tight group-hover:text-primary transition-colors">
             {user.name}
           </CardTitle>

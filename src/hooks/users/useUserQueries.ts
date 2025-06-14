@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { User, Delegation } from '@/types';
@@ -85,6 +84,7 @@ export const useUserQueries = () => {
           email: profile.email,
           role: userRole?.role || 'user',
           delegationId: profile.delegation_id,
+          avatarUrl: profile.avatar_url,
           permissions: combinedPermissions,
           createdAt: new Date(profile.created_at),
           updatedAt: new Date(profile.updated_at),

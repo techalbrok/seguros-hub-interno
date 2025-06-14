@@ -1,4 +1,3 @@
-
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -6,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
 import { Link } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationsDropdown } from "./notifications/NotificationsDropdown";
 
@@ -18,7 +17,8 @@ export const Header = () => {
   const {
     user,
     signOut,
-    isAdmin
+    isAdmin,
+    profile,
   } = useAuth();
   const {
     config
@@ -29,6 +29,11 @@ export const Header = () => {
   };
   const brokerageName = config?.name || "Intranet Correduría";
   const logoUrl = config?.logo_url;
+
+  const getInitials = (name?: string) => {
+    if (!name) return '';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
 
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
@@ -54,8 +59,9 @@ export const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile?.avatarUrl} alt={profile?.name || ''} />
                     <AvatarFallback className="bg-primary text-white">
-                      <User className="h-4 w-4" />
+                      {profile?.name ? getInitials(profile.name) : <User className="h-4 w-4" />}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -64,7 +70,7 @@ export const Header = () => {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {user.user_metadata.name || 'Usuario'}
+                      {profile?.name || user.email}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {user.email}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -11,9 +10,10 @@ import { User, Mail, Building, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User as UserType, Delegation } from "@/types";
+import { AvatarUpload } from "./AvatarUpload";
 
 export const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, profile: authProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -75,6 +75,7 @@ export const UserProfile = () => {
         id: profile.id,
         name: profile.name,
         email: profile.email,
+        avatarUrl: profile.avatar_url,
         role: roleData.role,
         delegationId: profile.delegation_id,
         permissions: {
@@ -125,6 +126,35 @@ export const UserProfile = () => {
     }
   };
 
+  const handleAvatarUpload = async (url: string) => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: url, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      
+      setUserProfile(prev => prev ? { ...prev, avatarUrl: url, updatedAt: new Date() } : null);
+
+      toast({
+        title: "Avatar actualizado",
+        description: "Tu foto de perfil se ha actualizado.",
+      });
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el avatar",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!user || !userProfile) return;
 
@@ -140,7 +170,7 @@ export const UserProfile = () => {
 
       if (error) throw error;
 
-      setUserProfile({ ...userProfile, name: formData.name });
+      setUserProfile({ ...userProfile, name: formData.name, updatedAt: new Date() });
       
       toast({
         title: "Perfil actualizado",
@@ -200,11 +230,11 @@ export const UserProfile = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-4">
-            <Avatar className="h-16 w-16">
-              <AvatarFallback className="bg-primary text-white text-lg">
-                {getInitials(userProfile.name)}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarUpload
+              currentAvatarUrl={userProfile.avatarUrl}
+              onUploadComplete={handleAvatarUpload}
+              name={userProfile.name}
+            />
             <div>
               <CardTitle className="text-2xl text-sidebar-primary dark:text-white">
                 Mi Perfil
@@ -341,7 +371,7 @@ export const UserProfile = () => {
           <div className="flex justify-end space-x-3">
             <Button 
               onClick={handleSave} 
-              disabled={saving || formData.name === userProfile.name}
+              disabled={saving || (formData.name === userProfile.name)}
               className="corporate-button"
             >
               {saving ? 'Guardando...' : 'Guardar Cambios'}
