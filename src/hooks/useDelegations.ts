@@ -13,6 +13,14 @@ export const useDelegations = () => {
     try {
       setLoading(true);
       
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('User not authenticated');
+        setDelegations([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('delegations')
         .select('*')
@@ -59,11 +67,16 @@ export const useDelegations = () => {
     email: string;
     website?: string;
     contactPerson: string;
-    userId?: string;
   }) => {
     try {
       console.log('Creating delegation:', delegationData);
       
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Usuario no autenticado');
+      }
+
       const { data, error } = await supabase
         .from('delegations')
         .insert({
@@ -74,7 +87,7 @@ export const useDelegations = () => {
           email: delegationData.email,
           website: delegationData.website,
           contact_person: delegationData.contactPerson,
-          user_id: delegationData.userId,
+          user_id: user.id, // Set the current user's ID
         })
         .select()
         .single();
