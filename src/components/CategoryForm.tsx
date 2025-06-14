@@ -26,11 +26,6 @@ export const CategoryForm = ({ category, parentCategoryId, onSubmit, onCancel, i
   const [documents, setDocuments] = useState<File[]>([]);
   const { categories } = useProductCategories();
 
-  // Filter out current category and its children to prevent circular references
-  const availableParentCategories = categories.filter(cat => 
-    cat.id !== category?.id && !isDescendant(cat, category?.id)
-  );
-
   const isDescendant = (cat: ProductCategory, categoryId?: string): boolean => {
     if (!categoryId) return false;
     if (cat.parentId === categoryId) return true;
@@ -43,6 +38,11 @@ export const CategoryForm = ({ category, parentCategoryId, onSubmit, onCancel, i
     const parent = categories.find(cat => cat.id === parentId);
     return parent ? parent.level + 1 : 1;
   };
+
+  // Filter out current category and its children to prevent circular references
+  const availableParentCategories = categories.filter(cat => 
+    cat.id !== category?.id && !isDescendant(cat, category?.id)
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
