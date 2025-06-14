@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ const Products = () => {
   const [activeTab, setActiveTab] = useState("products");
   const [showForm, setShowForm] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const {
     products,
@@ -49,7 +50,7 @@ const Products = () => {
       (product.process && product.process.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (product.strengths && product.strengths.toLowerCase().includes(searchTerm.toLowerCase()));
   
-    if (!selectedCategory) {
+    if (selectedCategory === "all") {
       return searchMatch;
     }
   
@@ -153,7 +154,7 @@ const Products = () => {
                   <SelectValue placeholder="Todas las categorías" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas las categorías</SelectItem>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
                   {productCategories.map(category => (
                     <SelectItem key={category.id} value={category.id}>
                       {"—".repeat(category.level > 1 ? category.level - 1 : 0)} {category.name}
