@@ -2,6 +2,7 @@
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const Header = () => {
   const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
@@ -54,9 +60,11 @@ export const Header = () => {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Administrador</p>
+                  <p className="text-sm font-medium leading-none">
+                    {user ? 'Usuario autenticado' : 'Administrador'}
+                  </p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    admin@correduriaseguros.com
+                    {user?.email || 'admin@correduriaseguros.com'}
                   </p>
                 </div>
               </DropdownMenuLabel>
@@ -68,7 +76,10 @@ export const Header = () => {
                 Configuración
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer text-red-600">
+              <DropdownMenuItem 
+                className="cursor-pointer text-red-600" 
+                onClick={handleSignOut}
+              >
                 Cerrar Sesión
               </DropdownMenuItem>
             </DropdownMenuContent>

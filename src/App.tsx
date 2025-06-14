@@ -5,8 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { AuthGuard } from "@/components/AuthGuard";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
 import Users from "./pages/Users";
 import Delegations from "./pages/Delegations";
 import NotFound from "./pages/NotFound";
@@ -23,46 +25,63 @@ const App = () => (
       <ThemeProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={
+              <AuthGuard>
+                <Index />
+              </AuthGuard>
+            } />
             <Route path="/users" element={
-              <Layout>
-                <Users />
-              </Layout>
+              <AuthGuard>
+                <Layout>
+                  <Users />
+                </Layout>
+              </AuthGuard>
             } />
             <Route path="/delegations" element={
-              <Layout>
-                <Delegations />
-              </Layout>
+              <AuthGuard>
+                <Layout>
+                  <Delegations />
+                </Layout>
+              </AuthGuard>
             } />
             <Route path="/companies" element={
-              <Layout>
-                <Companies />
-              </Layout>
+              <AuthGuard>
+                <Layout>
+                  <Companies />
+                </Layout>
+              </AuthGuard>
             } />
             <Route path="/products" element={
-              <Layout>
-                <Products />
-              </Layout>
+              <AuthGuard>
+                <Layout>
+                  <Products />
+                </Layout>
+              </AuthGuard>
             } />
             <Route path="/department-content" element={
-              <Layout>
-                <div className="text-center py-12">
-                  <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
-                    Contenido por Departamento
-                  </h1>
-                  <p className="text-muted-foreground">Próximamente disponible</p>
-                </div>
-              </Layout>
+              <AuthGuard>
+                <Layout>
+                  <div className="text-center py-12">
+                    <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
+                      Contenido por Departamento
+                    </h1>
+                    <p className="text-muted-foreground">Próximamente disponible</p>
+                  </div>
+                </Layout>
+              </AuthGuard>
             } />
             <Route path="/news" element={
-              <Layout>
-                <div className="text-center py-12">
-                  <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
-                    Gestión de Noticias
-                  </h1>
-                  <p className="text-muted-foreground">Próximamente disponible</p>
-                </div>
-              </Layout>
+              <AuthGuard>
+                <Layout>
+                  <div className="text-center py-12">
+                    <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
+                      Gestión de Noticias
+                    </h1>
+                    <p className="text-muted-foreground">Próximamente disponible</p>
+                  </div>
+                </Layout>
+              </AuthGuard>
             } />
             <Route path="*" element={<NotFound />} />
           </Routes>
