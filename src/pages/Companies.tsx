@@ -8,6 +8,18 @@ import { CompaniesControls } from "@/components/CompaniesControls";
 import { CompaniesGrid } from "@/components/CompaniesGrid";
 import { CompaniesList } from "@/components/CompaniesList";
 import type { Company } from "@/types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
+
 type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
 
@@ -21,7 +33,8 @@ export default function Companies() {
     updateCompany,
     deleteCompany,
     isCreating,
-    isUpdating
+    isUpdating,
+    isDeleting,
   } = useCompanies();
   const [currentView, setCurrentView] = useState<CurrentView>("main");
   const [displayMode, setDisplayMode] = useState<DisplayMode>("grid");
@@ -29,6 +42,8 @@ export default function Companies() {
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+
   const filteredCompanies = companies.filter(company => company.name.toLowerCase().includes(searchTerm.toLowerCase()) || company.commercialManager.toLowerCase().includes(searchTerm.toLowerCase()) || company.managerEmail.toLowerCase().includes(searchTerm.toLowerCase()));
   
   const handleCreateCompany = (data: CompanyFormData) => {
@@ -65,21 +80,40 @@ export default function Companies() {
     setSelectedCompany(company);
     setCurrentView("detail");
   };
+
   const handleDeleteCompany = (id: string) => {
-    deleteCompany(id);
-    if (selectedCompany?.id === id) {
-      setSelectedCompany(null);
-      setCurrentView("main");
-    }
-    if (editingCompany?.id === id) {
-      setEditingCompany(null);
-      setShowForm(false);
+    const company = companies.find((c) => c.id === id);
+    if (company) {
+      setCompanyToDelete(company);
     }
   };
+
+  const handleConfirmDelete = () => {
+    if (companyToDelete) {
+      deleteCompany(companyToDelete.id, {
+        onSuccess: () => {
+          if (selectedCompany?.id === companyToDelete.id) {
+            setSelectedCompany(null);
+            setCurrentView("main");
+          }
+          if (editingCompany?.id === companyToDelete.id) {
+            setEditingCompany(null);
+            setShowForm(false);
+          }
+          setCompanyToDelete(null);
+        },
+        onError: () => {
+          setCompanyToDelete(null);
+        },
+      });
+    }
+  };
+
   const handleAddNewCompanyClick = () => {
     setEditingCompany(null);
     setShowForm(true);
   };
+
   const handleBackFromDetail = () => {
     setSelectedCompany(null);
     setCurrentView("main");
@@ -92,6 +126,30 @@ export default function Companies() {
     }
   }
 
+  const deleteConfirmationDialog = (
+    <AlertDialog open={!!companyToDelete} onOpenChange={(open) => !open && setCompanyToDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no se puede deshacer. Se eliminará permanentemente la compañía{' '}
+            <span className="font-semibold">{companyToDelete?.name}</span>.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirmDelete}
+            disabled={isDeleting}
+            className={buttonVariants({ variant: "destructive" })}
+          >
+            {isDeleting ? 'Eliminando...' : 'Sí, eliminar'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
   if (currentView === "detail" && selectedCompany) {
     return (
       <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -103,6 +161,7 @@ export default function Companies() {
           onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
           isLoading={isCreating || isUpdating}
         />
+        {deleteConfirmationDialog}
       </div>
     );
   }
@@ -130,6 +189,7 @@ export default function Companies() {
         onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
         isLoading={isCreating || isUpdating}
       />
+      {deleteConfirmationDialog}
     </div>
   );
 }

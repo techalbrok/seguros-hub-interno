@@ -2,6 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Company } from "@/types";
+import { Trash2 } from "lucide-react";
 
 interface CompaniesListProps {
   companies: Company[];
@@ -45,14 +46,14 @@ export const CompaniesList = ({
                 Editar
               </Button>
               <Button
-                variant="ghost"
+                variant="destructive-outline"
                 size="sm"
-                className="text-destructive hover:text-destructive/90"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(company.id);
                 }}
               >
+                <Trash2 className="h-4 w-4 mr-1" />
                 Eliminar
               </Button>
             </div>
