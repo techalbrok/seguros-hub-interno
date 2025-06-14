@@ -25,28 +25,37 @@ export const useUsers = () => {
           )
         `);
 
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
 
       // Fetch user roles
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
 
-      if (rolesError) throw rolesError;
+      if (rolesError) {
+        console.error('Error fetching roles:', rolesError);
+        throw rolesError;
+      }
 
       // Fetch user permissions
       const { data: permissions, error: permissionsError } = await supabase
         .from('user_permissions')
         .select('*');
 
-      if (permissionsError) throw permissionsError;
+      if (permissionsError) {
+        console.error('Error fetching permissions:', permissionsError);
+        throw permissionsError;
+      }
 
       // Combine data
       const combinedUsers: User[] = profiles?.map((profile: any) => {
         const userRole = roles?.find(role => role.user_id === profile.id);
         const userPermissions = permissions?.filter(perm => perm.user_id === profile.id);
         
-        // Calculate combined permissions
+        // Calculate combined permissions by checking if ANY permission section allows the action
         const combinedPermissions = {
           canCreate: userPermissions?.some(p => p.can_create) || false,
           canEdit: userPermissions?.some(p => p.can_edit) || false,
@@ -67,6 +76,7 @@ export const useUsers = () => {
       }) || [];
 
       setUsers(combinedUsers);
+      console.log('Users fetched successfully:', combinedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -86,7 +96,10 @@ export const useUsers = () => {
         .select('*')
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching delegations:', error);
+        throw error;
+      }
 
       const delegationsData: Delegation[] = data?.map((delegation: any) => ({
         id: delegation.id,
@@ -103,6 +116,7 @@ export const useUsers = () => {
       })) || [];
 
       setDelegations(delegationsData);
+      console.log('Delegations fetched successfully:', delegationsData);
     } catch (error) {
       console.error('Error fetching delegations:', error);
     }
@@ -117,6 +131,8 @@ export const useUsers = () => {
     permissions: Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
   }) => {
     try {
+      console.log('Creating user with data:', userData);
+      
       // Create user in auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: userData.email,
@@ -128,21 +144,37 @@ export const useUsers = () => {
         },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Auth error during signup:', authError);
+        throw authError;
+      }
 
-      if (!authData.user) throw new Error('No se pudo crear el usuario');
+      if (!authData.user) {
+        console.error('No user returned from signup');
+        throw new Error('No se pudo crear el usuario');
+      }
 
-      // Update profile with delegation
+      console.log('User created in auth, ID:', authData.user.id);
+
+      // Wait a bit for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Update profile with delegation if provided
       if (userData.delegationId) {
+        console.log('Updating profile with delegation:', userData.delegationId);
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ delegation_id: userData.delegationId })
           .eq('id', authData.user.id);
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error('Error updating profile:', profileError);
+          throw profileError;
+        }
       }
 
       // Create user role
+      console.log('Creating user role:', userData.role);
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
@@ -150,9 +182,12 @@ export const useUsers = () => {
           role: userData.role,
         });
 
-      if (roleError) throw roleError;
+      if (roleError) {
+        console.error('Error creating user role:', roleError);
+        throw roleError;
+      }
 
-      // Create user permissions
+      // Create user permissions for each section
       const permissionsToInsert = Object.entries(userData.permissions).map(([section, perms]) => ({
         user_id: authData.user.id,
         section,
@@ -162,11 +197,15 @@ export const useUsers = () => {
         can_view: perms.canView,
       }));
 
+      console.log('Creating user permissions:', permissionsToInsert);
       const { error: permissionsError } = await supabase
         .from('user_permissions')
         .insert(permissionsToInsert);
 
-      if (permissionsError) throw permissionsError;
+      if (permissionsError) {
+        console.error('Error creating user permissions:', permissionsError);
+        throw permissionsError;
+      }
 
       toast({
         title: "Usuario creado",
@@ -179,7 +218,7 @@ export const useUsers = () => {
       console.error('Error creating user:', error);
       toast({
         title: "Error",
-        description: "No se pudo crear el usuario",
+        description: error instanceof Error ? error.message : "No se pudo crear el usuario",
         variant: "destructive",
       });
       return false;
@@ -188,16 +227,24 @@ export const useUsers = () => {
 
   const updateUser = async (userId: string, updates: Partial<User>) => {
     try {
+      console.log('Updating user:', userId, updates);
+      
       // Update profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          name: updates.name,
-          delegation_id: updates.delegationId,
-        })
-        .eq('id', userId);
+      const profileUpdates: any = {};
+      if (updates.name !== undefined) profileUpdates.name = updates.name;
+      if (updates.delegationId !== undefined) profileUpdates.delegation_id = updates.delegationId;
 
-      if (profileError) throw profileError;
+      if (Object.keys(profileUpdates).length > 0) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update(profileUpdates)
+          .eq('id', userId);
+
+        if (profileError) {
+          console.error('Error updating profile:', profileError);
+          throw profileError;
+        }
+      }
 
       // Update role if changed
       if (updates.role) {
@@ -206,7 +253,10 @@ export const useUsers = () => {
           .update({ role: updates.role })
           .eq('user_id', userId);
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error('Error updating role:', roleError);
+          throw roleError;
+        }
       }
 
       toast({
@@ -229,10 +279,40 @@ export const useUsers = () => {
 
   const deleteUser = async (userId: string) => {
     try {
-      // Delete from auth (this will cascade to profiles, roles, and permissions)
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      console.log('Deleting user:', userId);
+      
+      // Delete user permissions first
+      const { error: permissionsError } = await supabase
+        .from('user_permissions')
+        .delete()
+        .eq('user_id', userId);
 
-      if (error) throw error;
+      if (permissionsError) {
+        console.error('Error deleting user permissions:', permissionsError);
+        throw permissionsError;
+      }
+
+      // Delete user role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (roleError) {
+        console.error('Error deleting user role:', roleError);
+        throw roleError;
+      }
+
+      // Delete profile (this should be handled by cascade, but doing it explicitly)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (profileError) {
+        console.error('Error deleting profile:', profileError);
+        throw profileError;
+      }
 
       toast({
         title: "Usuario eliminado",
@@ -245,7 +325,7 @@ export const useUsers = () => {
       console.error('Error deleting user:', error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar el usuario",
+        description: "No se pudo eliminar el usuario. Solo se pueden eliminar datos de perfil, no la cuenta de autenticación.",
         variant: "destructive",
       });
       return false;
