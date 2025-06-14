@@ -10,7 +10,7 @@ import { Building2, Palette, Upload, Link, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ColorPicker } from "@/components/ColorPicker";
-import { ImageUpload } from "@/components/ImageUpload";
+import { SimpleImageUpload } from "@/components/SimpleImageUpload";
 
 interface BrokerageConfig {
   id?: string;
@@ -50,7 +50,7 @@ export const BrokerageSettings = () => {
       const { data, error } = await supabase
         .from('brokerage_config')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
@@ -228,7 +228,7 @@ export const BrokerageSettings = () => {
 
                   <div className="space-y-2">
                     <Label>Logotipo</Label>
-                    <ImageUpload
+                    <SimpleImageUpload
                       onUpload={handleLogoUpload}
                       currentImage={config.logo_url}
                       accept="image/*"

@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      brokerage_config: {
+        Row: {
+          accent_color_dark: string
+          accent_color_light: string
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          phone: string | null
+          primary_color_dark: string
+          primary_color_light: string
+          updated_at: string
+        }
+        Insert: {
+          accent_color_dark?: string
+          accent_color_light?: string
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          primary_color_dark?: string
+          primary_color_light?: string
+          updated_at?: string
+        }
+        Update: {
+          accent_color_dark?: string
+          accent_color_light?: string
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          primary_color_dark?: string
+          primary_color_light?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       category_documents: {
         Row: {
           category_id: string | null
