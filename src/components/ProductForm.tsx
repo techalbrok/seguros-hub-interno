@@ -1,15 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, Upload, FileText } from "lucide-react";
-import { RichTextEditor } from "@/components/RichTextEditor";
-import type { Product, ProductCategory, Company } from "@/types";
-import { useProductCategories } from "@/hooks/useProductCategories";
-import { useCompanies } from "@/hooks/useCompanies";
+import { ProductBasicInfo } from "@/components/ProductBasicInfo";
+import { ProductDocumentUpload } from "@/components/ProductDocumentUpload";
+import { ProductRichTextFields } from "@/components/ProductRichTextFields";
+import type { Product } from "@/types";
 
 interface ProductFormProps {
   product?: Product;
@@ -29,31 +25,10 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
   });
 
   const [documents, setDocuments] = useState<File[]>([]);
-  const { categories } = useProductCategories();
-  const { companies } = useCompanies();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ ...formData, documents });
-  };
-
-  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setDocuments(prev => [...prev, ...files]);
-  };
-
-  const removeDocument = (index: number) => {
-    setDocuments(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleCategoryChange = (value: string) => {
-    const categoryId = value === "no-category" ? "" : value;
-    setFormData({ ...formData, categoryId });
-  };
-
-  const handleCompanyChange = (value: string) => {
-    const companyId = value === "no-company" ? "" : value;
-    setFormData({ ...formData, companyId });
   };
 
   return (
@@ -64,123 +39,21 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Título *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="categoryId">Categoría</Label>
-                <Select
-                  value={formData.categoryId || "no-category"}
-                  onValueChange={handleCategoryChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="no-category">Sin categoría</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {"—".repeat(category.level - 1)} {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="companyId">Compañía</Label>
-                <Select
-                  value={formData.companyId || "no-company"}
-                  onValueChange={handleCompanyChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar compañía" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="no-company">Sin compañía</SelectItem>
-                    {companies.map((company) => (
-                      <SelectItem key={company.id} value={company.id}>
-                        {company.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="documents">Documentos Específicos</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <input
-                    type="file"
-                    id="documents"
-                    multiple
-                    onChange={handleDocumentChange}
-                    className="hidden"
-                  />
-                  <label htmlFor="documents" className="cursor-pointer">
-                    <div className="flex flex-col items-center justify-center py-4">
-                      <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-500">Subir archivos</p>
-                    </div>
-                  </label>
-                  
-                  {documents.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      {documents.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <div className="flex items-center">
-                            <FileText className="h-4 w-4 mr-2" />
-                            <span className="text-sm">{file.name}</span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeDocument(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <RichTextEditor
-              label="Proceso"
-              value={formData.process}
-              onChange={(value) => setFormData({ ...formData, process: value })}
-              placeholder="Describe el proceso del producto..."
+            <ProductBasicInfo 
+              formData={formData}
+              onFormDataChange={setFormData}
             />
 
-            <RichTextEditor
-              label="Fortalezas"
-              value={formData.strengths}
-              onChange={(value) => setFormData({ ...formData, strengths: value })}
-              placeholder="Describe las fortalezas del producto..."
-            />
-
-            <RichTextEditor
-              label="Observaciones"
-              value={formData.observations}
-              onChange={(value) => setFormData({ ...formData, observations: value })}
-              placeholder="Añade observaciones sobre el producto..."
+            <ProductDocumentUpload
+              documents={documents}
+              onDocumentsChange={setDocuments}
             />
           </div>
+
+          <ProductRichTextFields
+            formData={formData}
+            onFormDataChange={setFormData}
+          />
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onCancel}>
