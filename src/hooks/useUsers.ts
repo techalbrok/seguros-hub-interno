@@ -328,10 +328,30 @@ export const useUsers = () => {
     delegations,
     loading,
     error,
-    createUser: (data: any) => createUserMutation.mutateAsync(data),
-    updateUser: (userId: string, updates: Partial<User>) => 
-      updateUserMutation.mutateAsync({ userId, updates }),
-    deleteUser: deleteUserMutation.mutateAsync,
+    createUser: async (data: any) => {
+      try {
+        await createUserMutation.mutateAsync(data);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    updateUser: async (userId: string, updates: Partial<User>) => {
+      try {
+        await updateUserMutation.mutateAsync({ userId, updates });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    deleteUser: async (userId: string) => {
+      try {
+        await deleteUserMutation.mutateAsync(userId);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
     refetch: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
     isCreating: createUserMutation.isPending,
     isUpdating: updateUserMutation.isPending,
