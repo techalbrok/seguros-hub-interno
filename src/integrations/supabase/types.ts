@@ -249,6 +249,158 @@ export type Database = {
         }
         Relationships: []
       }
+      news: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          featured_image: string | null
+          id: string
+          published: boolean | null
+          published_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          featured_image?: string | null
+          id?: string
+          published?: boolean | null
+          published_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          featured_image?: string | null
+          id?: string
+          published?: boolean | null
+          published_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_categories: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          news_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          news_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          news_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_categories_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_companies: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          news_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          news_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          news_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_companies_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_products: {
+        Row: {
+          created_at: string
+          id: string
+          news_id: string
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          news_id: string
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          news_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_products_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           created_at: string

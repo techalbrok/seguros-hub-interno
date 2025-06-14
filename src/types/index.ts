@@ -108,10 +108,11 @@ export interface News {
   content: string;
   featuredImage?: string;
   authorId: string;
+  published: boolean;
+  publishedAt?: Date;
   companyIds?: string[];
   categoryIds?: string[];
   productIds?: string[];
-  publishedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }

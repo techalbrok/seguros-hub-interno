@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
 import Products from "./pages/Products";
 import Departments from "./pages/Departments";
+import News from "./pages/News";
 
 const queryClient = new QueryClient();
 
@@ -76,12 +78,7 @@ const App = () => (
             <Route path="/news" element={
               <AuthGuard>
                 <Layout>
-                  <div className="text-center py-12">
-                    <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
-                      Gestión de Noticias
-                    </h1>
-                    <p className="text-muted-foreground">Próximamente disponible</p>
-                  </div>
+                  <News />
                 </Layout>
               </AuthGuard>
             } />
