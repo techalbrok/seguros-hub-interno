@@ -1,4 +1,3 @@
-
 import { Users as UsersIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UsersStats } from "./UsersStats";
@@ -31,7 +30,7 @@ export const UserListPage = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
             <UsersIcon className="h-8 w-8" />
@@ -42,7 +41,7 @@ export const UserListPage = ({
           </p>
         </div>
         {isAdmin && (
-          <Button className="corporate-button" onClick={onSetPageMode}>
+          <Button className="corporate-button self-start sm:self-auto" onClick={onSetPageMode}>
             <Plus className="h-4 w-4 mr-2" />
             Crear Usuario
           </Button>

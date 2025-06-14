@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -109,7 +108,7 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <CardTitle className="text-sidebar-primary dark:text-white">
               Lista de Usuarios
@@ -125,7 +124,7 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
             )}
           </div>
           {numSelected === 0 && (
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2">
               <Input
                 placeholder="Buscar usuarios..."
                 value={searchTerm}
@@ -133,10 +132,10 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-48"
+                className="w-full sm:w-48"
               />
               <Select value={roleFilter} onValueChange={(value) => { setRoleFilter(value); setCurrentPage(1); }}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-full sm:w-[150px]">
                   <SelectValue placeholder="Rol" />
                 </SelectTrigger>
                 <SelectContent>
@@ -146,7 +145,7 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
                 </SelectContent>
               </Select>
               <Select value={delegationFilter} onValueChange={(value) => { setDelegationFilter(value); setCurrentPage(1); }}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="Delegación" />
                 </SelectTrigger>
                 <SelectContent>
@@ -158,7 +157,7 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
                   ))}
                 </SelectContent>
               </Select>
-              <div className="flex items-center space-x-1 border rounded-md p-1">
+              <div className="flex items-center space-x-1 border rounded-md p-1 self-center sm:ml-auto">
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
                   size="sm"
