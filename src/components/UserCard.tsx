@@ -4,32 +4,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Building, Edit, Trash2, Eye } from 'lucide-react';
+import { User as UserType, Delegation } from '@/types';
 
 interface UserCardProps {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    delegation?: string;
-    active: boolean;
-    last_login?: string;
-  };
-  onEdit: (user: any) => void;
+  user: UserType;
+  delegations: Delegation[];
+  onEdit: (user: UserType) => void;
   onDelete: (id: string) => void;
-  onView: (user: any) => void;
+  onView: (user: UserType) => void;
 }
 
 export const UserCard: React.FC<UserCardProps> = ({
   user,
+  delegations,
   onEdit,
   onDelete,
   onView
 }) => {
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Nunca';
+  const delegation = delegations.find(d => d.id === user.delegationId);
+
+  const formatDate = (date: Date) => {
     try {
-      const date = new Date(dateString);
       return date.toLocaleDateString('es-ES');
     } catch {
       return 'Fecha inválida';
@@ -44,8 +39,8 @@ export const UserCard: React.FC<UserCardProps> = ({
             <User className="w-5 h-5 text-primary" />
             <CardTitle className="text-lg">{user.name}</CardTitle>
           </div>
-          <Badge variant={user.active ? "default" : "secondary"}>
-            {user.active ? "Activo" : "Inactivo"}
+          <Badge variant={user.role === 'admin' ? "default" : "secondary"}>
+            {user.role === 'admin' ? "Administrador" : "Usuario"}
           </Badge>
         </div>
       </CardHeader>
@@ -55,20 +50,20 @@ export const UserCard: React.FC<UserCardProps> = ({
             <Mail className="w-4 h-4 text-gray-500" />
             <span>{user.email}</span>
           </div>
-          {user.delegation && (
+          {delegation && (
             <div className="flex items-center space-x-2 text-sm">
               <Building className="w-4 h-4 text-gray-500" />
-              <span>{user.delegation}</span>
+              <span>{delegation.name}</span>
             </div>
           )}
         </div>
 
         <div>
           <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Rol: {user.role}
+            Rol: {user.role === 'admin' ? 'Administrador' : 'Usuario'}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            Último acceso: {formatDate(user.last_login)}
+            Creado: {formatDate(user.createdAt)}
           </div>
         </div>
 
