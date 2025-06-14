@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -10,53 +9,29 @@ import { DepartmentContentDetail } from '@/components/DepartmentContentDetail';
 import { DepartmentsTabs } from './DepartmentsTabs';
 
 type ViewType = 'departments' | 'content' | 'detail';
-type ViewModeType = 'grid' | 'list';
 
 const Departments = () => {
   const [view, setView] = useState<ViewType>('departments');
-  const [viewMode, setViewMode] = useState<ViewModeType>('grid');
   const [showDepartmentForm, setShowDepartmentForm] = useState(false);
   const [showContentForm, setShowContentForm] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
   const [editingContent, setEditingContent] = useState<DepartmentContent | null>(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('');
   const [selectedContent, setSelectedContent] = useState<DepartmentContent | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     departments,
-    loading: departmentsLoading,
     createDepartment,
     updateDepartment,
-    deleteDepartment,
     isCreating,
     isUpdating
   } = useDepartments();
 
   const {
-    content,
-    loading: contentLoading,
     createContent,
     updateContent,
-    deleteContent,
     uploadImage
   } = useDepartmentContent();
-
-  const departmentForFilter = departments.find(d => d.id === selectedDepartmentId);
-
-  const filteredDepartments = departments.filter(dept => 
-    dept.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    dept.responsible_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const contentForSelectedDepartment = selectedDepartmentId
-    ? content.filter(item => item.department_id === selectedDepartmentId)
-    : content;
-
-  const filteredContent = contentForSelectedDepartment.filter(item => 
-    item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    item.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleDepartmentSubmit = async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
     if (editingDepartment) {
@@ -115,9 +90,10 @@ const Departments = () => {
 
   const handleViewChange = (value: string) => {
     setView(value as ViewType);
-    if (value === 'content') {
-      setSelectedDepartmentId('');
-    }
+  };
+
+  const handleClearDepartmentFilter = () => {
+    setSelectedDepartmentId('');
   };
 
   const onFormOpenChange = (isOpen: boolean) => {
@@ -176,26 +152,15 @@ const Departments = () => {
         </div>
       </div>
 
-      <DepartmentsTabs 
-        view={view}
+      <DepartmentsTabs
+        view={view as 'departments' | 'content'}
         onViewChange={handleViewChange}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        filteredDepartments={filteredDepartments}
-        filteredContent={filteredContent}
-        content={content}
-        departmentsLoading={departmentsLoading}
-        contentLoading={contentLoading}
-        onShowContentForm={() => setShowContentForm(true)}
-        onEditDepartment={handleEditDepartment}
-        onDeleteDepartment={deleteDepartment}
+        selectedDepartmentId={selectedDepartmentId}
+        onClearDepartmentFilter={handleClearDepartmentFilter}
         onViewContent={handleViewContent}
+        onEditDepartment={handleEditDepartment}
         onEditContent={handleEditContent}
-        onDeleteContent={deleteContent}
         onViewContentDetail={handleViewContentDetail}
-        departmentForFilter={departmentForFilter}
       />
 
       <DepartmentForm

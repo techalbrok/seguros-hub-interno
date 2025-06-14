@@ -1,63 +1,67 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, Grid, List } from 'lucide-react';
-import { Department } from '@/hooks/useDepartments';
-import { DepartmentContent } from '@/hooks/useDepartmentContent';
+import { Search, Grid, List } from 'lucide-react';
+import { useDepartments, Department } from '@/hooks/useDepartments';
+import { useDepartmentContent, DepartmentContent } from '@/hooks/useDepartmentContent';
 import { DepartmentCard } from '@/components/DepartmentCard';
 import { DepartmentContentCard } from '@/components/DepartmentContentCard';
 
 type ViewModeType = 'grid' | 'list';
 
 interface DepartmentsTabsProps {
-  view: 'departments' | 'content' | 'detail';
+  view: 'departments' | 'content';
   onViewChange: (value: string) => void;
-  viewMode: ViewModeType;
-  setViewMode: (mode: ViewModeType) => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  filteredDepartments: Department[];
-  filteredContent: DepartmentContent[];
-  content: DepartmentContent[];
-  departmentsLoading: boolean;
-  contentLoading: boolean;
-  onShowContentForm: () => void;
-  onEditDepartment: (department: Department) => void;
-  onDeleteDepartment: (id: string) => Promise<boolean>;
+  selectedDepartmentId: string;
+  onClearDepartmentFilter: () => void;
   onViewContent: (departmentId: string) => void;
+  onEditDepartment: (department: Department) => void;
   onEditContent: (content: DepartmentContent) => void;
-  onDeleteContent: (id: string) => Promise<boolean>;
   onViewContentDetail: (content: DepartmentContent) => void;
-  departmentForFilter?: Department;
 }
 
 export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
   view,
   onViewChange,
-  viewMode,
-  setViewMode,
-  searchTerm,
-  setSearchTerm,
-  filteredDepartments,
-  filteredContent,
-  content,
-  departmentsLoading,
-  contentLoading,
-  onShowContentForm,
-  onEditDepartment,
-  onDeleteDepartment,
+  selectedDepartmentId,
+  onClearDepartmentFilter,
   onViewContent,
+  onEditDepartment,
   onEditContent,
-  onDeleteContent,
   onViewContentDetail,
-  departmentForFilter,
 }) => {
-  // Only render tabs if view is departments or content (not detail)
-  if (view === 'detail') {
-    return null;
-  }
+  const [viewMode, setViewMode] = useState<ViewModeType>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const {
+    departments,
+    loading: departmentsLoading,
+    deleteDepartment,
+  } = useDepartments();
+
+  const {
+    content,
+    loading: contentLoading,
+    deleteContent,
+  } = useDepartmentContent();
+
+  const departmentForFilter = departments.find(d => d.id === selectedDepartmentId);
+
+  const filteredDepartments = departments.filter(dept => 
+    dept.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    dept.responsible_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const contentForSelectedDepartment = selectedDepartmentId
+    ? content.filter(item => item.department_id === selectedDepartmentId)
+    : content;
+
+  const filteredContent = contentForSelectedDepartment.filter(item => 
+    item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    item.content.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Tabs value={view} onValueChange={onViewChange} className="w-full">
@@ -105,7 +109,7 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
                 key={department.id}
                 department={department}
                 onEdit={onEditDepartment}
-                onDelete={onDeleteDepartment}
+                onDelete={deleteDepartment}
                 onViewContent={onViewContent}
                 contentCount={content.filter(c => c.department_id === department.id).length}
               />
@@ -127,7 +131,7 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span>Mostrando contenido para:</span>
             <span className="font-semibold text-foreground">{departmentForFilter.name}</span>
-            <Button variant="link" size="sm" onClick={() => onViewChange('content')} className="p-0 h-auto">Ver todo</Button>
+            <Button variant="link" size="sm" onClick={onClearDepartmentFilter} className="p-0 h-auto">Ver todo</Button>
           </div>
         )}
         <div className="flex items-center justify-between">
@@ -168,7 +172,7 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
                 key={item.id}
                 content={item}
                 onEdit={onEditContent}
-                onDelete={onDeleteContent}
+                onDelete={deleteContent}
                 onView={onViewContentDetail}
               />
             ))}
