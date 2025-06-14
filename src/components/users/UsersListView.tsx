@@ -10,6 +10,13 @@ import { User, Delegation } from '@/types';
 import { AppPagination } from '../ui/AppPagination';
 import { UserTableRowSkeleton, UserCardSkeleton } from '../skeletons/UserSkeletons';
 import { Table, TableBody, TableHeader } from '../ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ViewMode = 'table' | 'grid';
 
@@ -26,13 +33,17 @@ interface UsersListViewProps {
 export const UsersListView = ({ users, delegations, loading, onViewUser, onEditUser, onDeleteUser, onBulkDelete }: UsersListViewProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [delegationFilter, setDelegationFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const usersPerPage = viewMode === 'grid' ? 6 : 5;
 
   const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (roleFilter === 'all' || user.role === roleFilter) &&
+    (delegationFilter === 'all' || user.delegationId === delegationFilter)
   );
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
@@ -43,7 +54,7 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
 
   useEffect(() => {
     setSelectedUserIds([]);
-  }, [currentPage, viewMode, searchTerm]);
+  }, [currentPage, viewMode, searchTerm, roleFilter, delegationFilter]);
 
   const handleSelectUser = (userId: string, isSelected: boolean) => {
     if (isSelected) {
@@ -122,8 +133,31 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-64"
+                className="w-48"
               />
+              <Select value={roleFilter} onValueChange={(value) => { setRoleFilter(value); setCurrentPage(1); }}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los roles</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                  <SelectItem value="user">Usuario</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={delegationFilter} onValueChange={(value) => { setDelegationFilter(value); setCurrentPage(1); }}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Delegación" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las delegaciones</SelectItem>
+                  {delegations.map(delegation => (
+                    <SelectItem key={delegation.id} value={delegation.id}>
+                      {delegation.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="flex items-center space-x-1 border rounded-md p-1">
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
