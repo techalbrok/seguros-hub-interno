@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +11,7 @@ import Users from "./pages/Users";
 import Delegations from "./pages/Delegations";
 import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
+import Products from "./pages/Products";
 
 const queryClient = new QueryClient();
 
@@ -39,12 +41,7 @@ const App = () => (
             } />
             <Route path="/products" element={
               <Layout>
-                <div className="text-center py-12">
-                  <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
-                    Gestión de Productos
-                  </h1>
-                  <p className="text-muted-foreground">Próximamente disponible</p>
-                </div>
+                <Products />
               </Layout>
             } />
             <Route path="/department-content" element={
