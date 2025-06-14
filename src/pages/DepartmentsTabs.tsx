@@ -9,11 +9,10 @@ import { DepartmentContent } from '@/hooks/useDepartmentContent';
 import { DepartmentCard } from '@/components/DepartmentCard';
 import { DepartmentContentCard } from '@/components/DepartmentContentCard';
 
-type ViewType = 'departments' | 'content';
 type ViewModeType = 'grid' | 'list';
 
 interface DepartmentsTabsProps {
-  view: ViewType;
+  view: 'departments' | 'content' | 'detail';
   onViewChange: (value: string) => void;
   viewMode: ViewModeType;
   setViewMode: (mode: ViewModeType) => void;
@@ -53,6 +52,11 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
   onDeleteContent,
   onViewContentDetail
 }) => {
+  // Only render tabs if view is departments or content (not detail)
+  if (view === 'detail') {
+    return null;
+  }
+
   return (
     <Tabs value={view} onValueChange={onViewChange} className="w-full">
       <TabsList>
