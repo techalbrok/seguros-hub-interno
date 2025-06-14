@@ -3,11 +3,11 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, X, Image } from 'lucide-react';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { Department } from '@/hooks/useDepartments';
 import { DepartmentContent } from '@/hooks/useDepartmentContent';
 
@@ -161,20 +161,13 @@ export const DepartmentContentForm: React.FC<DepartmentContentFormProps> = ({
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="content">Contenido</Label>
-            <Textarea
-              id="content"
-              value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              rows={10}
-              placeholder="Escribe el contenido aquí. Puedes incluir texto, enlaces a videos de YouTube, Vimeo, etc."
-              required
-            />
-            <div className="text-sm text-gray-500 mt-1">
-              Tip: Para videos, puedes pegar el enlace de YouTube o Vimeo directamente en el contenido.
-            </div>
-          </div>
+          <RichTextEditor
+            label="Contenido"
+            value={formData.content}
+            onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+            placeholder="Escribe el contenido aquí. Puedes incluir texto, enlaces a videos de YouTube, Vimeo, etc."
+            required
+          />
 
           <div className="flex items-center space-x-2">
             <Switch

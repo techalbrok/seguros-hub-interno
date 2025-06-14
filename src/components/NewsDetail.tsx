@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, Calendar, Building2, Tag, Package } from 'lucide-react';
+import { ArrowLeft, User, Calendar, Building2, Package, Tag } from 'lucide-react';
 import { News } from '@/hooks/useNews';
 
 interface NewsDetailProps {
@@ -28,30 +28,6 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({
     } catch {
       return dateString;
     }
-  };
-
-  const renderContent = (text: string) => {
-    // Simple video embed detection
-    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/g;
-    const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/g;
-
-    let processedContent = text;
-    
-    // Replace YouTube links with embeds
-    processedContent = processedContent.replace(youtubeRegex, (match, videoId) => {
-      return `<div class="aspect-video my-4"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-    });
-
-    // Replace Vimeo links with embeds
-    processedContent = processedContent.replace(vimeoRegex, (match, videoId) => {
-      return `<div class="aspect-video my-4"><iframe width="100%" height="100%" src="https://player.vimeo.com/video/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-    });
-
-    // Convert line breaks to paragraphs
-    processedContent = processedContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-    processedContent = `<p>${processedContent}</p>`;
-
-    return { __html: processedContent };
   };
 
   return (
@@ -85,6 +61,27 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({
               <Calendar className="w-4 h-4" />
               <span>{formatDate(news.created_at)}</span>
             </div>
+            
+            {news.companies && news.companies.length > 0 && (
+              <div className="flex items-center space-x-1">
+                <Building2 className="w-4 h-4" />
+                <span>{news.companies.length} compañía(s)</span>
+              </div>
+            )}
+            
+            {news.categories && news.categories.length > 0 && (
+              <div className="flex items-center space-x-1">
+                <Tag className="w-4 h-4" />
+                <span>{news.categories.length} categoría(s)</span>
+              </div>
+            )}
+            
+            {news.products && news.products.length > 0 && (
+              <div className="flex items-center space-x-1">
+                <Package className="w-4 h-4" />
+                <span>{news.products.length} producto(s)</span>
+              </div>
+            )}
           </div>
         </CardHeader>
         
@@ -101,59 +98,54 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({
 
           <div 
             className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={renderContent(news.content)}
+            dangerouslySetInnerHTML={{ __html: news.content }}
           />
 
-          {/* Related items */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t">
-            {news.companies && news.companies.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                  <Building2 className="w-4 h-4 mr-1" />
-                  Compañías Relacionadas
-                </h3>
-                <div className="space-y-1">
-                  {news.companies.map((company) => (
-                    <Badge key={company.id} variant="outline" className="text-xs">
-                      {company.name}
-                    </Badge>
-                  ))}
+          {/* Mostrar entidades relacionadas */}
+          {(news.companies?.length || news.categories?.length || news.products?.length) && (
+            <div className="border-t pt-6 space-y-4">
+              <h3 className="text-lg font-semibold">Contenido Relacionado</h3>
+              
+              {news.companies && news.companies.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Compañías:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {news.companies.map(company => (
+                      <Badge key={company.id} variant="outline">
+                        {company.name}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {news.categories && news.categories.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                  <Tag className="w-4 h-4 mr-1" />
-                  Categorías Relacionadas
-                </h3>
-                <div className="space-y-1">
-                  {news.categories.map((category) => (
-                    <Badge key={category.id} variant="outline" className="text-xs">
-                      {category.name}
-                    </Badge>
-                  ))}
+              {news.categories && news.categories.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Categorías de Productos:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {news.categories.map(category => (
+                      <Badge key={category.id} variant="outline">
+                        {category.name}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {news.products && news.products.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                  <Package className="w-4 h-4 mr-1" />
-                  Productos Relacionados
-                </h3>
-                <div className="space-y-1">
-                  {news.products.map((product) => (
-                    <Badge key={product.id} variant="outline" className="text-xs">
-                      {product.title}
-                    </Badge>
-                  ))}
+              {news.products && news.products.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Productos:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {news.products.map(product => (
+                      <Badge key={product.id} variant="outline">
+                        {product.title}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { X, Upload, Image } from 'lucide-react';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { News, CreateNewsData } from '@/hooks/useNews';
 import { useCompanies } from '@/hooks/useCompanies';
 import { useProductCategories } from '@/hooks/useProductCategories';
@@ -191,17 +190,13 @@ export const NewsForm: React.FC<NewsFormProps> = ({
             />
           </div>
 
-          <div>
-            <Label htmlFor="content">Contenido *</Label>
-            <Textarea
-              id="content"
-              value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              rows={10}
-              placeholder="Escribe el contenido de la noticia. Puedes incluir enlaces de YouTube o Vimeo que se convertirán automáticamente en videos incrustados."
-              required
-            />
-          </div>
+          <RichTextEditor
+            label="Contenido"
+            value={formData.content}
+            onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+            placeholder="Escribe el contenido de la noticia. Puedes incluir enlaces de YouTube o Vimeo que se convertirán automáticamente en videos incrustados."
+            required
+          />
 
           <div>
             <Label htmlFor="featured_image">Imagen Destacada</Label>

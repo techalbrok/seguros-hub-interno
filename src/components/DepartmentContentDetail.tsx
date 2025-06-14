@@ -30,30 +30,6 @@ export const DepartmentContentDetail: React.FC<DepartmentContentDetailProps> = (
     }
   };
 
-  const renderContent = (text: string) => {
-    // Simple video embed detection
-    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/g;
-    const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/g;
-
-    let processedContent = text;
-    
-    // Replace YouTube links with embeds
-    processedContent = processedContent.replace(youtubeRegex, (match, videoId) => {
-      return `<div class="aspect-video my-4"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-    });
-
-    // Replace Vimeo links with embeds
-    processedContent = processedContent.replace(vimeoRegex, (match, videoId) => {
-      return `<div class="aspect-video my-4"><iframe width="100%" height="100%" src="https://player.vimeo.com/video/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-    });
-
-    // Convert line breaks to paragraphs
-    processedContent = processedContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-    processedContent = `<p>${processedContent}</p>`;
-
-    return { __html: processedContent };
-  };
-
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
@@ -107,7 +83,7 @@ export const DepartmentContentDetail: React.FC<DepartmentContentDetailProps> = (
 
           <div 
             className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={renderContent(content.content)}
+            dangerouslySetInnerHTML={{ __html: content.content }}
           />
         </CardContent>
       </Card>
