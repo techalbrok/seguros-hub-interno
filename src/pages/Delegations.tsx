@@ -21,7 +21,10 @@ import {
   Phone,
   Mail,
   Globe,
-  User
+  User,
+  Eye,
+  Edit,
+  Trash2
 } from "lucide-react";
 
 const Delegations = () => {
