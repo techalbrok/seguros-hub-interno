@@ -13,10 +13,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (!error && data) {
+        setIsAdmin(data.role === 'admin');
+      }
+    };
+
+    checkAdminRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -75,9 +96,13 @@ export const Header = () => {
                   Mi Perfil
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                Configuración
-              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem className="cursor-pointer" asChild>
+                  <Link to="/settings">
+                    Configuración
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 className="cursor-pointer text-red-600" 

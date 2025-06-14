@@ -17,6 +17,7 @@ import Products from "./pages/Products";
 import Departments from "./pages/Departments";
 import News from "./pages/News";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,13 @@ const App = () => (
               <AuthGuard>
                 <Layout>
                   <Profile />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/settings" element={
+              <AuthGuard>
+                <Layout>
+                  <Settings />
                 </Layout>
               </AuthGuard>
             } />
