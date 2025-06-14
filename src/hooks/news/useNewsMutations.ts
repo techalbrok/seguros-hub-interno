@@ -12,6 +12,8 @@ export const useNewsMutations = () => {
 
   const createNewsMutation = useMutation({
     mutationFn: async (newsData: CreateNewsData) => {
+      console.log('Creating news with data:', newsData);
+      
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -36,6 +38,7 @@ export const useNewsMutations = () => {
         throw error;
       }
 
+      console.log('News created successfully:', newsItem);
       await createNewsRelations(newsItem.id, newsData);
       return newsItem;
     },
@@ -58,13 +61,26 @@ export const useNewsMutations = () => {
 
   const updateNewsMutation = useMutation({
     mutationFn: async ({ id, newsData }: { id: string; newsData: Partial<CreateNewsData> }) => {
+      console.log('Updating news with ID:', id, 'Data:', newsData);
+      
+      // Preparar los datos para la actualización
+      const updateData: any = {};
+      
+      if (newsData.title !== undefined) updateData.title = newsData.title;
+      if (newsData.content !== undefined) updateData.content = newsData.content;
+      if (newsData.featured_image !== undefined) updateData.featured_image = newsData.featured_image;
+      if (newsData.published !== undefined) {
+        updateData.published = newsData.published;
+        updateData.published_at = newsData.published ? new Date().toISOString() : null;
+      }
+      
+      updateData.updated_at = new Date().toISOString();
+
+      console.log('Prepared update data:', updateData);
+
       const { error } = await supabase
         .from('news')
-        .update({
-          ...newsData,
-          updated_at: new Date().toISOString(),
-          published_at: newsData.published ? new Date().toISOString() : null
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) {
@@ -72,6 +88,9 @@ export const useNewsMutations = () => {
         throw error;
       }
 
+      console.log('News updated successfully');
+      
+      // Actualizar las relaciones
       await updateNewsRelations(id, newsData);
     },
     onSuccess: () => {
@@ -93,6 +112,8 @@ export const useNewsMutations = () => {
 
   const deleteNewsMutation = useMutation({
     mutationFn: async (id: string) => {
+      console.log('Deleting news with ID:', id);
+      
       const { error } = await supabase
         .from('news')
         .delete()
@@ -102,6 +123,8 @@ export const useNewsMutations = () => {
         console.error('Error deleting news:', error);
         throw error;
       }
+      
+      console.log('News deleted successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["news"] });

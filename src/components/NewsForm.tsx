@@ -42,6 +42,7 @@ export const NewsForm: React.FC<NewsFormProps> = ({
   const { uploadImage, uploading } = useImageUpload('news');
 
   useEffect(() => {
+    console.log('NewsForm - Setting form data from news:', news);
     if (news) {
       setFormData({
         title: news.title,
@@ -56,35 +57,60 @@ export const NewsForm: React.FC<NewsFormProps> = ({
   }, [news]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('NewsForm - Image upload triggered');
+    
     if (!event.target.files || event.target.files.length === 0) {
+      console.log('NewsForm - No file selected');
       return;
     }
 
     const file = event.target.files[0];
-    const imageUrl = await uploadImage(file);
-    if (imageUrl) {
-      setFormData(prev => ({ ...prev, featured_image: imageUrl }));
+    console.log('NewsForm - File selected:', file.name, file.size);
+    
+    try {
+      const imageUrl = await uploadImage(file);
+      console.log('NewsForm - Image uploaded successfully:', imageUrl);
+      
+      if (imageUrl) {
+        setFormData(prev => ({ ...prev, featured_image: imageUrl }));
+      }
+    } catch (error) {
+      console.error('NewsForm - Error uploading image:', error);
     }
+  };
+
+  const handleImageChange = (url: string) => {
+    console.log('NewsForm - Image URL changed:', url);
+    setFormData(prev => ({ ...prev, featured_image: url }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('NewsForm - Submitting form with data:', formData);
+    
     setSubmitting(true);
     
-    const success = await onSubmit(formData);
-    if (success && !news) {
-      setFormData({
-        title: '',
-        content: '',
-        featured_image: '',
-        published: false,
-        company_ids: [],
-        category_ids: [],
-        product_ids: []
-      });
+    try {
+      const success = await onSubmit(formData);
+      console.log('NewsForm - Submit result:', success);
+      
+      if (success && !news) {
+        // Solo resetear el formulario si es una nueva noticia y fue exitoso
+        setFormData({
+          title: '',
+          content: '',
+          featured_image: '',
+          published: false,
+          company_ids: [],
+          category_ids: [],
+          product_ids: []
+        });
+      }
+    } catch (error) {
+      console.error('NewsForm - Error submitting form:', error);
+    } finally {
+      setSubmitting(false);
     }
-    
-    setSubmitting(false);
   };
 
   return (
@@ -116,7 +142,7 @@ export const NewsForm: React.FC<NewsFormProps> = ({
             label="Imagen Destacada"
             imageUrl={formData.featured_image}
             uploading={uploading}
-            onImageChange={(url) => setFormData(prev => ({ ...prev, featured_image: url }))}
+            onImageChange={handleImageChange}
             onImageUpload={handleImageUpload}
           />
 

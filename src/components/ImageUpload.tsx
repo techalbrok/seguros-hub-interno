@@ -22,6 +22,19 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File selected for upload');
+    onImageUpload(event);
+  };
+
+  const handleRemoveImage = () => {
+    console.log('Removing image');
+    onImageChange('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="space-y-3">
       <Label htmlFor="featured_image">{label}</Label>
@@ -38,7 +51,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               variant="destructive"
               size="sm"
               className="absolute top-2 right-2"
-              onClick={() => onImageChange('')}
+              onClick={handleRemoveImage}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -49,7 +62,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onChange={onImageUpload}
+            onChange={handleFileSelect}
             disabled={uploading}
             className="hidden"
             id="image-upload"
