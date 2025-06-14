@@ -1,10 +1,13 @@
-import { useState } from "react";
+
+import { useState, lazy, Suspense } from "react";
 import { useUsers } from "@/hooks/useUsers";
 import { User as UserType } from "@/types";
-import { CreateUserPage } from "@/components/users/CreateUserPage";
-import { EditUserPage } from "@/components/users/EditUserPage";
-import { UserDetailPage } from "@/components/users/UserDetailPage";
 import { UserListPage } from "@/components/users/UserListPage";
+
+const CreateUserPage = lazy(() => import('@/components/users/CreateUserPage').then(m => ({ default: m.CreateUserPage })));
+const EditUserPage = lazy(() => import('@/components/users/EditUserPage').then(m => ({ default: m.EditUserPage })));
+const UserDetailPage = lazy(() => import('@/components/users/UserDetailPage').then(m => ({ default: m.UserDetailPage })));
+
 
 type PageMode = 'list' | 'create' | 'detail' | 'edit';
 
@@ -64,6 +67,15 @@ const Users = () => {
     }
   };
 
+  const SuspenseFallback = () => (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-4 text-muted-foreground">Cargando vista...</p>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -75,53 +87,61 @@ const Users = () => {
     );
   }
 
-  if (pageMode === 'create') {
+  const pageContent = () => {
+    if (pageMode === 'create') {
+      return (
+        <CreateUserPage
+          delegations={delegations}
+          onSubmit={handleCreateUser}
+          onCancel={() => setPageMode('list')}
+        />
+      );
+    }
+  
+    if (pageMode === 'edit' && selectedUser) {
+      return (
+        <EditUserPage
+          user={selectedUser}
+          delegations={delegations}
+          onSubmit={handleUpdateUser}
+          onCancel={() => {
+            setPageMode('list');
+            setSelectedUser(null);
+          }}
+        />
+      );
+    }
+  
+    if (pageMode === 'detail' && selectedUser) {
+      return (
+        <UserDetailPage
+          user={selectedUser}
+          delegations={delegations}
+          onBack={() => setPageMode('list')}
+          onEdit={handleEditUser}
+          onDelete={handleDeleteUser}
+        />
+      );
+    }
+  
     return (
-      <CreateUserPage
+      <UserListPage
+        users={users}
         delegations={delegations}
-        onSubmit={handleCreateUser}
-        onCancel={() => setPageMode('list')}
+        loading={loading}
+        onSetPageMode={() => setPageMode('create')}
+        onViewUser={handleViewUser}
+        onEditUser={handleEditUser}
+        onDeleteUser={handleDeleteUser}
+        onBulkDelete={handleBulkDelete}
       />
     );
-  }
-
-  if (pageMode === 'edit' && selectedUser) {
-    return (
-      <EditUserPage
-        user={selectedUser}
-        delegations={delegations}
-        onSubmit={handleUpdateUser}
-        onCancel={() => {
-          setPageMode('list');
-          setSelectedUser(null);
-        }}
-      />
-    );
-  }
-
-  if (pageMode === 'detail' && selectedUser) {
-    return (
-      <UserDetailPage
-        user={selectedUser}
-        delegations={delegations}
-        onBack={() => setPageMode('list')}
-        onEdit={handleEditUser}
-        onDelete={handleDeleteUser}
-      />
-    );
-  }
+  };
 
   return (
-    <UserListPage
-      users={users}
-      delegations={delegations}
-      loading={loading}
-      onSetPageMode={() => setPageMode('create')}
-      onViewUser={handleViewUser}
-      onEditUser={handleEditUser}
-      onDeleteUser={handleDeleteUser}
-      onBulkDelete={handleBulkDelete}
-    />
+    <Suspense fallback={<SuspenseFallback />}>
+      {pageContent()}
+    </Suspense>
   );
 };
 
