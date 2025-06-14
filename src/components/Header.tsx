@@ -1,3 +1,4 @@
+
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -8,6 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { GlobalSearch } from "./GlobalSearch";
+
 export const Header = () => {
   const {
     theme,
@@ -50,6 +53,8 @@ export const Header = () => {
         </div>
         
         <div className="flex items-center space-x-4">
+          <GlobalSearch />
+
           <Button variant="outline" size="sm" onClick={toggleTheme} className="transition-all duration-200 hover:scale-105">
             {theme === 'light' ? '🌙' : '☀️'}
           </Button>
