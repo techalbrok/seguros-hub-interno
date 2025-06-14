@@ -135,8 +135,73 @@ export const useUsers = () => {
       // Get current session for authorization
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (sessionError || !session) {
-        throw new Error('Usuario no autenticado');
+      console.log('Current session:', session ? 'Session exists' : 'No session');
+      console.log('Session error:', sessionError);
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw new Error('Error al verificar la sesión: ' + sessionError.message);
+      }
+      
+      if (!session) {
+        console.log('No active session found');
+        // If no users exist yet, create the first admin user directly
+        const existingUsersCount = users.length;
+        console.log('Existing users count:', existingUsersCount);
+        
+        if (existingUsersCount === 0) {
+          console.log('No users exist, attempting to create first admin user');
+          // For the first user, we'll try to create without authentication
+          const { data, error } = await supabase.functions.invoke('create-user', {
+            body: {
+              name: userData.name,
+              email: userData.email,
+              password: userData.password,
+              role: 'admin', // First user should always be admin
+              delegationId: userData.delegationId,
+              permissions: userData.permissions,
+              isFirstUser: true, // Special flag for first user creation
+            },
+          });
+
+          if (error) {
+            console.error('Error calling create-user function:', error);
+            throw error;
+          }
+
+          if (data?.error) {
+            console.error('Error from create-user function:', data.error);
+            throw new Error(data.error);
+          }
+
+          console.log('First user created successfully:', data);
+          toast({
+            title: "Primer usuario creado",
+            description: "El primer usuario administrador ha sido creado exitosamente. Por favor, inicia sesión.",
+          });
+
+          await fetchUsers();
+          return true;
+        } else {
+          throw new Error('Debes iniciar sesión como administrador para crear nuevos usuarios');
+        }
+      }
+
+      // If we have a session, proceed with normal user creation
+      // Check if current user is admin
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const { data: userRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!userRole || userRole.role !== 'admin') {
+        throw new Error('Solo los administradores pueden crear nuevos usuarios');
       }
 
       // Call the edge function to create user
@@ -159,7 +224,7 @@ export const useUsers = () => {
         throw error;
       }
 
-      if (data.error) {
+      if (data?.error) {
         console.error('Error from create-user function:', data.error);
         throw new Error(data.error);
       }

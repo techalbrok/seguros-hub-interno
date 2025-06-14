@@ -26,36 +26,46 @@ serve(async (req) => {
       }
     )
 
-    // Get the session or user object
-    const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
+    const { name, email, password, role, delegationId, permissions, isFirstUser } = await req.json()
 
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'No user found' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    console.log('Creating user with service role key:', { name, email, role, isFirstUser })
+
+    // If this is not the first user, check authentication
+    if (!isFirstUser) {
+      const authHeader = req.headers.get('Authorization')
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'No authorization header provided' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      const token = authHeader.replace('Bearer ', '')
+      const { data, error: userError } = await supabaseClient.auth.getUser(token)
+      const user = data.user
+
+      if (userError || !user) {
+        console.error('Auth error:', userError)
+        return new Response(
+          JSON.stringify({ error: 'Invalid authentication token' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Check if the current user is admin
+      const { data: userRole } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!userRole || userRole.role !== 'admin') {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized: Admin access required' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
-
-    // Check if the current user is admin
-    const { data: userRole } = await supabaseClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (!userRole || userRole.role !== 'admin') {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized: Admin access required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const { name, email, password, role, delegationId, permissions } = await req.json()
-
-    console.log('Creating user with service role key:', { name, email, role })
 
     // Create user in auth with service role key
     const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
@@ -81,6 +91,9 @@ serve(async (req) => {
     }
 
     console.log('User created in auth, ID:', authData.user.id)
+
+    // Wait a moment for the trigger to create the profile
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     // Update profile with delegation if provided
     if (delegationId) {
