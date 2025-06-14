@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -41,12 +42,18 @@ const Departments = () => {
     uploadImage
   } = useDepartmentContent();
 
+  const departmentForFilter = departments.find(d => d.id === selectedDepartmentId);
+
   const filteredDepartments = departments.filter(dept => 
     dept.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     dept.responsible_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredContent = content.filter(item => 
+  const contentForSelectedDepartment = selectedDepartmentId
+    ? content.filter(item => item.department_id === selectedDepartmentId)
+    : content;
+
+  const filteredContent = contentForSelectedDepartment.filter(item => 
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
     item.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -108,6 +115,9 @@ const Departments = () => {
 
   const handleViewChange = (value: string) => {
     setView(value as ViewType);
+    if (value === 'content') {
+      setSelectedDepartmentId('');
+    }
   };
 
   const onFormOpenChange = (isOpen: boolean) => {
@@ -185,6 +195,7 @@ const Departments = () => {
         onEditContent={handleEditContent}
         onDeleteContent={deleteContent}
         onViewContentDetail={handleViewContentDetail}
+        departmentForFilter={departmentForFilter}
       />
 
       <DepartmentForm

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,6 +30,7 @@ interface DepartmentsTabsProps {
   onEditContent: (content: DepartmentContent) => void;
   onDeleteContent: (id: string) => Promise<boolean>;
   onViewContentDetail: (content: DepartmentContent) => void;
+  departmentForFilter?: Department;
 }
 
 export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
@@ -50,7 +51,8 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
   onViewContent,
   onEditContent,
   onDeleteContent,
-  onViewContentDetail
+  onViewContentDetail,
+  departmentForFilter,
 }) => {
   // Only render tabs if view is departments or content (not detail)
   if (view === 'detail') {
@@ -96,7 +98,7 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>
-        ) : (
+        ) : filteredDepartments.length > 0 ? (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredDepartments.map((department) => (
               <DepartmentCard
@@ -109,10 +111,25 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
               />
             ))}
           </div>
+        ) : (
+           <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              {searchTerm
+                ? "No se encontraron departamentos que coincidan con tu búsqueda."
+                : "No hay departamentos disponibles."}
+            </p>
+          </div>
         )}
       </TabsContent>
 
       <TabsContent value="content" className="space-y-4">
+        {departmentForFilter && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <span>Mostrando contenido para:</span>
+            <span className="font-semibold text-foreground">{departmentForFilter.name}</span>
+            <Button variant="link" size="sm" onClick={() => onViewChange('content')} className="p-0 h-auto">Ver todo</Button>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 flex-1 max-w-md">
             <Search className="w-4 h-4 text-gray-400" />
@@ -144,7 +161,7 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>
-        ) : (
+        ) : filteredContent.length > 0 ? (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredContent.map((item) => (
               <DepartmentContentCard
@@ -155,6 +172,14 @@ export const DepartmentsTabs: React.FC<DepartmentsTabsProps> = ({
                 onView={onViewContentDetail}
               />
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              {searchTerm || departmentForFilter
+                ? "No se encontró contenido que coincida con tu búsqueda."
+                : "No hay contenido disponible."}
+            </p>
           </div>
         )}
       </TabsContent>

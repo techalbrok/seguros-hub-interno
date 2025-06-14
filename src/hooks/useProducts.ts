@@ -298,9 +298,19 @@ export const useProducts = () => {
       const previousProducts = queryClient.getQueryData<Product[]>(['products']);
       
       queryClient.setQueryData<Product[]>(['products'], (old = []) => 
-        old.map(product => 
-          product.id === updatedProduct.id ? { ...product, ...updatedProduct, updatedAt: new Date() } : product
-        )
+        old.map(product => {
+          if (product.id === updatedProduct.id) {
+            // Exclude documents from optimistic update to avoid type mismatch.
+            // Documents will be updated on success.
+            const { documents, ...productCoreData } = updatedProduct;
+            return { 
+              ...product, 
+              ...productCoreData, 
+              updatedAt: new Date() 
+            };
+          }
+          return product;
+        })
       );
 
       return { previousProducts };
