@@ -186,10 +186,30 @@ export const useDelegations = () => {
     delegations,
     loading,
     error,
-    createDelegation: (data: any) => createDelegationMutation.mutateAsync(data),
-    updateDelegation: (delegationId: string, updates: Partial<Delegation>) => 
-      updateDelegationMutation.mutateAsync({ delegationId, updates }),
-    deleteDelegation: deleteDelegationMutation.mutateAsync,
+    createDelegation: async (data: any) => {
+      try {
+        await createDelegationMutation.mutateAsync(data);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    updateDelegation: async (delegationId: string, updates: Partial<Delegation>) => {
+      try {
+        await updateDelegationMutation.mutateAsync({ delegationId, updates });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    deleteDelegation: async (delegationId: string) => {
+      try {
+        await deleteDelegationMutation.mutateAsync(delegationId);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
     refetch: () => queryClient.invalidateQueries({ queryKey: ["delegations"] }),
     isCreating: createDelegationMutation.isPending,
     isUpdating: updateDelegationMutation.isPending,

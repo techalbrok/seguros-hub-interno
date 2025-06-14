@@ -135,13 +135,30 @@ export const useDepartments = () => {
     loading,
     error,
     fetchDepartments: () => queryClient.invalidateQueries({ queryKey: ["departments"] }),
-    createDepartment: (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
-      return createDepartmentMutation.mutateAsync(data);
+    createDepartment: async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
+      try {
+        await createDepartmentMutation.mutateAsync(data);
+        return true;
+      } catch (error) {
+        return false;
+      }
     },
-    updateDepartment: (id: string, updates: Partial<Department>) => {
-      return updateDepartmentMutation.mutateAsync({ id, updates });
+    updateDepartment: async (id: string, updates: Partial<Department>) => {
+      try {
+        await updateDepartmentMutation.mutateAsync({ id, updates });
+        return true;
+      } catch (error) {
+        return false;
+      }
     },
-    deleteDepartment: deleteDepartmentMutation.mutateAsync,
+    deleteDepartment: async (id: string) => {
+      try {
+        await deleteDepartmentMutation.mutateAsync(id);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
     isCreating: createDepartmentMutation.isPending,
     isUpdating: updateDepartmentMutation.isPending,
     isDeleting: deleteDepartmentMutation.isPending,

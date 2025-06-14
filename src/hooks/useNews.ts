@@ -204,10 +204,30 @@ export const useNews = () => {
     news,
     loading,
     error,
-    createNews: (data: CreateNewsData) => createNewsMutation.mutateAsync(data),
-    updateNews: (id: string, newsData: Partial<CreateNewsData>) => 
-      updateNewsMutation.mutateAsync({ id, newsData }),
-    deleteNews: deleteNewsMutation.mutateAsync,
+    createNews: async (data: CreateNewsData) => {
+      try {
+        await createNewsMutation.mutateAsync(data);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    updateNews: async (id: string, newsData: Partial<CreateNewsData>) => {
+      try {
+        await updateNewsMutation.mutateAsync({ id, newsData });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    deleteNews: async (id: string) => {
+      try {
+        await deleteNewsMutation.mutateAsync(id);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
     refetch: () => queryClient.invalidateQueries({ queryKey: ["news"] }),
     isCreating: createNewsMutation.isPending,
     isUpdating: updateNewsMutation.isPending,

@@ -215,10 +215,30 @@ export const useDepartmentContent = (departmentId?: string) => {
     loading,
     error,
     fetchContent: () => queryClient.invalidateQueries({ queryKey: ["department-content"] }),
-    createContent: (data: any) => createContentMutation.mutateAsync(data),
-    updateContent: (id: string, updates: Partial<DepartmentContent>) => 
-      updateContentMutation.mutateAsync({ id, updates }),
-    deleteContent: deleteContentMutation.mutateAsync,
+    createContent: async (data: any) => {
+      try {
+        await createContentMutation.mutateAsync(data);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    updateContent: async (id: string, updates: Partial<DepartmentContent>) => {
+      try {
+        await updateContentMutation.mutateAsync({ id, updates });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    deleteContent: async (id: string) => {
+      try {
+        await deleteContentMutation.mutateAsync(id);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
     uploadImage,
     isCreating: createContentMutation.isPending,
     isUpdating: updateContentMutation.isPending,
