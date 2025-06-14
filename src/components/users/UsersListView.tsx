@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -69,7 +70,16 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
     viewMode === 'table' ? (
       <Table>
         <TableHeader>
-          <UsersTable users={[]} delegations={[]} onViewUser={()=>{}} onEditUser={()=>{}} />
+          <UsersTable 
+            users={[]} 
+            delegations={[]} 
+            onViewUser={()=>{}} 
+            onEditUser={()=>{}} 
+            selectedUserIds={[]}
+            onSelectUser={()=>{}}
+            onSelectAll={()=>{}}
+            areAllOnPageSelected={false}
+          />
         </TableHeader>
         <TableBody>
           {[...Array(5)].map((_, i) => <UserTableRowSkeleton key={i} />)}
