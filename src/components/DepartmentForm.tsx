@@ -1,108 +1,131 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Department } from '@/hooks/useDepartments';
 
 interface DepartmentFormProps {
   department?: Department;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSubmit: (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => Promise<boolean>;
-  onCancel: () => void;
+  isLoading?: boolean;
 }
 
 export const DepartmentForm: React.FC<DepartmentFormProps> = ({
   department,
+  open,
+  onOpenChange,
   onSubmit,
-  onCancel
+  isLoading
 }) => {
   const [formData, setFormData] = useState({
-    name: department?.name || '',
-    responsible_name: department?.responsible_name || '',
-    responsible_email: department?.responsible_email || '',
-    description: department?.description || ''
+    name: '',
+    responsible_name: '',
+    responsible_email: '',
+    description: ''
   });
-  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      if (department) {
+        setFormData({
+          name: department.name,
+          responsible_name: department.responsible_name,
+          responsible_email: department.responsible_email || '',
+          description: department.description || ''
+        });
+      } else {
+        setFormData({
+          name: '',
+          responsible_name: '',
+          responsible_email: '',
+          description: ''
+        });
+      }
+    }
+  }, [department, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
     const success = await onSubmit(formData);
     if (success) {
-      setFormData({
-        name: '',
-        responsible_name: '',
-        responsible_email: '',
-        description: ''
-      });
-      onCancel();
+      onOpenChange(false);
     }
-    
-    setLoading(false);
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>
-          {department ? 'Editar Departamento' : 'Nuevo Departamento'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Nombre del Departamento</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              required
-            />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>
+            {department ? 'Editar Departamento' : 'Nuevo Departamento'}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre del Departamento *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+                required
+                placeholder="Nombre del departamento"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="responsible_name">Responsable del Departamento *</Label>
+              <Input
+                id="responsible_name"
+                value={formData.responsible_name}
+                onChange={(e) => handleChange("responsible_name", e.target.value)}
+                required
+                placeholder="Nombre del responsable"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="responsible_name">Responsable del Departamento</Label>
-            <Input
-              id="responsible_name"
-              value={formData.responsible_name}
-              onChange={(e) => setFormData(prev => ({ ...prev, responsible_name: e.target.value }))}
-              required
-            />
-          </div>
-
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="responsible_email">Email del Responsable</Label>
             <Input
               id="responsible_email"
               type="email"
               value={formData.responsible_email}
-              onChange={(e) => setFormData(prev => ({ ...prev, responsible_email: e.target.value }))}
+              onChange={(e) => handleChange("responsible_email", e.target.value)}
+              placeholder="email@ejemplo.com"
             />
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => handleChange("description", e.target.value)}
               rows={3}
+              placeholder="Descripción del departamento"
             />
           </div>
 
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onCancel}>
+          <DialogFooter className="pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Guardando...' : department ? 'Actualizar' : 'Crear'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Guardando...' : department ? 'Actualizar' : 'Crear'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 };
