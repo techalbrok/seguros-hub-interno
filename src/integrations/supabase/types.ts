@@ -9,6 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      companies: {
+        Row: {
+          broker_access: string
+          commercial_manager: string
+          commercial_website: string | null
+          created_at: string
+          id: string
+          manager_email: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          broker_access: string
+          commercial_manager: string
+          commercial_website?: string | null
+          created_at?: string
+          id?: string
+          manager_email: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          broker_access?: string
+          commercial_manager?: string
+          commercial_website?: string | null
+          created_at?: string
+          id?: string
+          manager_email?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_specifications: {
+        Row: {
+          category: string
+          company_id: string
+          content: string
+          created_at: string
+          id: string
+          order_position: number | null
+        }
+        Insert: {
+          category: string
+          company_id: string
+          content: string
+          created_at?: string
+          id?: string
+          order_position?: number | null
+        }
+        Update: {
+          category?: string
+          company_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          order_position?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_specifications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delegations: {
         Row: {
           address: string
