@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,15 +11,16 @@ import { useProductCategories } from "@/hooks/useProductCategories";
 
 interface CategoryFormProps {
   category?: ProductCategory;
+  parentCategoryId?: string;
   onSubmit: (data: any) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-export const CategoryForm = ({ category, onSubmit, onCancel, isLoading }: CategoryFormProps) => {
+export const CategoryForm = ({ category, parentCategoryId, onSubmit, onCancel, isLoading }: CategoryFormProps) => {
   const [formData, setFormData] = useState({
     name: category?.name || "",
-    parentId: category?.parentId || "",
+    parentId: category?.parentId || parentCategoryId || "",
   });
 
   const [documents, setDocuments] = useState<File[]>([]);

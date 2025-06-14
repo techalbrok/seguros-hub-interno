@@ -51,16 +51,23 @@ export const CategoryManagement = () => {
   const handleSubmit = (data: any) => {
     const categoryData = {
       name: data.name,
-      parentId: data.parentId || parentCategoryId || undefined,
+      parentId: data.parentId || undefined,
       level: data.level,
     };
 
+    const mutationCallbacks = {
+      onSuccess: () => {
+        setViewMode('list');
+        setSelectedCategory(null);
+        setParentCategoryId("");
+      }
+    };
+
     if (selectedCategory) {
-      updateCategory({ ...categoryData, id: selectedCategory.id });
+      updateCategory({ ...categoryData, id: selectedCategory.id }, mutationCallbacks);
     } else {
-      createCategory(categoryData);
+      createCategory(categoryData, mutationCallbacks);
     }
-    setViewMode('list');
   };
 
   const handleCancel = () => {
@@ -73,6 +80,7 @@ export const CategoryManagement = () => {
     return (
       <CategoryForm
         category={selectedCategory || undefined}
+        parentCategoryId={parentCategoryId}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         isLoading={isCreating || isUpdating}
