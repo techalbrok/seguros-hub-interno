@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -8,7 +9,7 @@ import { CompaniesControls } from "@/components/CompaniesControls";
 import { CompaniesGrid } from "@/components/CompaniesGrid";
 import { CompaniesList } from "@/components/CompaniesList";
 import type { Company } from "@/types";
-type CurrentView = "main" | "form" | "detail";
+type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
 
 // Define the type for company data used in forms, excluding auto-generated fields
@@ -27,26 +28,40 @@ export default function Companies() {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("grid");
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const filteredCompanies = companies.filter(company => company.name.toLowerCase().includes(searchTerm.toLowerCase()) || company.commercialManager.toLowerCase().includes(searchTerm.toLowerCase()) || company.managerEmail.toLowerCase().includes(searchTerm.toLowerCase()));
+  
   const handleCreateCompany = (data: CompanyFormData) => {
-    createCompany(data);
-    setCurrentView("main");
+    createCompany(data, {
+      onSuccess: () => {
+        setShowForm(false);
+      }
+    });
   };
+
   const handleUpdateCompany = (data: CompanyFormData) => {
     if (editingCompany) {
       updateCompany({
         ...data,
         id: editingCompany.id
+      }, {
+        onSuccess: (updatedCompany) => {
+          setShowForm(false);
+          if (selectedCompany?.id === editingCompany.id) {
+            setSelectedCompany(updatedCompany);
+          }
+          setEditingCompany(null);
+        }
       });
-      setEditingCompany(null);
-      setCurrentView("main");
     }
   };
+
   const handleEditCompany = (company: Company) => {
     setEditingCompany(company);
-    setCurrentView("form");
+    setShowForm(true);
   };
+
   const handleViewCompany = (company: Company) => {
     setSelectedCompany(company);
     setCurrentView("detail");
@@ -59,32 +74,42 @@ export default function Companies() {
     }
     if (editingCompany?.id === id) {
       setEditingCompany(null);
-      setCurrentView("main");
+      setShowForm(false);
     }
   };
   const handleAddNewCompanyClick = () => {
     setEditingCompany(null);
-    setCurrentView("form");
-  };
-  const handleCancelForm = () => {
-    setEditingCompany(null);
-    setCurrentView("main");
+    setShowForm(true);
   };
   const handleBackFromDetail = () => {
     setSelectedCompany(null);
     setCurrentView("main");
   };
-  if (currentView === "form") {
-    return <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <CompanyForm company={editingCompany || undefined} onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany} onCancel={handleCancelForm} isLoading={isCreating || isUpdating} />
-      </div>;
+
+  const onFormOpenChange = (isOpen: boolean) => {
+    setShowForm(isOpen);
+    if (!isOpen) {
+      setEditingCompany(null);
+    }
   }
+
   if (currentView === "detail" && selectedCompany) {
-    return <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    return (
+      <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <CompanyDetail company={selectedCompany} onEdit={handleEditCompany} onBack={handleBackFromDetail} />
-      </div>;
+        <CompanyForm
+          open={showForm}
+          onOpenChange={onFormOpenChange}
+          company={editingCompany || undefined}
+          onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
+          isLoading={isCreating || isUpdating}
+        />
+      </div>
+    );
   }
-  return <div className="space-y-6 p-4 sm:p-6 px-0 py-0">
+
+  return (
+    <div className="space-y-6 p-4 sm:p-6 px-0 py-0">
       <CompaniesHeader onAddNewCompany={handleAddNewCompanyClick} />
 
       <Card>
@@ -99,5 +124,13 @@ export default function Companies() {
             </div> : displayMode === "grid" ? <CompaniesGrid companies={filteredCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} /> : <CompaniesList companies={filteredCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} />}
         </CardContent>
       </Card>
-    </div>;
+      <CompanyForm
+        open={showForm}
+        onOpenChange={onFormOpenChange}
+        company={editingCompany || undefined}
+        onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
+        isLoading={isCreating || isUpdating}
+      />
+    </div>
+  );
 }

@@ -1,13 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import type { Company } from "@/types";
 
 interface CompanyFormProps {
   company?: Company;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSubmit: (data: {
     name: string;
     commercialWebsite?: string;
@@ -15,18 +17,39 @@ interface CompanyFormProps {
     commercialManager: string;
     managerEmail: string;
   }) => void;
-  onCancel: () => void;
   isLoading?: boolean;
 }
 
-export const CompanyForm = ({ company, onSubmit, onCancel, isLoading }: CompanyFormProps) => {
+export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }: CompanyFormProps) => {
   const [formData, setFormData] = useState({
-    name: company?.name || "",
-    commercialWebsite: company?.commercialWebsite || "",
-    brokerAccess: company?.brokerAccess || "",
-    commercialManager: company?.commercialManager || "",
-    managerEmail: company?.managerEmail || "",
+    name: "",
+    commercialWebsite: "",
+    brokerAccess: "",
+    commercialManager: "",
+    managerEmail: "",
   });
+
+  useEffect(() => {
+    if (open) {
+      if (company) {
+        setFormData({
+          name: company.name,
+          commercialWebsite: company.commercialWebsite || "",
+          brokerAccess: company.brokerAccess,
+          commercialManager: company.commercialManager,
+          managerEmail: company.managerEmail,
+        });
+      } else {
+        setFormData({
+          name: "",
+          commercialWebsite: "",
+          brokerAccess: "",
+          commercialManager: "",
+          managerEmail: "",
+        });
+      }
+    }
+  }, [company, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,14 +61,14 @@ export const CompanyForm = ({ company, onSubmit, onCancel, isLoading }: CompanyF
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>
-          {company ? "Editar Compañía" : "Nueva Compañía"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>
+            {company ? "Editar Compañía" : "Nueva Compañía"}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nombre *</Label>
@@ -106,16 +129,16 @@ export const CompanyForm = ({ company, onSubmit, onCancel, isLoading }: CompanyF
             </div>
           </div>
 
-          <div className="flex gap-2 pt-4">
+          <DialogFooter className="pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+              Cancelar
+            </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Guardando..." : company ? "Actualizar" : "Crear"}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancelar
-            </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 };
