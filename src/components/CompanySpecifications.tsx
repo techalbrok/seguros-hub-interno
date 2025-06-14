@@ -1,13 +1,15 @@
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { Company, CompanySpecification } from "@/types";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Search, Settings } from "lucide-react";
 import { CompanySpecificationForm } from "./CompanySpecificationForm";
 import { useCompanySpecifications } from "@/hooks/useCompanySpecifications";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { SpecificationCategoryManager } from "./SpecificationCategoryManager";
+import { SpecificationsSidebar } from "./SpecificationsSidebar";
+import { SpecificationContentPanel } from "./SpecificationContentPanel";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface CompanySpecificationsProps {
   company: Company;
@@ -16,7 +18,25 @@ interface CompanySpecificationsProps {
 export const CompanySpecifications = ({ company }: CompanySpecificationsProps) => {
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingSpec, setEditingSpec] = useState<CompanySpecification | null>(null);
+  const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  
   const { deleteSpecification, isDeleting } = useCompanySpecifications();
+
+  useEffect(() => {
+    if (!selectedSpecId && company.specifications && company.specifications.length > 0) {
+      const sortedCategories = [...company.specificationCategories].sort((a,b) => (a.order || 0) - (b.order || 0));
+      const categoryOrder = sortedCategories.map(c => c.id);
+      
+      const allSpecsOrdered = categoryOrder
+        .flatMap(catId => company.specifications.filter(s => s.categoryId === catId))
+        .concat(company.specifications.filter(s => !s.categoryId || !categoryOrder.includes(s.categoryId!)));
+
+      if (allSpecsOrdered.length > 0) {
+        setSelectedSpecId(allSpecsOrdered[0].id);
+      }
+    }
+  }, [company.specifications, company.specificationCategories, selectedSpecId]);
 
   const handleAddNew = () => {
     setEditingSpec(null);
@@ -29,98 +49,84 @@ export const CompanySpecifications = ({ company }: CompanySpecificationsProps) =
   };
   
   const handleDelete = (id: string) => {
-    deleteSpecification(id);
+    deleteSpecification(id, {
+        onSuccess: () => {
+            if (selectedSpecId === id) {
+                setSelectedSpecId(null);
+            }
+        }
+    });
   };
 
-  const specsByCategory = (company.specifications || []).reduce((acc, spec) => {
-    const categoryId = spec.categoryId || 'uncategorized';
-    (acc[categoryId] = acc[categoryId] || []).push(spec);
-    return acc;
-  }, {} as Record<string, CompanySpecification[]>);
-
-  const getCategoryName = (categoryId: string) => {
-    if (categoryId === 'uncategorized') return "Otras Especificaciones";
-    return company.specificationCategories.find(c => c.id === categoryId)?.name || "Categoría Desconocida";
-  }
-
-  const sortedCategories = [...company.specificationCategories].sort((a,b) => (a.order || 0) - (b.order || 0));
-
-  const categoryOrder = sortedCategories.map(c => c.id);
-  if (specsByCategory['uncategorized'] && specsByCategory['uncategorized'].length > 0) {
-    categoryOrder.push('uncategorized');
-  }
-  
-  const defaultOpenCategories = categoryOrder.filter(id => specsByCategory[id] && specsByCategory[id].length > 0);
+  const selectedSpec = useMemo(() => {
+    if (!selectedSpecId) return null;
+    return company.specifications.find(s => s.id === selectedSpecId) || null;
+  }, [selectedSpecId, company.specifications]);
 
   return (
-    <div>
-      <SpecificationCategoryManager company={company} />
-
-      <div className="flex justify-end my-6">
+    <div className="flex flex-col border rounded-lg overflow-hidden" style={{ height: 'calc(100vh - 280px)'}}>
+      <div className="flex items-center justify-between p-3 border-b bg-muted/30">
+        <div className="flex items-center gap-2">
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="success">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Categorías
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>Gestionar Categorías</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <SpecificationCategoryManager company={company} />
+                    </div>
+                </DialogContent>
+            </Dialog>
+            <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Input
+                    placeholder="Buscar especificación..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-full sm:w-64"
+                />
+            </div>
+        </div>
         <Button onClick={handleAddNew}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Añadir Especificación
         </Button>
       </div>
-      
-      {company.specifications.length > 0 ? (
-        <Accordion type="multiple" className="w-full" defaultValue={defaultOpenCategories}>
-          {categoryOrder.map(categoryId => (
-            specsByCategory[categoryId] && specsByCategory[categoryId].length > 0 && (
-              <AccordionItem value={categoryId} key={categoryId}>
-                <AccordionTrigger className="text-lg font-semibold">{getCategoryName(categoryId)} ({specsByCategory[categoryId].length})</AccordionTrigger>
-                <AccordionContent>
-                  {specsByCategory[categoryId].map(spec => (
-                    <div key={spec.id} className="prose dark:prose-invert max-w-none border-b last:border-b-0 py-4">
-                      <h4 className="font-bold not-prose text-base mb-2">{spec.title}</h4>
-                      <div dangerouslySetInnerHTML={{ __html: spec.content }} />
-                      <div className="flex gap-2 justify-end mt-4 not-prose">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(spec)}>
-                          <Edit className="h-4 w-4 mr-1" /> Editar
-                        </Button>
-                         <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive-outline" size="sm">
-                              <Trash2 className="h-4 w-4 mr-1" /> Eliminar
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Esta acción no se puede deshacer. Esto eliminará permanentemente la especificación.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDelete(spec.id)} disabled={isDeleting}>
-                                {isDeleting ? "Eliminando..." : "Eliminar"}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-            )
-          ))}
-        </Accordion>
-      ) : (
-        <div className="text-center py-8 text-muted-foreground bg-secondary/50 rounded-lg">
-          <p>No hay especificaciones para esta compañía.</p>
-          <p className="text-sm">Puedes añadir una haciendo clic en el botón de arriba.</p>
-        </div>
-      )}
 
+      <div className="flex-grow grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 overflow-hidden">
+        <div className="col-span-1 border-r overflow-y-auto bg-muted/20">
+            <SpecificationsSidebar 
+                company={company}
+                searchTerm={searchTerm}
+                selectedSpecId={selectedSpecId}
+                onSelectSpec={setSelectedSpecId}
+            />
+        </div>
+        <div className="col-span-1 md:col-span-2 xl:col-span-3 overflow-y-auto">
+             <SpecificationContentPanel 
+                specification={selectedSpec}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                isDeleting={isDeleting}
+            />
+        </div>
+      </div>
+      
       <CompanySpecificationForm
         companyId={company.id}
         specification={editingSpec}
         specificationCategories={company.specificationCategories}
         open={isFormOpen}
         onOpenChange={setFormOpen}
-        onSuccess={() => {}}
+        onSuccess={() => {
+          setFormOpen(false);
+        }}
       />
     </div>
   );
