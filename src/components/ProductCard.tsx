@@ -70,10 +70,10 @@ export const ProductCard = ({ product, onEdit, onDelete, onView }: ProductCardPr
               Editar
             </Button>
             <Button
-              variant="outline"
+              variant="destructive-outline"
               size="sm"
               onClick={() => onDelete(product.id)}
-              className="flex items-center gap-1 text-destructive hover:text-destructive"
+              className="flex items-center gap-1"
             >
               <Trash2 className="h-4 w-4" />
               Eliminar

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -150,7 +149,7 @@ const Departments = () => {
   }
 
   return (
-    <div className="p-6 space-y-6 px-0 py-0">
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Departamentos</h1>
         <div className="flex gap-2">
