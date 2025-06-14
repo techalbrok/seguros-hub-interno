@@ -1,9 +1,6 @@
+
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, Grid, List } from "lucide-react";
-import { ProductCard } from "@/components/ProductCard";
 import { ProductForm } from "@/components/ProductForm";
 import { ProductDetail } from "@/components/ProductDetail";
 import { CategoryManagement } from "@/components/CategoryManagement";
@@ -11,6 +8,9 @@ import { useProducts } from "@/hooks/useProducts";
 import type { Product } from "@/types";
 import { useProductCategories } from "@/hooks/useProductCategories";
 import { ProductCategorySidebar } from "@/components/ProductCategorySidebar";
+import { ProductsHeader } from "@/components/products/ProductsHeader";
+import { ProductControls } from "@/components/products/ProductControls";
+import { ProductList } from "@/components/products/ProductList";
 
 const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -118,17 +118,8 @@ const Products = () => {
   };
 
   return <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">Productos</h1>
-          <p className="text-muted-foreground mt-1">
-            Administra el catálogo de productos y categorías
-          </p>
-        </div>
-      </div>
+      <ProductsHeader />
 
-      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="products">Productos</TabsTrigger>
@@ -144,44 +135,24 @@ const Products = () => {
               onSelectCategory={setSelectedCategory}
             />
             <div className="flex-1 space-y-6">
-              {/* Controls */}
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 w-full">
-                  <div className="relative w-full sm:flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      placeholder="Buscar productos..." 
-                      value={searchTerm} 
-                      onChange={e => setSearchTerm(e.target.value)} 
-                      className="pl-10 w-full"
-                    />
-                  </div>
-                </div>
+              <ProductControls
+                searchTerm={searchTerm}
+                onSearchTermChange={setSearchTerm}
+                viewType={viewType}
+                onViewTypeChange={setViewType}
+                onAddNew={handleAddNew}
+              />
 
-                <div className="flex items-center gap-2">
-                  <Button variant={viewType === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => setViewType('grid')}>
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button variant={viewType === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setViewType('list')}>
-                    <List className="h-4 w-4" />
-                  </Button>
-                  <Button onClick={handleAddNew} className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Nuevo Producto
-                  </Button>
-                </div>
-              </div>
-
-              {/* Products Grid */}
-              {isLoading ? <div className="text-center py-12">
-                  <p>Cargando productos...</p>
-                </div> : filteredProducts.length === 0 ? <div className="text-center py-12">
-                  <p className="text-muted-foreground">
-                    {searchTerm || selectedCategory !== 'all' ? 'No se encontraron productos que coincidan con tu búsqueda.' : 'No hay productos disponibles.'}
-                  </p>
-                </div> : <div className={viewType === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}>
-                  {filteredProducts.map(product => <ProductCard key={product.id} product={product} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />)}
-                </div>}
+              <ProductList
+                isLoading={isLoading}
+                filteredProducts={filteredProducts}
+                viewType={viewType}
+                searchTerm={searchTerm}
+                selectedCategory={selectedCategory}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onView={handleView}
+              />
             </div>
           </div>
         </TabsContent>
