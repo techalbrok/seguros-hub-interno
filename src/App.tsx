@@ -9,6 +9,8 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import UpdatePassword from "./pages/UpdatePassword";
 import Users from "./pages/Users";
 import Delegations from "./pages/Delegations";
 import NotFound from "./pages/NotFound";
@@ -30,6 +32,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/" element={<Index />} />
             <Route path="/profile" element={
               <AuthGuard>

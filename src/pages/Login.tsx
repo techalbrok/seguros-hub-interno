@@ -71,6 +71,12 @@ const Login = () => {
               {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Button>
           </form>
+
+          <div className="mt-4 text-center text-sm">
+            <Link to="/forgot-password" className="text-primary hover:underline">
+              ¿Has olvidado tu contraseña?
+            </Link>
+          </div>
           
           <div className="mt-4 text-center">
             <Link to="/" className="text-sm text-primary hover:underline">
