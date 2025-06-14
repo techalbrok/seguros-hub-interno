@@ -1,15 +1,16 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, X, Image } from 'lucide-react';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { ImageUpload } from '@/components/ImageUpload';
 import { Department } from '@/hooks/useDepartments';
 import { DepartmentContent } from '@/hooks/useDepartmentContent';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 interface DepartmentContentFormProps {
   departments: Department[];
@@ -40,19 +41,16 @@ export const DepartmentContentForm: React.FC<DepartmentContentFormProps> = ({
     published: content?.published || false
   });
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploading } = useImageUpload('department-content');
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
     const imageUrl = await onUploadImage(file);
     if (imageUrl) {
       setFormData(prev => ({ ...prev, featured_image: imageUrl }));
     }
-    setUploading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,54 +110,13 @@ export const DepartmentContentForm: React.FC<DepartmentContentFormProps> = ({
             </Select>
           </div>
 
-          <div>
-            <Label>Imagen Destacada</Label>
-            <div className="mt-2">
-              {formData.featured_image ? (
-                <div className="relative inline-block">
-                  <img
-                    src={formData.featured_image}
-                    alt="Imagen destacada"
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
-                    onClick={() => setFormData(prev => ({ ...prev, featured_image: '' }))}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <div className="space-y-2">
-                    <div className="mx-auto w-12 h-12 text-gray-400">
-                      {uploading ? (
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-                      ) : (
-                        <Image className="w-12 h-12" />
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {uploading ? 'Subiendo...' : 'Haz clic para subir una imagen'}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </div>
-          </div>
+          <ImageUpload
+            label="Imagen Destacada"
+            imageUrl={formData.featured_image}
+            uploading={uploading}
+            onImageChange={(url) => setFormData(prev => ({ ...prev, featured_image: url }))}
+            onImageUpload={handleImageUpload}
+          />
 
           <RichTextEditor
             label="Contenido"

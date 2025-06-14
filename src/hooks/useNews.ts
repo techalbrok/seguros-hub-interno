@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNewsOperations } from './useNewsOperations';
 
 export interface News {
   id: string;
@@ -45,6 +46,7 @@ export const useNews = () => {
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { createNewsRelations, updateNewsRelations } = useNewsOperations();
 
   const fetchNews = async () => {
     try {
@@ -133,33 +135,7 @@ export const useNews = () => {
         return false;
       }
 
-      // Create relations
-      if (newsData.company_ids?.length) {
-        await supabase
-          .from('news_companies')
-          .insert(newsData.company_ids.map(company_id => ({
-            news_id: newsItem.id,
-            company_id
-          })));
-      }
-
-      if (newsData.category_ids?.length) {
-        await supabase
-          .from('news_categories')
-          .insert(newsData.category_ids.map(category_id => ({
-            news_id: newsItem.id,
-            category_id
-          })));
-      }
-
-      if (newsData.product_ids?.length) {
-        await supabase
-          .from('news_products')
-          .insert(newsData.product_ids.map(product_id => ({
-            news_id: newsItem.id,
-            product_id
-          })));
-      }
+      await createNewsRelations(newsItem.id, newsData);
 
       toast({
         title: "Éxito",
@@ -200,42 +176,7 @@ export const useNews = () => {
         return false;
       }
 
-      // Update relations if provided
-      if (newsData.company_ids !== undefined) {
-        await supabase.from('news_companies').delete().eq('news_id', id);
-        if (newsData.company_ids.length > 0) {
-          await supabase
-            .from('news_companies')
-            .insert(newsData.company_ids.map(company_id => ({
-              news_id: id,
-              company_id
-            })));
-        }
-      }
-
-      if (newsData.category_ids !== undefined) {
-        await supabase.from('news_categories').delete().eq('news_id', id);
-        if (newsData.category_ids.length > 0) {
-          await supabase
-            .from('news_categories')
-            .insert(newsData.category_ids.map(category_id => ({
-              news_id: id,
-              category_id
-            })));
-        }
-      }
-
-      if (newsData.product_ids !== undefined) {
-        await supabase.from('news_products').delete().eq('news_id', id);
-        if (newsData.product_ids.length > 0) {
-          await supabase
-            .from('news_products')
-            .insert(newsData.product_ids.map(product_id => ({
-              news_id: id,
-              product_id
-            })));
-        }
-      }
+      await updateNewsRelations(id, newsData);
 
       toast({
         title: "Éxito",
