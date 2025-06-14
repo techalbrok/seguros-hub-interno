@@ -120,30 +120,30 @@ const NewsPage = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input placeholder="Buscar noticias..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
         </div>
-        <Select value={companyFilter} onValueChange={setCompanyFilter}>
+        <Select value={companyFilter || 'all'} onValueChange={(value) => setCompanyFilter(value === 'all' ? '' : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filtrar por compañía" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas las compañías</SelectItem>
+            <SelectItem value="all">Todas las compañías</SelectItem>
             {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter || 'all'} onValueChange={(value) => setCategoryFilter(value === 'all' ? '' : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filtrar por categoría" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas las categorías</SelectItem>
+            <SelectItem value="all">Todas las categorías</SelectItem>
             {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={productFilter} onValueChange={setProductFilter}>
+        <Select value={productFilter || 'all'} onValueChange={(value) => setProductFilter(value === 'all' ? '' : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filtrar por producto" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos los productos</SelectItem>
+            <SelectItem value="all">Todos los productos</SelectItem>
             {products.map(p => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
           </SelectContent>
         </Select>
