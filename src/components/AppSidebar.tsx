@@ -1,7 +1,10 @@
+
 import { useState } from "react";
 import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link, Settings } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { NavigationShortcuts } from "@/components/NavigationShortcuts";
+
 const navigationItems = [
   {
     title: "Dashboard",
@@ -44,30 +47,35 @@ const navigationItems = [
     icon: Settings
   }
 ];
+
 export function AppSidebar() {
-  const {
-    state
-  } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+
   const isActive = (path: string) => {
     if (path === "/") {
       return currentPath === "/";
     }
     return currentPath.startsWith(path);
   };
-  const isExpanded = navigationItems.some(item => isActive(item.url));
+
   const getNavClass = (path: string) => {
     const baseClass = "flex items-center w-full transition-colors duration-200";
-    return isActive(path) ? `${baseClass} bg-sidebar-accent text-sidebar-primary font-medium border-r-2 border-primary` : `${baseClass} hover:bg-sidebar-accent/50 text-sidebar-foreground`;
+    return isActive(path) 
+      ? `${baseClass} bg-sidebar-accent text-sidebar-primary font-medium border-r-2 border-primary` 
+      : `${baseClass} hover:bg-sidebar-accent/50 text-sidebar-foreground`;
   };
-  return <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border`} collapsible="icon">
+
+  return (
+    <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border`} collapsible="icon">
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-        {!collapsed && <div className="flex items-center space-x-2">
+        {!collapsed && (
+          <div className="flex items-center space-x-2">
             
-            
-          </div>}
+          </div>
+        )}
         <SidebarTrigger className="h-8 w-8" />
       </div>
 
@@ -78,17 +86,22 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {navigationItems.map(item => <SidebarMenuItem key={item.title}>
+              {navigationItems.map(item => (
+                <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="h-10">
                     <NavLink to={item.url} className={getNavClass(item.url)}>
                       <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
                       {!collapsed && <span className="truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
-                </SidebarMenuItem>)}
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <NavigationShortcuts />
       </SidebarContent>
-    </Sidebar>;
+    </Sidebar>
+  );
 }
