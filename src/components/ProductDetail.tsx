@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
@@ -35,27 +34,21 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit }: ProductDe
           {product.process && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Proceso</h3>
-              <div className="prose max-w-none">
-                <p className="whitespace-pre-wrap">{product.process}</p>
-              </div>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.process }} />
             </div>
           )}
 
           {product.strengths && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Fortalezas</h3>
-              <div className="prose max-w-none">
-                <p className="whitespace-pre-wrap">{product.strengths}</p>
-              </div>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.strengths }} />
             </div>
           )}
 
           {product.observations && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Observaciones</h3>
-              <div className="prose max-w-none">
-                <p className="whitespace-pre-wrap">{product.observations}</p>
-              </div>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.observations }} />
             </div>
           )}
 
