@@ -1,16 +1,20 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, Grid, List } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useCompanies } from "@/hooks/useCompanies";
 import { CompanyForm } from "@/components/CompanyForm";
-import { CompanyCard } from "@/components/CompanyCard";
 import { CompanyDetail } from "@/components/CompanyDetail";
+import { CompaniesHeader } from "@/components/CompaniesHeader";
+import { CompaniesControls } from "@/components/CompaniesControls";
+import { CompaniesGrid } from "@/components/CompaniesGrid";
+import { CompaniesList } from "@/components/CompaniesList";
 import type { Company } from "@/types";
 
-type ViewMode = "list" | "grid" | "detail" | "form";
+type CurrentView = "main" | "form" | "detail";
+type DisplayMode = "list" | "grid";
+
+// Define the type for company data used in forms, excluding auto-generated fields
+type CompanyFormData = Omit<Company, "id" | "createdAt" | "updatedAt">;
 
 export default function Companies() {
   const {
@@ -23,7 +27,8 @@ export default function Companies() {
     isUpdating,
   } = useCompanies();
 
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [currentView, setCurrentView] = useState<CurrentView>("main");
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("grid");
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,115 +39,94 @@ export default function Companies() {
     company.managerEmail.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateCompany = (data: any) => {
+  const handleCreateCompany = (data: CompanyFormData) => {
     createCompany(data);
-    setViewMode("grid");
+    setCurrentView("main");
   };
 
-  const handleUpdateCompany = (data: any) => {
+  const handleUpdateCompany = (data: CompanyFormData) => {
     if (editingCompany) {
       updateCompany({ ...data, id: editingCompany.id });
       setEditingCompany(null);
-      setViewMode("grid");
+      setCurrentView("main");
     }
   };
 
   const handleEditCompany = (company: Company) => {
     setEditingCompany(company);
-    setViewMode("form");
+    setCurrentView("form");
   };
 
   const handleViewCompany = (company: Company) => {
     setSelectedCompany(company);
-    setViewMode("detail");
+    setCurrentView("detail");
   };
 
   const handleDeleteCompany = (id: string) => {
     deleteCompany(id);
+    if (selectedCompany?.id === id) {
+      setSelectedCompany(null);
+      setCurrentView("main");
+    }
+    if (editingCompany?.id === id) {
+      setEditingCompany(null);
+      setCurrentView("main");
+    }
   };
 
-  if (viewMode === "form") {
+  const handleAddNewCompanyClick = () => {
+    setEditingCompany(null);
+    setCurrentView("form");
+  };
+
+  const handleCancelForm = () => {
+    setEditingCompany(null);
+    setCurrentView("main");
+  };
+  
+  const handleBackFromDetail = () => {
+    setSelectedCompany(null);
+    setCurrentView("main");
+  };
+
+  if (currentView === "form") {
     return (
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <CompanyForm
           company={editingCompany || undefined}
           onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
-          onCancel={() => {
-            setEditingCompany(null);
-            setViewMode("grid");
-          }}
+          onCancel={handleCancelForm}
           isLoading={isCreating || isUpdating}
         />
       </div>
     );
   }
 
-  if (viewMode === "detail" && selectedCompany) {
+  if (currentView === "detail" && selectedCompany) {
     return (
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <CompanyDetail
           company={selectedCompany}
           onEdit={handleEditCompany}
-          onBack={() => {
-            setSelectedCompany(null);
-            setViewMode("grid");
-          }}
+          onBack={handleBackFromDetail}
         />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">
-            Gestión de Compañías
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Administra las compañías aseguradoras
-          </p>
-        </div>
-        <Button onClick={() => setViewMode("form")} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nueva Compañía
-        </Button>
-      </div>
+    <div className="space-y-6 p-4 sm:p-6">
+      <CompaniesHeader onAddNewCompany={handleAddNewCompanyClick} />
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <CardTitle>Compañías ({filteredCompanies.length})</CardTitle>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar compañías..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64"
-                />
-              </div>
-              <div className="flex border rounded-md">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="rounded-r-none"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="rounded-l-none"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+          <CompaniesControls
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+            activeDisplayMode={displayMode}
+            onDisplayModeChange={setDisplayMode}
+            companyCount={filteredCompanies.length}
+          />
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -152,63 +136,23 @@ export default function Companies() {
           ) : filteredCompanies.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               {searchTerm
-                ? "No se encontraron compañías que coincidan con la búsqueda"
-                : "No hay compañías registradas"}
+                ? "No se encontraron compañías que coincidan con la búsqueda."
+                : "No hay compañías registradas. ¡Añade una!"}
             </div>
-          ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredCompanies.map((company) => (
-                <CompanyCard
-                  key={company.id}
-                  company={company}
-                  onEdit={handleEditCompany}
-                  onDelete={handleDeleteCompany}
-                  onView={handleViewCompany}
-                />
-              ))}
-            </div>
+          ) : displayMode === "grid" ? (
+            <CompaniesGrid
+              companies={filteredCompanies}
+              onEdit={handleEditCompany}
+              onDelete={handleDeleteCompany}
+              onView={handleViewCompany}
+            />
           ) : (
-            <div className="space-y-2">
-              {filteredCompanies.map((company) => (
-                <Card key={company.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4" onClick={() => handleViewCompany(company)}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{company.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {company.commercialManager} • {company.managerEmail}
-                        </p>
-                        {company.commercialWebsite && (
-                          <p className="text-xs text-blue-600 mt-1">{company.commercialWebsite}</p>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditCompany(company);
-                          }}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteCompany(company.id);
-                          }}
-                        >
-                          Eliminar
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <CompaniesList
+              companies={filteredCompanies}
+              onEdit={handleEditCompany}
+              onDelete={handleDeleteCompany}
+              onView={handleViewCompany}
+            />
           )}
         </CardContent>
       </Card>
