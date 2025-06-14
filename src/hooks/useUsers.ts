@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Profile, UserRole, UserPermission, Delegation } from '@/types';
@@ -131,81 +130,41 @@ export const useUsers = () => {
     permissions: Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
   }) => {
     try {
-      console.log('Creating user with data:', userData);
+      console.log('Creating user with edge function:', userData);
       
-      // Create user in auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: userData.email,
-        password: userData.password,
-        options: {
-          data: {
-            name: userData.name,
-          },
+      // Get current session for authorization
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      // Call the edge function to create user
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          role: userData.role,
+          delegationId: userData.delegationId,
+          permissions: userData.permissions,
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
 
-      if (authError) {
-        console.error('Auth error during signup:', authError);
-        throw authError;
+      if (error) {
+        console.error('Error calling create-user function:', error);
+        throw error;
       }
 
-      if (!authData.user) {
-        console.error('No user returned from signup');
-        throw new Error('No se pudo crear el usuario');
+      if (data.error) {
+        console.error('Error from create-user function:', data.error);
+        throw new Error(data.error);
       }
 
-      console.log('User created in auth, ID:', authData.user.id);
-
-      // Wait a bit for the trigger to create the profile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Update profile with delegation if provided
-      if (userData.delegationId) {
-        console.log('Updating profile with delegation:', userData.delegationId);
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({ delegation_id: userData.delegationId })
-          .eq('id', authData.user.id);
-
-        if (profileError) {
-          console.error('Error updating profile:', profileError);
-          throw profileError;
-        }
-      }
-
-      // Create user role
-      console.log('Creating user role:', userData.role);
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: authData.user.id,
-          role: userData.role,
-        });
-
-      if (roleError) {
-        console.error('Error creating user role:', roleError);
-        throw roleError;
-      }
-
-      // Create user permissions for each section
-      const permissionsToInsert = Object.entries(userData.permissions).map(([section, perms]) => ({
-        user_id: authData.user.id,
-        section,
-        can_create: perms.canCreate,
-        can_edit: perms.canEdit,
-        can_delete: perms.canDelete,
-        can_view: perms.canView,
-      }));
-
-      console.log('Creating user permissions:', permissionsToInsert);
-      const { error: permissionsError } = await supabase
-        .from('user_permissions')
-        .insert(permissionsToInsert);
-
-      if (permissionsError) {
-        console.error('Error creating user permissions:', permissionsError);
-        throw permissionsError;
-      }
+      console.log('User created successfully:', data);
 
       toast({
         title: "Usuario creado",
@@ -303,7 +262,7 @@ export const useUsers = () => {
         throw roleError;
       }
 
-      // Delete profile (this should be handled by cascade, but doing it explicitly)
+      // Delete profile
       const { error: profileError } = await supabase
         .from('profiles')
         .delete()
