@@ -3,6 +3,7 @@ import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,8 +70,10 @@ export const Header = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                Mi Perfil
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <Link to="/profile">
+                  Mi Perfil
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 Configuración
