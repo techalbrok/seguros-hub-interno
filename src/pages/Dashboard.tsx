@@ -1,5 +1,5 @@
 
-import { Users, User, Link, Edit, News, Calendar } from "lucide-react";
+import { Users, User, Link, Edit, Newspaper, Calendar } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ const Dashboard = () => {
     {
       title: "Noticias",
       value: 23,
-      icon: <News className="h-4 w-4" />,
+      icon: <Newspaper className="h-4 w-4" />,
       description: "Publicadas este mes",
       trend: { value: 21, isPositive: true }
     },
@@ -61,7 +61,7 @@ const Dashboard = () => {
     switch (type) {
       case 'user': return <Users className="h-4 w-4 text-blue-500" />;
       case 'product': return <Edit className="h-4 w-4 text-green-500" />;
-      case 'news': return <News className="h-4 w-4 text-orange-500" />;
+      case 'news': return <Newspaper className="h-4 w-4 text-orange-500" />;
       case 'company': return <Link className="h-4 w-4 text-purple-500" />;
       default: return <Calendar className="h-4 w-4" />;
     }
@@ -144,7 +144,7 @@ const Dashboard = () => {
                 <span className="text-xs">Crear Producto</span>
               </Button>
               <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
-                <News className="h-6 w-6" />
+                <Newspaper className="h-6 w-6" />
                 <span className="text-xs">Publicar Noticia</span>
               </Button>
             </div>

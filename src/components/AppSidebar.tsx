@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Users, User, Calendar, Bell, News, Edit, Image, Video, Link } from "lucide-react";
+import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -22,13 +22,14 @@ const navigationItems = [
   { title: "Compañías", url: "/companies", icon: Link },
   { title: "Productos", url: "/products", icon: Edit },
   { title: "Contenido por Departamento", url: "/department-content", icon: Image },
-  { title: "Noticias", url: "/news", icon: News },
+  { title: "Noticias", url: "/news", icon: Newspaper },
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const collapsed = state === "collapsed";
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -49,7 +50,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border`}
-      collapsible
+      collapsible="icon"
     >
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
@@ -64,7 +65,7 @@ export function AppSidebar() {
       </div>
 
       <SidebarContent className="px-2 py-4">
-        <SidebarGroup open={isExpanded}>
+        <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-2">
             {!collapsed && "Navegación Principal"}
           </SidebarGroupLabel>
