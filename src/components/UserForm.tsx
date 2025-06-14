@@ -36,7 +36,7 @@ export const UserForm = ({ delegations, onSubmit, onCancel }: UserFormProps) => 
     email: '',
     password: '',
     role: 'user' as 'admin' | 'user',
-    delegationId: '',
+    delegationId: 'none',
   });
 
   const [permissions, setPermissions] = useState<Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>>(() => {
@@ -60,7 +60,7 @@ export const UserForm = ({ delegations, onSubmit, onCancel }: UserFormProps) => 
 
     const success = await onSubmit({
       ...formData,
-      delegationId: formData.delegationId || undefined,
+      delegationId: formData.delegationId === 'none' ? undefined : formData.delegationId,
       permissions,
     });
 
@@ -70,7 +70,7 @@ export const UserForm = ({ delegations, onSubmit, onCancel }: UserFormProps) => 
         email: '',
         password: '',
         role: 'user',
-        delegationId: '',
+        delegationId: 'none',
       });
       setPermissions(() => {
         const initial: Record<string, any> = {};
@@ -180,7 +180,7 @@ export const UserForm = ({ delegations, onSubmit, onCancel }: UserFormProps) => 
                   <SelectValue placeholder="Seleccionar delegación" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sin delegación</SelectItem>
+                  <SelectItem value="none">Sin delegación</SelectItem>
                   {delegations.map((delegation) => (
                     <SelectItem key={delegation.id} value={delegation.id}>
                       {delegation.name}
