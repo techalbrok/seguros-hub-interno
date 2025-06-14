@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserForm } from "@/components/UserForm";
+import { UserEditForm } from "@/components/UserEditForm";
 import { UserCard } from "@/components/UserCard";
 import { UserDetail } from "@/components/UserDetail";
 import { useUsers } from "@/hooks/useUsers";
@@ -54,6 +55,27 @@ const Users = () => {
   const handleEditUser = (user: UserType) => {
     setSelectedUser(user);
     setPageMode('edit');
+  };
+
+  const handleUpdateUser = async (userData: {
+    name: string;
+    role: 'admin' | 'user';
+    delegationId?: string;
+    permissions: Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
+  }) => {
+    if (!selectedUser) return false;
+    
+    const success = await updateUser(selectedUser.id, {
+      name: userData.name,
+      role: userData.role,
+      delegationId: userData.delegationId,
+    });
+    
+    if (success) {
+      setPageMode('list');
+      setSelectedUser(null);
+    }
+    return success;
   };
 
   const handleViewUser = (user: UserType) => {
@@ -96,6 +118,33 @@ const Users = () => {
           delegations={delegations}
           onSubmit={handleCreateUser}
           onCancel={() => setPageMode('list')}
+        />
+      </div>
+    );
+  }
+
+  if (pageMode === 'edit' && selectedUser) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
+              <UsersIcon className="h-8 w-8" />
+              Editar Usuario
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Modifica la información del usuario
+            </p>
+          </div>
+        </div>
+        <UserEditForm
+          user={selectedUser}
+          delegations={delegations}
+          onSubmit={handleUpdateUser}
+          onCancel={() => {
+            setPageMode('list');
+            setSelectedUser(null);
+          }}
         />
       </div>
     );
