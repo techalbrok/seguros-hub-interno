@@ -4,23 +4,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Search, Grid, List } from 'lucide-react';
-import { useDepartments } from '@/hooks/useDepartments';
-import { useDepartmentContent } from '@/hooks/useDepartmentContent';
+import { useDepartments, Department } from '@/hooks/useDepartments';
+import { useDepartmentContent, DepartmentContent } from '@/hooks/useDepartmentContent';
 import { DepartmentForm } from '@/components/DepartmentForm';
 import { DepartmentCard } from '@/components/DepartmentCard';
 import { DepartmentContentForm } from '@/components/DepartmentContentForm';
 import { DepartmentContentCard } from '@/components/DepartmentContentCard';
 import { DepartmentContentDetail } from '@/components/DepartmentContentDetail';
 
+type ViewType = 'departments' | 'content' | 'detail';
+type ViewModeType = 'grid' | 'list';
+
 const Departments = () => {
-  const [view, setView] = useState<'departments' | 'content' | 'detail'>('departments');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [view, setView] = useState<ViewType>('departments');
+  const [viewMode, setViewMode] = useState<ViewModeType>('grid');
   const [showDepartmentForm, setShowDepartmentForm] = useState(false);
   const [showContentForm, setShowContentForm] = useState(false);
-  const [editingDepartment, setEditingDepartment] = useState(null);
-  const [editingContent, setEditingContent] = useState(null);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
+  const [editingContent, setEditingContent] = useState<DepartmentContent | null>(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('');
-  const [selectedContent, setSelectedContent] = useState(null);
+  const [selectedContent, setSelectedContent] = useState<DepartmentContent | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const {
@@ -50,42 +53,52 @@ const Departments = () => {
     item.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDepartmentSubmit = async (data) => {
+  const handleDepartmentSubmit = async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
     if (editingDepartment) {
       const success = await updateDepartment(editingDepartment.id, data);
       if (success) {
         setEditingDepartment(null);
         setShowDepartmentForm(false);
       }
+      return success;
     } else {
       const success = await createDepartment(data);
       if (success) {
         setShowDepartmentForm(false);
       }
+      return success;
     }
   };
 
-  const handleContentSubmit = async (data) => {
+  const handleContentSubmit = async (data: {
+    title: string;
+    content: string;
+    department_id: string;
+    featured_image?: string;
+    published?: boolean;
+  }) => {
     if (editingContent) {
       const success = await updateContent(editingContent.id, data);
       if (success) {
         setEditingContent(null);
         setShowContentForm(false);
       }
+      return success;
     } else {
       const success = await createContent(data);
       if (success) {
         setShowContentForm(false);
       }
+      return success;
     }
   };
 
-  const handleEditDepartment = (department) => {
+  const handleEditDepartment = (department: Department) => {
     setEditingDepartment(department);
     setShowDepartmentForm(true);
   };
 
-  const handleEditContent = (content) => {
+  const handleEditContent = (content: DepartmentContent) => {
     setEditingContent(content);
     setShowContentForm(true);
   };
@@ -95,16 +108,20 @@ const Departments = () => {
     setView('content');
   };
 
-  const handleViewContentDetail = (content) => {
+  const handleViewContentDetail = (content: DepartmentContent) => {
     setSelectedContent(content);
     setView('detail');
+  };
+
+  const handleViewChange = (value: string) => {
+    setView(value as ViewType);
   };
 
   if (showDepartmentForm) {
     return (
       <div className="p-6">
         <DepartmentForm
-          department={editingDepartment}
+          department={editingDepartment || undefined}
           onSubmit={handleDepartmentSubmit}
           onCancel={() => {
             setShowDepartmentForm(false);
@@ -120,7 +137,7 @@ const Departments = () => {
       <div className="p-6">
         <DepartmentContentForm
           departments={departments}
-          content={editingContent}
+          content={editingContent || undefined}
           onSubmit={handleContentSubmit}
           onCancel={() => {
             setShowContentForm(false);
@@ -164,7 +181,7 @@ const Departments = () => {
         </div>
       </div>
 
-      <Tabs value={view} onValueChange={setView} className="w-full">
+      <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <TabsList>
           <TabsTrigger value="departments">Departamentos</TabsTrigger>
           <TabsTrigger value="content">Contenido</TabsTrigger>

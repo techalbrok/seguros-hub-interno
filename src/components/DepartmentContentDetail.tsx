@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, User, Calendar, Building2 } from 'lucide-react';
 import { DepartmentContent } from '@/hooks/useDepartmentContent';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 interface DepartmentContentDetailProps {
   content: DepartmentContent;
@@ -17,6 +15,21 @@ export const DepartmentContentDetail: React.FC<DepartmentContentDetailProps> = (
   content,
   onBack
 }) => {
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   const renderContent = (text: string) => {
     // Simple video embed detection
     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/g;
@@ -66,11 +79,11 @@ export const DepartmentContentDetail: React.FC<DepartmentContentDetailProps> = (
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 pt-2">
             <div className="flex items-center space-x-1">
               <User className="w-4 h-4" />
-              <span>{content.profiles?.name}</span>
+              <span>{content.profiles?.name || 'Usuario'}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Calendar className="w-4 h-4" />
-              <span>{format(new Date(content.created_at), 'dd/MM/yyyy HH:mm', { locale: es })}</span>
+              <span>{formatDate(content.created_at)}</span>
             </div>
             {content.departments && (
               <div className="flex items-center space-x-1">

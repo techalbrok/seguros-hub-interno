@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Edit, Trash2, Eye, User, Calendar } from 'lucide-react';
 import { DepartmentContent } from '@/hooks/useDepartmentContent';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 interface DepartmentContentCardProps {
   content: DepartmentContent;
@@ -21,6 +19,15 @@ export const DepartmentContentCard: React.FC<DepartmentContentCardProps> = ({
   onDelete,
   onView
 }) => {
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES');
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
@@ -49,11 +56,11 @@ export const DepartmentContentCard: React.FC<DepartmentContentCardProps> = ({
         <div className="space-y-2 text-xs text-gray-500">
           <div className="flex items-center space-x-1">
             <User className="w-3 h-3" />
-            <span>{content.profiles?.name}</span>
+            <span>{content.profiles?.name || 'Usuario'}</span>
           </div>
           <div className="flex items-center space-x-1">
             <Calendar className="w-3 h-3" />
-            <span>{format(new Date(content.created_at), 'dd/MM/yyyy', { locale: es })}</span>
+            <span>{formatDate(content.created_at)}</span>
           </div>
           {content.departments && (
             <div className="flex items-center space-x-1">
