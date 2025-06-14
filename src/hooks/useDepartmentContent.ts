@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,14 +26,19 @@ export interface DepartmentContent {
 }
 
 export const useDepartmentContent = (departmentId?: string) => {
-  const [content, setContent] = useState<DepartmentContent[]>([]);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const fetchContent = async () => {
-    try {
-      setLoading(true);
+  const {
+    data: content = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["department-content", departmentId],
+    queryFn: async () => {
+      console.log("Fetching department content...");
+      
       let query = supabase
         .from('department_content')
         .select(`
@@ -49,30 +54,26 @@ export const useDepartmentContent = (departmentId?: string) => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
-      setContent(data || []);
-    } catch (error: any) {
-      console.error('Error fetching content:', error);
-      toast({
-        title: "Error",
-        description: "Error al cargar el contenido",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (error) {
+        console.error('Error fetching content:', error);
+        throw error;
+      }
 
-  const createContent = async (contentData: {
-    title: string;
-    content: string;
-    department_id: string;
-    featured_image?: string;
-    published?: boolean;
-  }) => {
-    if (!user) return false;
+      console.log("Department content fetched successfully:", data);
+      return data as DepartmentContent[];
+    },
+  });
 
-    try {
+  const createContentMutation = useMutation({
+    mutationFn: async (contentData: {
+      title: string;
+      content: string;
+      department_id: string;
+      featured_image?: string;
+      published?: boolean;
+    }) => {
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('department_content')
         .insert([{
@@ -88,28 +89,29 @@ export const useDepartmentContent = (departmentId?: string) => {
         .single();
 
       if (error) throw error;
-
-      setContent(prev => [data, ...prev]);
+      return data as DepartmentContent;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["department-content"] });
       toast({
         title: "Éxito",
         description: "Contenido creado correctamente",
       });
-      return true;
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       console.error('Error creating content:', error);
       toast({
         title: "Error",
         description: error.message || "Error al crear el contenido",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
-  const updateContent = async (id: string, updates: Partial<DepartmentContent>) => {
-    if (!user) return false;
+  const updateContentMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<DepartmentContent> }) => {
+      if (!user) throw new Error('User not authenticated');
 
-    try {
       const updateData = {
         ...updates,
         updated_at: new Date().toISOString()
@@ -131,51 +133,52 @@ export const useDepartmentContent = (departmentId?: string) => {
         .single();
 
       if (error) throw error;
-
-      setContent(prev => prev.map(item => item.id === id ? data : item));
+      return data as DepartmentContent;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["department-content"] });
       toast({
         title: "Éxito",
         description: "Contenido actualizado correctamente",
       });
-      return true;
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       console.error('Error updating content:', error);
       toast({
         title: "Error",
         description: error.message || "Error al actualizar el contenido",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
-  const deleteContent = async (id: string) => {
-    if (!user) return false;
+  const deleteContentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!user) throw new Error('User not authenticated');
 
-    try {
       const { error } = await supabase
         .from('department_content')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-
-      setContent(prev => prev.filter(item => item.id !== id));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["department-content"] });
       toast({
         title: "Éxito",
         description: "Contenido eliminado correctamente",
       });
-      return true;
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       console.error('Error deleting content:', error);
       toast({
         title: "Error",
         description: error.message || "Error al eliminar el contenido",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
   const uploadImage = async (file: File) => {
     if (!user) return null;
@@ -207,17 +210,18 @@ export const useDepartmentContent = (departmentId?: string) => {
     }
   };
 
-  useEffect(() => {
-    fetchContent();
-  }, [departmentId]);
-
   return {
     content,
     loading,
-    fetchContent,
-    createContent,
-    updateContent,
-    deleteContent,
-    uploadImage
+    error,
+    fetchContent: () => queryClient.invalidateQueries({ queryKey: ["department-content"] }),
+    createContent: (data: any) => createContentMutation.mutateAsync(data),
+    updateContent: (id: string, updates: Partial<DepartmentContent>) => 
+      updateContentMutation.mutateAsync({ id, updates }),
+    deleteContent: deleteContentMutation.mutateAsync,
+    uploadImage,
+    isCreating: createContentMutation.isPending,
+    isUpdating: updateContentMutation.isPending,
+    isDeleting: deleteContentMutation.isPending,
   };
 };

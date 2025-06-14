@@ -1,18 +1,21 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { User, Profile, UserRole, UserPermission, Delegation } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [delegations, setDelegations] = useState<Delegation[]>([]);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
+  const {
+    data: users = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      console.log("Fetching users...");
       
       // Fetch profiles with delegations
       const { data: profiles, error: profilesError } = await supabase
@@ -92,22 +95,16 @@ export const useUsers = () => {
         };
       }) || [];
 
-      setUsers(combinedUsers);
       console.log('Users fetched successfully:', combinedUsers);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los usuarios",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      return combinedUsers;
+    },
+  });
 
-  const fetchDelegations = async () => {
-    try {
+  const {
+    data: delegations = [],
+  } = useQuery({
+    queryKey: ["delegations-for-users"],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('delegations')
         .select('*')
@@ -132,22 +129,20 @@ export const useUsers = () => {
         updatedAt: new Date(delegation.updated_at),
       })) || [];
 
-      setDelegations(delegationsData);
       console.log('Delegations fetched successfully:', delegationsData);
-    } catch (error) {
-      console.error('Error fetching delegations:', error);
-    }
-  };
+      return delegationsData;
+    },
+  });
 
-  const createUser = async (userData: {
-    name: string;
-    email: string;
-    password: string;
-    role: 'admin' | 'user';
-    delegationId?: string;
-    permissions: Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
-  }) => {
-    try {
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: {
+      name: string;
+      email: string;
+      password: string;
+      role: 'admin' | 'user';
+      delegationId?: string;
+      permissions: Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
+    }) => {
       console.log('Creating user with edge function:', userData);
       
       // Get current session for authorization
@@ -204,27 +199,27 @@ export const useUsers = () => {
       }
 
       console.log('User created successfully:', data);
-
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({
         title: "Usuario creado",
         description: "El usuario ha sido creado exitosamente",
       });
-
-      await fetchUsers();
-      return true;
-    } catch (error) {
+    },
+    onError: (error: any) => {
       console.error('Error creating user:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo crear el usuario",
+        description: error.message || "No se pudo crear el usuario",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
-  const updateUser = async (userId: string, updates: Partial<User>) => {
-    try {
+  const updateUserMutation = useMutation({
+    mutationFn: async ({ userId, updates }: { userId: string; updates: Partial<User> }) => {
       console.log('Updating user:', userId, updates);
       
       // Update profile
@@ -256,27 +251,26 @@ export const useUsers = () => {
           throw roleError;
         }
       }
-
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({
         title: "Usuario actualizado",
         description: "Los datos del usuario han sido actualizados",
       });
-
-      await fetchUsers();
-      return true;
-    } catch (error) {
+    },
+    onError: (error: any) => {
       console.error('Error updating user:', error);
       toast({
         title: "Error",
         description: "No se pudo actualizar el usuario",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
-  const deleteUser = async (userId: string) => {
-    try {
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
       console.log('Deleting user:', userId);
       
       // Delete user permissions first
@@ -311,37 +305,36 @@ export const useUsers = () => {
         console.error('Error deleting profile:', profileError);
         throw profileError;
       }
-
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({
         title: "Usuario eliminado",
         description: "El usuario ha sido eliminado exitosamente",
       });
-
-      await fetchUsers();
-      return true;
-    } catch (error) {
+    },
+    onError: (error: any) => {
       console.error('Error deleting user:', error);
       toast({
         title: "Error",
         description: "No se pudo eliminar el usuario. Solo se pueden eliminar datos de perfil, no la cuenta de autenticación.",
         variant: "destructive",
       });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-    fetchDelegations();
-  }, []);
+    },
+  });
 
   return {
     users,
     delegations,
     loading,
-    createUser,
-    updateUser,
-    deleteUser,
-    refetch: fetchUsers,
+    error,
+    createUser: (data: any) => createUserMutation.mutateAsync(data),
+    updateUser: (userId: string, updates: Partial<User>) => 
+      updateUserMutation.mutateAsync({ userId, updates }),
+    deleteUser: deleteUserMutation.mutateAsync,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    isCreating: createUserMutation.isPending,
+    isUpdating: updateUserMutation.isPending,
+    isDeleting: deleteUserMutation.isPending,
   };
 };

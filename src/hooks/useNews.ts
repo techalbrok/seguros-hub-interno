@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNewsOperations } from './useNewsOperations';
@@ -43,14 +43,18 @@ export interface CreateNewsData {
 }
 
 export const useNews = () => {
-  const [news, setNews] = useState<News[]>([]);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { createNewsRelations, updateNewsRelations } = useNewsOperations();
+  const queryClient = useQueryClient();
 
-  const fetchNews = async () => {
-    try {
-      setLoading(true);
+  const {
+    data: news = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["news"],
+    queryFn: async () => {
+      console.log("Fetching news...");
       
       const { data, error } = await supabase
         .from('news')
@@ -71,12 +75,7 @@ export const useNews = () => {
 
       if (error) {
         console.error('Error fetching news:', error);
-        toast({
-          title: "Error",
-          description: "Error al cargar las noticias",
-          variant: "destructive",
-        });
-        return;
+        throw error;
       }
 
       const processedNews = data?.map(item => ({
@@ -86,30 +85,17 @@ export const useNews = () => {
         products: item.news_products?.map(np => np.products).filter(Boolean) || []
       })) || [];
 
-      setNews(processedNews);
-    } catch (error) {
-      console.error('Error fetching news:', error);
-      toast({
-        title: "Error",
-        description: "Error al cargar las noticias",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      console.log("News fetched successfully:", processedNews);
+      return processedNews as News[];
+    },
+  });
 
-  const createNews = async (newsData: CreateNewsData) => {
-    try {
+  const createNewsMutation = useMutation({
+    mutationFn: async (newsData: CreateNewsData) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        toast({
-          title: "Error",
-          description: "Usuario no autenticado",
-          variant: "destructive",
-        });
-        return false;
+        throw new Error('Usuario no autenticado');
       }
 
       const { data: newsItem, error } = await supabase
@@ -127,36 +113,31 @@ export const useNews = () => {
 
       if (error) {
         console.error('Error creating news:', error);
-        toast({
-          title: "Error",
-          description: "Error al crear la noticia",
-          variant: "destructive",
-        });
-        return false;
+        throw error;
       }
 
       await createNewsRelations(newsItem.id, newsData);
-
+      return newsItem;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["news"] });
       toast({
         title: "Éxito",
         description: "Noticia creada correctamente",
       });
-
-      fetchNews();
-      return true;
-    } catch (error) {
+    },
+    onError: (error: any) => {
       console.error('Error creating news:', error);
       toast({
         title: "Error",
         description: "Error al crear la noticia",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
-  const updateNews = async (id: string, newsData: Partial<CreateNewsData>) => {
-    try {
+  const updateNewsMutation = useMutation({
+    mutationFn: async ({ id, newsData }: { id: string; newsData: Partial<CreateNewsData> }) => {
       const { error } = await supabase
         .from('news')
         .update({
@@ -168,36 +149,30 @@ export const useNews = () => {
 
       if (error) {
         console.error('Error updating news:', error);
-        toast({
-          title: "Error",
-          description: "Error al actualizar la noticia",
-          variant: "destructive",
-        });
-        return false;
+        throw error;
       }
 
       await updateNewsRelations(id, newsData);
-
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["news"] });
       toast({
         title: "Éxito",
         description: "Noticia actualizada correctamente",
       });
-
-      fetchNews();
-      return true;
-    } catch (error) {
+    },
+    onError: (error: any) => {
       console.error('Error updating news:', error);
       toast({
         title: "Error",
         description: "Error al actualizar la noticia",
         variant: "destructive",
       });
-      return false;
-    }
-  };
+    },
+  });
 
-  const deleteNews = async (id: string) => {
-    try {
+  const deleteNewsMutation = useMutation({
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('news')
         .delete()
@@ -205,42 +180,37 @@ export const useNews = () => {
 
       if (error) {
         console.error('Error deleting news:', error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar la noticia",
-          variant: "destructive",
-        });
-        return false;
+        throw error;
       }
-
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["news"] });
       toast({
         title: "Éxito",
         description: "Noticia eliminada correctamente",
       });
-
-      fetchNews();
-      return true;
-    } catch (error) {
+    },
+    onError: (error: any) => {
       console.error('Error deleting news:', error);
       toast({
         title: "Error",
         description: "Error al eliminar la noticia",
         variant: "destructive",
       });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    fetchNews();
-  }, []);
+    },
+  });
 
   return {
     news,
     loading,
-    createNews,
-    updateNews,
-    deleteNews,
-    refetch: fetchNews,
+    error,
+    createNews: (data: CreateNewsData) => createNewsMutation.mutateAsync(data),
+    updateNews: (id: string, newsData: Partial<CreateNewsData>) => 
+      updateNewsMutation.mutateAsync({ id, newsData }),
+    deleteNews: deleteNewsMutation.mutateAsync,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ["news"] }),
+    isCreating: createNewsMutation.isPending,
+    isUpdating: updateNewsMutation.isPending,
+    isDeleting: deleteNewsMutation.isPending,
   };
 };
