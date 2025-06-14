@@ -31,7 +31,7 @@ export const useNavigationShortcuts = () => {
         .order('order_position', { ascending: true });
 
       if (error) throw error;
-      setShortcuts((data as NavigationShortcut[]) || []);
+      setShortcuts((data as unknown as NavigationShortcut[]) || []);
     } catch (error) {
       console.error('Error fetching shortcuts:', error);
       toast({
@@ -55,7 +55,7 @@ export const useNavigationShortcuts = () => {
 
       if (error) throw error;
 
-      setShortcuts(prev => [...prev, data as NavigationShortcut]);
+      setShortcuts(prev => [...prev, data as unknown as NavigationShortcut]);
       toast({
         title: "Acceso directo creado",
         description: "El acceso directo se ha creado correctamente",
@@ -84,7 +84,7 @@ export const useNavigationShortcuts = () => {
 
       if (error) throw error;
 
-      setShortcuts(prev => prev.map(s => s.id === id ? data as NavigationShortcut : s));
+      setShortcuts(prev => prev.map(s => s.id === id ? data as unknown as NavigationShortcut : s));
       toast({
         title: "Acceso directo actualizado",
         description: "El acceso directo se ha actualizado correctamente",
