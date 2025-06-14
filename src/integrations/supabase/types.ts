@@ -9,16 +9,180 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      delegations: {
+        Row: {
+          address: string
+          contact_person: string
+          created_at: string
+          email: string
+          id: string
+          legal_name: string
+          name: string
+          phone: string
+          updated_at: string
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          address: string
+          contact_person: string
+          created_at?: string
+          email: string
+          id?: string
+          legal_name: string
+          name: string
+          phone: string
+          updated_at?: string
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          contact_person?: string
+          created_at?: string
+          email?: string
+          id?: string
+          legal_name?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delegations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          delegation_id: string | null
+          email: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delegation_id?: string | null
+          email: string
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delegation_id?: string | null
+          email?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_delegation_id_fkey"
+            columns: ["delegation_id"]
+            isOneToOne: false
+            referencedRelation: "delegations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_permissions: {
+        Row: {
+          can_create: boolean
+          can_delete: boolean
+          can_edit: boolean
+          can_view: boolean
+          created_at: string
+          id: string
+          section: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          section: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          section?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      is_admin: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +297,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "user"],
+    },
   },
 } as const

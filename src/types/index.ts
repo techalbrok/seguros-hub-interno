@@ -119,3 +119,31 @@ export interface News {
 export interface ThemeMode {
   mode: 'light' | 'dark';
 }
+
+export interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  delegationId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserRole {
+  id: string;
+  userId: string;
+  role: 'admin' | 'user';
+  createdAt: Date;
+}
+
+export interface UserPermission {
+  id: string;
+  userId: string;
+  section: 'users' | 'delegations' | 'companies' | 'products' | 'department_content' | 'news';
+  canCreate: boolean;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
