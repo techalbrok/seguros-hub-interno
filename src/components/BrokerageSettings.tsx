@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ColorPicker } from "@/components/ColorPicker";
 import { SimpleImageUpload } from "@/components/SimpleImageUpload";
+import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
 
 interface BrokerageConfig {
   id?: string;
@@ -27,6 +27,7 @@ interface BrokerageConfig {
 
 export const BrokerageSettings = () => {
   const { toast } = useToast();
+  const { refreshConfig } = useBrokerageConfig();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<BrokerageConfig>({
@@ -117,6 +118,9 @@ export const BrokerageSettings = () => {
       }
 
       if (result.error) throw result.error;
+
+      // Refrescar la configuración en toda la aplicación
+      refreshConfig();
 
       toast({
         title: "Configuración guardada",

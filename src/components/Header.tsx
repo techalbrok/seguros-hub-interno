@@ -3,6 +3,7 @@ import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
+  const { config, loading } = useBrokerageConfig();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -43,12 +45,22 @@ export const Header = () => {
     await signOut();
   };
 
+  const brokerageName = config?.name || "Intranet Correduría";
+  const logoUrl = config?.logo_url;
+
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="flex items-center justify-between h-full px-6">
         <div className="flex items-center space-x-4">
+          {logoUrl && (
+            <img 
+              src={logoUrl} 
+              alt={`Logo de ${brokerageName}`}
+              className="h-8 w-auto object-contain"
+            />
+          )}
           <h1 className="text-xl font-semibold text-sidebar-primary dark:text-white">
-            Intranet Correduría
+            {brokerageName}
           </h1>
         </div>
         
@@ -86,7 +98,7 @@ export const Header = () => {
                     {user ? 'Usuario autenticado' : 'Administrador'}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email || 'admin@correduriaseguros.com'}
+                    {user?.email || config?.email || 'admin@correduriaseguros.com'}
                   </p>
                 </div>
               </DropdownMenuLabel>
