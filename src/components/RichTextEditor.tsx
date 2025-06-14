@@ -51,7 +51,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
       )}
-      <div className="bg-white dark:bg-gray-900 rounded-lg border">
+      <div className="rich-text-editor-container">
         <ReactQuill
           theme="snow"
           value={value}

@@ -110,4 +110,57 @@
   .corporate-button {
     @apply bg-corporate-red hover:bg-red-600 text-white transition-all duration-200 transform hover:scale-105;
   }
+
+  /* Rich Text Editor Styles */
+  .rich-text-editor-container {
+    @apply border border-input rounded-md overflow-hidden;
+  }
+
+  .rich-text-editor-container .ql-toolbar {
+    @apply border-0 border-b border-input bg-muted/50;
+    border-radius: 0;
+  }
+
+  .rich-text-editor-container .ql-container {
+    @apply border-0;
+    border-radius: 0;
+  }
+
+  .rich-text-editor-container .ql-editor {
+    @apply min-h-[200px] p-3;
+  }
+
+  .rich-text-editor-container .ql-toolbar .ql-stroke {
+    @apply stroke-foreground;
+  }
+
+  .rich-text-editor-container .ql-toolbar .ql-fill {
+    @apply fill-foreground;
+  }
+
+  .rich-text-editor-container .ql-toolbar .ql-picker-label {
+    @apply text-foreground;
+  }
+
+  .rich-text-editor-container .ql-toolbar button:hover,
+  .rich-text-editor-container .ql-toolbar button.ql-active {
+    @apply bg-accent;
+  }
+
+  .rich-text-editor-container .ql-toolbar .ql-picker-options {
+    @apply bg-background border border-input rounded-md shadow-md;
+  }
+
+  .rich-text-editor-container .ql-toolbar .ql-picker-item:hover {
+    @apply bg-accent;
+  }
+
+  /* Dark mode adjustments */
+  .dark .rich-text-editor-container .ql-editor {
+    @apply text-foreground bg-background;
+  }
+
+  .dark .rich-text-editor-container .ql-toolbar {
+    @apply bg-muted/30;
+  }
 }
