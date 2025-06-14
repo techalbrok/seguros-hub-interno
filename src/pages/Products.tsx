@@ -10,6 +10,17 @@ import { ProductCategorySidebar } from "@/components/ProductCategorySidebar";
 import { ProductsHeader } from "@/components/products/ProductsHeader";
 import { ProductControls } from "@/components/products/ProductControls";
 import { ProductList } from "@/components/products/ProductList";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
 
 const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -19,6 +30,7 @@ const Products = () => {
   const [showForm, setShowForm] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   const {
     products,
@@ -27,7 +39,8 @@ const Products = () => {
     updateProduct,
     deleteProduct,
     isCreating,
-    isUpdating
+    isUpdating,
+    isDeleting,
   } = useProducts();
   const { categories: productCategories } = useProductCategories();
 
@@ -78,9 +91,27 @@ const Products = () => {
     setShowDetail(true);
   };
   
-  const handleDelete = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      deleteProduct(id);
+  const handleDelete = (id: string) => {
+    const product = products.find((p) => p.id === id);
+    if (product) {
+      setProductToDelete(product);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (productToDelete) {
+      deleteProduct(productToDelete.id, {
+        onSuccess: () => {
+          if (selectedProduct?.id === productToDelete.id) {
+            setSelectedProduct(null);
+            setShowDetail(false);
+          }
+          setProductToDelete(null);
+        },
+        onError: () => {
+          setProductToDelete(null);
+        },
+      });
     }
   };
   
@@ -115,6 +146,30 @@ const Products = () => {
       setSelectedProduct(null);
     }
   };
+
+  const deleteConfirmationDialog = (
+    <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no se puede deshacer. Se eliminará permanentemente el producto{' '}
+            <span className="font-semibold">{productToDelete?.title}</span>.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirmDelete}
+            disabled={isDeleting}
+            className={buttonVariants({ variant: "destructive" })}
+          >
+            {isDeleting ? 'Eliminando...' : 'Sí, eliminar'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 
   return <div className="space-y-6">
       <ProductsHeader />
@@ -176,6 +231,8 @@ const Products = () => {
         product={selectedProduct}
         onEdit={handleEdit}
       />
+
+      {deleteConfirmationDialog}
     </div>;
 };
 export default Products;
