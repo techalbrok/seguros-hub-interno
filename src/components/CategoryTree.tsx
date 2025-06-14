@@ -15,16 +15,17 @@ interface CategoryTreeProps {
 
 interface CategoryNodeProps {
   category: ProductCategory;
-  children: ProductCategory[];
+  allCategories: ProductCategory[];
   level: number;
   onEdit: (category: ProductCategory) => void;
   onDelete: (id: string) => void;
   onAddSubcategory: (parentId: string) => void;
 }
 
-const CategoryNode = ({ category, children, level, onEdit, onDelete, onAddSubcategory }: CategoryNodeProps) => {
+const CategoryNode = ({ category, allCategories, level, onEdit, onDelete, onAddSubcategory }: CategoryNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(level <= 2);
 
+  const children = allCategories.filter(c => c.parentId === category.id);
   const hasChildren = children.length > 0;
 
   return (
@@ -94,20 +95,17 @@ const CategoryNode = ({ category, children, level, onEdit, onDelete, onAddSubcat
 
       {hasChildren && isExpanded && (
         <div className="ml-4">
-          {children.map((child) => {
-            const grandChildren = children.filter(c => c.parentId === child.id);
-            return (
+          {children.map((child) => (
               <CategoryNode
                 key={child.id}
                 category={child}
-                children={grandChildren}
+                allCategories={allCategories}
                 level={level + 1}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onAddSubcategory={onAddSubcategory}
               />
-            );
-          })}
+          ))}
         </div>
       )}
     </div>
@@ -115,29 +113,21 @@ const CategoryNode = ({ category, children, level, onEdit, onDelete, onAddSubcat
 };
 
 export const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory }: CategoryTreeProps) => {
-  // Build hierarchical structure
   const rootCategories = categories.filter(cat => !cat.parentId);
-  
-  const buildTree = (parentId?: string): ProductCategory[] => {
-    return categories.filter(cat => cat.parentId === parentId);
-  };
 
   return (
     <div className="space-y-4">
-      {rootCategories.map((category) => {
-        const children = buildTree(category.id);
-        return (
-          <CategoryNode
-            key={category.id}
-            category={category}
-            children={children}
-            level={1}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onAddSubcategory={onAddSubcategory}
-          />
-        );
-      })}
+      {rootCategories.map((category) => (
+        <CategoryNode
+          key={category.id}
+          category={category}
+          allCategories={categories}
+          level={1}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onAddSubcategory={onAddSubcategory}
+        />
+      ))}
     </div>
   );
 };
