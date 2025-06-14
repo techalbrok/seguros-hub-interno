@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +11,7 @@ interface CreateProductData {
   observations?: string;
   categoryId?: string;
   companyId?: string;
+  documents?: File[];
 }
 
 interface UpdateProductData extends CreateProductData {
@@ -83,27 +83,88 @@ export const useProducts = () => {
 
   const createProductMutation = useMutation({
     mutationFn: async (productData: CreateProductData) => {
-      console.log("Creating product:", productData);
-      
-      const { data, error } = await supabase
+      console.log("Creating product with documents:", productData);
+
+      const { documents, ...productCoreData } = productData;
+
+      // 1. Create the product
+      const { data: newProduct, error: productError } = await supabase
         .from("products")
         .insert([{
-          title: productData.title,
-          process: productData.process,
-          strengths: productData.strengths,
-          observations: productData.observations,
-          category_id: productData.categoryId,
-          company_id: productData.companyId,
+          title: productCoreData.title,
+          process: productCoreData.process,
+          strengths: productCoreData.strengths,
+          observations: productCoreData.observations,
+          category_id: productCoreData.categoryId,
+          company_id: productCoreData.companyId,
         }])
         .select()
         .single();
 
-      if (error) {
-        console.error("Error creating product:", error);
-        throw error;
+      if (productError) {
+        console.error("Error creating product:", productError);
+        throw productError;
       }
 
-      return transformDbRowToProduct(data);
+      // 2. Upload documents if any
+      if (documents && documents.length > 0) {
+        const productId = newProduct.id;
+        const uploadedDocuments = [];
+
+        for (const file of documents) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${productId}/${Date.now()}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('product-documents')
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error('Error uploading document:', uploadError);
+            continue;
+          }
+
+          const { data: urlData } = supabase.storage
+            .from('product-documents')
+            .getPublicUrl(fileName);
+
+          uploadedDocuments.push({
+            product_id: productId,
+            name: file.name,
+            url: urlData.publicUrl,
+            type: file.type,
+            size: file.size,
+          });
+        }
+
+        // 3. Insert document records
+        if (uploadedDocuments.length > 0) {
+          const { error: docError } = await supabase
+            .from('product_documents')
+            .insert(uploadedDocuments);
+
+          if (docError) {
+            console.error('Error inserting product documents:', docError);
+          }
+        }
+      }
+
+      // 4. Refetch the full product with documents to return
+      const { data: finalProduct, error: finalProductError } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_documents (*)
+        `)
+        .eq('id', newProduct.id)
+        .single();
+      
+      if (finalProductError) {
+        console.error("Error refetching product:", finalProductError);
+        throw finalProductError;
+      }
+      
+      return transformDbRowToProduct(finalProduct);
     },
     onMutate: async (newProduct) => {
       await queryClient.cancelQueries({ queryKey: ['products'] });
@@ -156,6 +217,9 @@ export const useProducts = () => {
 
   const updateProductMutation = useMutation({
     mutationFn: async (productData: UpdateProductData) => {
+      const { documents, ...productCoreData } = productData;
+    
+      // 1. Update product details
       const { data, error } = await supabase
         .from("products")
         .update({
@@ -172,7 +236,62 @@ export const useProducts = () => {
         .single();
 
       if (error) throw error;
-      return transformDbRowToProduct(data);
+      
+      // 2. Upload and insert new documents
+      if (documents && documents.length > 0) {
+        const productId = productCoreData.id;
+        const uploadedDocuments = [];
+
+        for (const file of documents) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${productId}/${Date.now()}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('product-documents')
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error('Error uploading document:', uploadError);
+            continue;
+          }
+
+          const { data: urlData } = supabase.storage
+            .from('product-documents')
+            .getPublicUrl(fileName);
+
+          uploadedDocuments.push({
+            product_id: productId,
+            name: file.name,
+            url: urlData.publicUrl,
+            type: file.type,
+            size: file.size,
+          });
+        }
+
+        if (uploadedDocuments.length > 0) {
+          const { error: docError } = await supabase
+            .from('product_documents')
+            .insert(uploadedDocuments);
+
+          if (docError) {
+            console.error('Error inserting product documents:', docError);
+          }
+        }
+      }
+
+      // 3. Refetch the full product with documents to return
+      const { data: finalProduct, error: finalProductError } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_documents (*)
+        `)
+        .eq('id', productCoreData.id)
+        .single();
+
+      if (finalProductError) throw finalProductError;
+      
+      return transformDbRowToProduct(finalProduct);
     },
     onMutate: async (updatedProduct) => {
       await queryClient.cancelQueries({ queryKey: ['products'] });
@@ -261,4 +380,3 @@ export const useProducts = () => {
     isDeleting: deleteProductMutation.isPending,
   };
 };
-

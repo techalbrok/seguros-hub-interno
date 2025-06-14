@@ -63,8 +63,10 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit }: ProductDe
                         <FileText className="h-4 w-4 mr-2" />
                         <span className="text-sm font-medium">{doc.name}</span>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Download className="h-4 w-4" />
+                      <Button variant="ghost" size="sm" asChild>
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
+                          <Download className="h-4 w-4" />
+                        </a>
                       </Button>
                     </div>
                   </div>
