@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { users } = useUsers();
   const { delegations } = useDelegations();
   const { companies } = useCompanies();
@@ -63,7 +63,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">
-          Bienvenido, {user?.user_metadata?.name || user?.email}
+          Bienvenido, {profile?.name || user?.user_metadata?.name || user?.email}
         </h1>
         <p className="text-muted-foreground mt-2">
           Panel de control del sistema de gestión interno
