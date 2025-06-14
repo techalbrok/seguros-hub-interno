@@ -19,6 +19,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { AppPagination } from "@/components/ui/AppPagination";
+import { CompanyCardSkeleton, CompanyListSkeleton } from "@/components/skeletons/CompanySkeletons";
 
 type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
@@ -43,8 +45,16 @@ export default function Companies() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredCompanies = companies.filter(company => company.name.toLowerCase().includes(searchTerm.toLowerCase()) || company.commercialManager.toLowerCase().includes(searchTerm.toLowerCase()) || company.managerEmail.toLowerCase().includes(searchTerm.toLowerCase()));
+  
+  const companiesPerPage = displayMode === 'grid' ? 6 : 5;
+  const totalPages = Math.ceil(filteredCompanies.length / companiesPerPage);
+  const paginatedCompanies = filteredCompanies.slice(
+    (currentPage - 1) * companiesPerPage,
+    currentPage * companiesPerPage
+  );
   
   const handleCreateCompany = (data: CompanyFormData) => {
     createCompany(data, {
@@ -175,11 +185,35 @@ export default function Companies() {
           <CompaniesControls searchTerm={searchTerm} onSearchTermChange={setSearchTerm} activeDisplayMode={displayMode} onDisplayModeChange={setDisplayMode} companyCount={filteredCompanies.length} />
         </CardHeader>
         <CardContent>
-          {isLoading ? <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div> : filteredCompanies.length === 0 ? <div className="text-center py-8 text-muted-foreground">
+          {isLoading ? (
+            displayMode === "grid" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => <CompanyCardSkeleton key={i} />)}
+              </div>
+            ) : (
+              <CompanyListSkeleton />
+            )
+          ) : filteredCompanies.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
               {searchTerm ? "No se encontraron compañías que coincidan con la búsqueda." : "No hay compañías registradas. ¡Añade una!"}
-            </div> : displayMode === "grid" ? <CompaniesGrid companies={filteredCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} /> : <CompaniesList companies={filteredCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} />}
+            </div>
+          ) : (
+            <>
+              {displayMode === "grid" ? (
+                <CompaniesGrid companies={paginatedCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} />
+              ) : (
+                <CompaniesList companies={paginatedCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} />
+              )}
+              {totalPages > 1 && (
+                <AppPagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                  className="mt-6"
+                />
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
       <CompanyForm

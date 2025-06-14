@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 import type { Product, ProductCategory } from "@/types";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductListItem } from "./ProductListItem";
@@ -9,6 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ProductCardSkeleton, ProductListItemSkeleton } from '../skeletons/ProductSkeletons';
+import { AppPagination } from '../ui/AppPagination';
 
 interface ProductListProps {
   isLoading: boolean;
@@ -33,10 +35,32 @@ export const ProductList = ({
   onView,
   categories,
 }: ProductListProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = viewType === 'list' ? 10 : 9;
+
   if (isLoading) {
+    if (viewType === 'list') {
+      return (
+        <div className="border rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40%]">Título</TableHead>
+                <TableHead className="hidden sm:table-cell">Categoría</TableHead>
+                <TableHead className="hidden md:table-cell">Proceso</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(5)].map((_, i) => <ProductListItemSkeleton key={i} />)}
+            </TableBody>
+          </Table>
+        </div>
+      );
+    }
     return (
-      <div className="text-center py-12">
-        <p>Cargando productos...</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => <ProductCardSkeleton key={i} />)}
       </div>
     );
   }
@@ -53,38 +77,40 @@ export const ProductList = ({
     );
   }
 
-  if (viewType === "list") {
-    return (
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40%]">Título</TableHead>
-              <TableHead className="hidden sm:table-cell">Categoría</TableHead>
-              <TableHead className="hidden md:table-cell">Proceso</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProducts.map((product) => (
-              <ProductListItem
-                key={product.id}
-                product={product}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onView={onView}
-                categories={categories}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    );
-  }
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  );
 
-  return (
+  const content = viewType === 'list' ? (
+    <div className="border rounded-lg overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[40%]">Título</TableHead>
+            <TableHead className="hidden sm:table-cell">Categoría</TableHead>
+            <TableHead className="hidden md:table-cell">Proceso</TableHead>
+            <TableHead className="text-right">Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {paginatedProducts.map((product) => (
+            <ProductListItem
+              key={product.id}
+              product={product}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onView={onView}
+              categories={categories}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  ) : (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-      {filteredProducts.map((product) => (
+      {paginatedProducts.map((product) => (
         <ProductCard
           key={product.id}
           product={product}
@@ -95,5 +121,19 @@ export const ProductList = ({
         />
       ))}
     </div>
+  );
+
+  return (
+    <>
+      {content}
+      {totalPages > 1 && (
+        <AppPagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          className="mt-6"
+        />
+      )}
+    </>
   );
 };

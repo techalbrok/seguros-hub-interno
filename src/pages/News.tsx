@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCompanies } from '@/hooks/useCompanies';
 import { useProductCategories } from '@/hooks/useProductCategories';
 import { useProducts } from '@/hooks/useProducts';
+import { NewsCardSkeleton } from '@/components/skeletons/NewsSkeletons';
+import { AppPagination } from '@/components/ui/AppPagination';
 
 type ViewMode = 'list' | 'create' | 'edit' | 'detail';
 
@@ -23,6 +25,8 @@ const NewsPage = () => {
   const [productFilter, setProductFilter] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const newsPerPage = 5;
 
   const {
     news,
@@ -46,6 +50,12 @@ const NewsPage = () => {
 
     return searchTermMatch && companyMatch && categoryMatch && productMatch;
   });
+
+  const totalPages = Math.ceil(filteredNews.length / newsPerPage);
+  const paginatedNews = filteredNews.slice(
+    (currentPage - 1) * newsPerPage,
+    currentPage * newsPerPage
+  );
 
   const handleCreate = () => {
     setSelectedNews(null);
@@ -156,8 +166,8 @@ const NewsPage = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Cargando noticias...</p>
+        <div className="space-y-6">
+          {[...Array(3)].map((_, i) => <NewsCardSkeleton key={i} />)}
         </div>
       ) : filteredNews.length === 0 ? (
         <div className="text-center py-12">
@@ -167,7 +177,15 @@ const NewsPage = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {filteredNews.map(newsItem => <NewsCard key={newsItem.id} news={newsItem} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />)}
+          {paginatedNews.map(newsItem => <NewsCard key={newsItem.id} news={newsItem} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />)}
+          {totalPages > 1 && (
+            <AppPagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              className="pt-4"
+            />
+          )}
         </div>
       )}
 

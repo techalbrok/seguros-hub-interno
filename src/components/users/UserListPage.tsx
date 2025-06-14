@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 interface UserListPageProps {
   users: User[];
   delegations: Delegation[];
+  loading: boolean;
   onSetPageMode: () => void;
   onViewUser: (user: User) => void;
   onEditUser: (user: User) => void;
@@ -18,6 +19,7 @@ interface UserListPageProps {
 export const UserListPage = ({
   users,
   delegations,
+  loading,
   onSetPageMode,
   onViewUser,
   onEditUser,
@@ -50,6 +52,7 @@ export const UserListPage = ({
       <UsersListView
         users={users}
         delegations={delegations}
+        loading={loading}
         onViewUser={onViewUser}
         onEditUser={onEditUser}
         onDeleteUser={onDeleteUser}

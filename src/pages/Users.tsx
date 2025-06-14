@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useUsers } from "@/hooks/useUsers";
 import { User as UserType } from "@/types";
@@ -110,6 +109,7 @@ const Users = () => {
     <UserListPage
       users={users}
       delegations={delegations}
+      loading={loading}
       onSetPageMode={() => setPageMode('create')}
       onViewUser={handleViewUser}
       onEditUser={handleEditUser}
