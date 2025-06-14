@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Users from "./pages/Users";
+import Delegations from "./pages/Delegations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,12 +29,7 @@ const App = () => (
             } />
             <Route path="/delegations" element={
               <Layout>
-                <div className="text-center py-12">
-                  <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
-                    Gestión de Delegaciones
-                  </h1>
-                  <p className="text-muted-foreground">Próximamente disponible</p>
-                </div>
+                <Delegations />
               </Layout>
             } />
             <Route path="/companies" element={
