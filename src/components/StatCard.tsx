@@ -1,36 +1,35 @@
 
-import { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
-  value: string | number;
-  icon: ReactNode;
+  value: string;
+  icon: LucideIcon;
   description?: string;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
 }
 
-export const StatCard = ({ title, value, icon, description, trend }: StatCardProps) => {
+export const StatCard: React.FC<StatCardProps> = ({
+  title,
+  value,
+  icon: Icon,
+  description
+}) => {
   return (
-    <Card className="transition-all duration-200 hover:shadow-lg hover:scale-105">
+    <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+        <CardTitle className="text-sm font-medium">
           {title}
         </CardTitle>
-        <div className="text-primary">{icon}</div>
+        <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-sidebar-primary dark:text-white">{value}</div>
+        <div className="text-2xl font-bold">{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        )}
-        {trend && (
-          <div className={`text-xs mt-1 ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {trend.isPositive ? '↗' : '↘'} {Math.abs(trend.value)}% vs mes anterior
-          </div>
+          <p className="text-xs text-muted-foreground">
+            {description}
+          </p>
         )}
       </CardContent>
     </Card>

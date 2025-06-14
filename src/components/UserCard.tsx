@@ -1,94 +1,101 @@
 
-import { User, Delegation } from "@/types";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { User, Mail, Building, Edit, Trash2, Eye } from 'lucide-react';
 
 interface UserCardProps {
-  user: User;
-  delegations: Delegation[];
-  onEdit: (user: User) => void;
-  onDelete: (userId: string) => void;
-  onView: (user: User) => void;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    delegation?: string;
+    active: boolean;
+    last_login?: string;
+  };
+  onEdit: (user: any) => void;
+  onDelete: (id: string) => void;
+  onView: (user: any) => void;
 }
 
-export const UserCard = ({ user, delegations, onEdit, onDelete, onView }: UserCardProps) => {
-  const delegation = delegations.find(d => d.id === user.delegationId);
-  
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
-
-  const getRoleColor = (role: string) => {
-    return role === 'admin' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground';
+export const UserCard: React.FC<UserCardProps> = ({
+  user,
+  onEdit,
+  onDelete,
+  onView
+}) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Nunca';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES');
+    } catch {
+      return 'Fecha inválida';
+    }
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-center space-x-4 mb-4">
-          <Avatar className="h-12 w-12">
-            <AvatarFallback className="bg-primary text-white">
-              {getInitials(user.name)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sidebar-primary dark:text-white truncate">
-              {user.name}
-            </h3>
-            <p className="text-sm text-muted-foreground truncate">
-              {user.email}
-            </p>
+    <Card className="h-full hover:shadow-lg transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-2">
+            <User className="w-5 h-5 text-primary" />
+            <CardTitle className="text-lg">{user.name}</CardTitle>
           </div>
+          <Badge variant={user.active ? "default" : "secondary"}>
+            {user.active ? "Activo" : "Inactivo"}
+          </Badge>
         </div>
-
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Rol:</span>
-            <Badge className={getRoleColor(user.role)}>
-              {user.role === 'admin' ? 'Administrador' : 'Usuario'}
-            </Badge>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2 text-sm">
+            <Mail className="w-4 h-4 text-gray-500" />
+            <span>{user.email}</span>
           </div>
-          
-          {delegation && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Delegación:</span>
-              <span className="text-sm font-medium text-sidebar-primary dark:text-white">
-                {delegation.name}
-              </span>
+          {user.delegation && (
+            <div className="flex items-center space-x-2 text-sm">
+              <Building className="w-4 h-4 text-gray-500" />
+              <span>{user.delegation}</span>
             </div>
           )}
+        </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Permisos:</span>
-            <div className="flex space-x-1">
-              {user.permissions.canView && (
-                <Badge variant="outline" className="text-xs">V</Badge>
-              )}
-              {user.permissions.canCreate && (
-                <Badge variant="outline" className="text-xs">C</Badge>
-              )}
-              {user.permissions.canEdit && (
-                <Badge variant="outline" className="text-xs">E</Badge>
-              )}
-              {user.permissions.canDelete && (
-                <Badge variant="outline" className="text-xs">D</Badge>
-              )}
-            </div>
+        <div>
+          <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Rol: {user.role}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Último acceso: {formatDate(user.last_login)}
           </div>
         </div>
 
-        <div className="flex space-x-2">
-          <Button size="sm" variant="outline" onClick={() => onView(user)}>
-            <Eye className="h-4 w-4" />
+        <div className="flex gap-2 pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onView(user)}
+            className="flex-1"
+          >
+            <Eye className="w-4 h-4 mr-1" />
+            Ver
           </Button>
-          <Button size="sm" variant="outline" onClick={() => onEdit(user)}>
-            <Edit className="h-4 w-4" />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onEdit(user)}
+          >
+            <Edit className="w-4 h-4" />
           </Button>
-          <Button size="sm" variant="outline" onClick={() => onDelete(user.id)}>
-            <Trash2 className="h-4 w-4" />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onDelete(user.id)}
+            className="text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </CardContent>
