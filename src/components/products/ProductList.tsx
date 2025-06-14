@@ -1,11 +1,19 @@
 
 import type { Product, ProductCategory } from "@/types";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductListItem } from "./ProductListItem";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface ProductListProps {
   isLoading: boolean;
   filteredProducts: Product[];
-  viewType: 'grid' | 'list';
+  viewType: "grid" | "list";
   searchTerm: string;
   selectedCategory: string;
   onEdit: (product: Product) => void;
@@ -37,21 +45,52 @@ export const ProductList = ({
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">
-          {searchTerm || selectedCategory !== 'all' ? 'No se encontraron productos que coincidan con tu búsqueda.' : 'No hay productos disponibles.'}
+          {searchTerm || selectedCategory !== "all"
+            ? "No se encontraron productos que coincidan con tu búsqueda."
+            : "No hay productos disponibles."}
         </p>
       </div>
     );
   }
 
+  if (viewType === "list") {
+    return (
+      <div className="border rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[40%]">Título</TableHead>
+              <TableHead className="hidden sm:table-cell">Categoría</TableHead>
+              <TableHead className="hidden md:table-cell">Proceso</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredProducts.map((product) => (
+              <ProductListItem
+                key={product.id}
+                product={product}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onView={onView}
+                categories={categories}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   return (
-    <div className={viewType === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}>
-      {filteredProducts.map(product => (
-        <ProductCard 
-          key={product.id} 
-          product={product} 
-          onEdit={onEdit} 
-          onDelete={onDelete} 
-          onView={onView} 
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      {filteredProducts.map((product) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onView={onView}
           categories={categories}
         />
       ))}
