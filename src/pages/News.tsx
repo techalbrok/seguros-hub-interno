@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,43 +7,37 @@ import { useNews, News } from '@/hooks/useNews';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsForm } from '@/components/NewsForm';
 import { NewsDetail } from '@/components/NewsDetail';
-
 type ViewMode = 'list' | 'create' | 'edit' | 'detail';
-
 const NewsPage = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
-
-  const { news, loading, createNews, updateNews, deleteNews } = useNews();
-
-  const filteredNews = news.filter(item =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  const {
+    news,
+    loading,
+    createNews,
+    updateNews,
+    deleteNews
+  } = useNews();
+  const filteredNews = news.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()) || item.content.toLowerCase().includes(searchTerm.toLowerCase()));
   const handleCreate = () => {
     setSelectedNews(null);
     setViewMode('create');
   };
-
   const handleEdit = (newsItem: News) => {
     setSelectedNews(newsItem);
     setViewMode('edit');
   };
-
   const handleView = (newsItem: News) => {
     setSelectedNews(newsItem);
     setViewMode('detail');
   };
-
   const handleDelete = (id: string) => {
     setNewsToDelete(id);
     setDeleteDialogOpen(true);
   };
-
   const confirmDelete = async () => {
     if (newsToDelete) {
       await deleteNews(newsToDelete);
@@ -52,7 +45,6 @@ const NewsPage = () => {
       setNewsToDelete(null);
     }
   };
-
   const handleSubmit = async (data: any) => {
     if (viewMode === 'edit' && selectedNews) {
       const success = await updateNews(selectedNews.id, data);
@@ -69,38 +61,20 @@ const NewsPage = () => {
       return success;
     }
   };
-
   const handleCancel = () => {
     setViewMode('list');
     setSelectedNews(null);
   };
-
   if (viewMode === 'create' || viewMode === 'edit') {
-    return (
-      <NewsForm
-        news={selectedNews || undefined}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-      />
-    );
+    return <NewsForm news={selectedNews || undefined} onSubmit={handleSubmit} onCancel={handleCancel} />;
   }
-
   if (viewMode === 'detail' && selectedNews) {
-    return (
-      <NewsDetail
-        news={selectedNews}
-        onBack={() => setViewMode('list')}
-      />
-    );
+    return <NewsDetail news={selectedNews} onBack={() => setViewMode('list')} />;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">
-            Gestión de Noticias
-          </h1>
+          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">Noticias</h1>
           <p className="text-muted-foreground mt-2">
             Administra las noticias de la correduría
           </p>
@@ -114,44 +88,23 @@ const NewsPage = () => {
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Buscar noticias..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+          <Input placeholder="Buscar noticias..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
         </div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-12">
+      {loading ? <div className="text-center py-12">
           <p className="text-muted-foreground">Cargando noticias...</p>
-        </div>
-      ) : filteredNews.length === 0 ? (
-        <div className="text-center py-12">
+        </div> : filteredNews.length === 0 ? <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
             {searchTerm ? 'No se encontraron noticias que coincidan con tu búsqueda.' : 'No hay noticias disponibles.'}
           </p>
-          {!searchTerm && (
-            <Button onClick={handleCreate}>
+          {!searchTerm && <Button onClick={handleCreate}>
               <Plus className="w-4 h-4 mr-2" />
               Crear Primera Noticia
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNews.map((newsItem) => (
-            <NewsCard
-              key={newsItem.id}
-              news={newsItem}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onView={handleView}
-            />
-          ))}
-        </div>
-      )}
+            </Button>}
+        </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredNews.map(newsItem => <NewsCard key={newsItem.id} news={newsItem} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />)}
+        </div>}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
@@ -169,8 +122,6 @@ const NewsPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 };
-
 export default NewsPage;
