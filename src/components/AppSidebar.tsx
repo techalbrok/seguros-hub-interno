@@ -1,9 +1,10 @@
 
 import { useState } from "react";
 import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link, Settings } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Link as RouterLink } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NavigationShortcuts } from "@/components/NavigationShortcuts";
+import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
 
 const navigationItems = [
   {
@@ -53,6 +54,9 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+  const { config } = useBrokerageConfig();
+  const logoUrl = config?.logo_url;
+  const brokerageName = config?.name || "Intranet Correduría";
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -70,13 +74,19 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border`} collapsible="icon">
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-        {!collapsed && (
-          <div className="flex items-center space-x-2">
-            
-          </div>
+      <div className={`flex items-center border-b border-sidebar-border ${
+          collapsed
+          ? 'flex-col justify-center p-2 gap-2'
+          : 'justify-between p-4'
+        }`}>
+        {logoUrl ? (
+          <RouterLink to="/">
+            <img src={logoUrl} alt={`Logo de ${brokerageName}`} className="h-8 w-8 object-contain" />
+          </RouterLink>
+        ) : (
+          !collapsed && <div />
         )}
-        <SidebarTrigger className="h-8 w-8" />
+        <SidebarTrigger className="h-8 w-8 flex-shrink-0" />
       </div>
 
       <SidebarContent className="px-2 py-4">
