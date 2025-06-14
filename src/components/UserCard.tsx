@@ -32,68 +32,72 @@ export const UserCard: React.FC<UserCardProps> = ({
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-2">
-            <User className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">{user.name}</CardTitle>
+    <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/50 flex flex-col h-full animate-fade-in group">
+      <CardHeader>
+        <div className="flex items-start justify-between mb-2">
+            <Badge variant={user.role === 'admin' ? "default" : "secondary"}>
+                {user.role === 'admin' ? "Administrador" : "Usuario"}
+            </Badge>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <User className="h-6 w-6 text-primary" />
           </div>
-          <Badge variant={user.role === 'admin' ? "default" : "secondary"}>
-            {user.role === 'admin' ? "Administrador" : "Usuario"}
-          </Badge>
+          <CardTitle className="text-xl font-bold text-sidebar-primary dark:text-white leading-tight group-hover:text-primary transition-colors">
+            {user.name}
+          </CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2 text-sm">
-            <Mail className="w-4 h-4 text-gray-500" />
+      <CardContent className="flex-grow space-y-4">
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="flex items-center space-x-2">
+            <Mail className="w-4 h-4" />
             <span>{user.email}</span>
           </div>
           {delegation && (
-            <div className="flex items-center space-x-2 text-sm">
-              <Building className="w-4 h-4 text-gray-500" />
+            <div className="flex items-center space-x-2">
+              <Building className="w-4 h-4" />
               <span>{delegation.name}</span>
             </div>
           )}
         </div>
-
         <div>
-          <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Rol: {user.role === 'admin' ? 'Administrador' : 'Usuario'}
-          </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Creado: {formatDate(user.createdAt)}
           </div>
         </div>
-
-        <div className="flex gap-2 pt-2">
+      </CardContent>
+      <div className="p-6 pt-0 mt-auto">
+        <div className="flex flex-wrap gap-2 pt-4 mt-4 border-t">
           <Button
-            size="sm"
             variant="outline"
+            size="sm"
             onClick={() => onView(user)}
-            className="flex-1"
+            className="flex-1 min-w-[80px]"
           >
-            <Eye className="w-4 h-4 mr-1" />
+            <Eye className="h-4 w-4 mr-1" />
             Ver
           </Button>
           <Button
-            size="sm"
             variant="outline"
+            size="sm"
             onClick={() => onEdit(user)}
+            className="flex-1 min-w-[80px]"
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="h-4 w-4 mr-1" />
+            Editar
           </Button>
           <Button
+            variant="destructive-outline"
             size="sm"
-            variant="outline"
             onClick={() => onDelete(user.id)}
-            className="text-red-600 hover:text-red-700"
+            className="flex-1 min-w-[80px]"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-4 w-4 mr-1" />
+            Eliminar
           </Button>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };
