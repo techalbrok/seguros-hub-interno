@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Users as UsersIcon, User, Grid, List, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -102,8 +101,8 @@ const Users = () => {
 
   if (pageMode === 'create') {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex justify-center">
+        <div className="w-full max-w-4xl space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
               <UsersIcon className="h-8 w-8" />
@@ -113,20 +112,20 @@ const Users = () => {
               Añade un nuevo usuario al sistema
             </p>
           </div>
+          <UserForm
+            delegations={delegations}
+            onSubmit={handleCreateUser}
+            onCancel={() => setPageMode('list')}
+          />
         </div>
-        <UserForm
-          delegations={delegations}
-          onSubmit={handleCreateUser}
-          onCancel={() => setPageMode('list')}
-        />
       </div>
     );
   }
 
   if (pageMode === 'edit' && selectedUser) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex justify-center">
+        <div className="w-full max-w-4xl space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
               <UsersIcon className="h-8 w-8" />
@@ -136,39 +135,41 @@ const Users = () => {
               Modifica la información del usuario
             </p>
           </div>
+          <UserEditForm
+            user={selectedUser}
+            delegations={delegations}
+            onSubmit={handleUpdateUser}
+            onCancel={() => {
+              setPageMode('list');
+              setSelectedUser(null);
+            }}
+          />
         </div>
-        <UserEditForm
-          user={selectedUser}
-          delegations={delegations}
-          onSubmit={handleUpdateUser}
-          onCancel={() => {
-            setPageMode('list');
-            setSelectedUser(null);
-          }}
-        />
       </div>
     );
   }
 
   if (pageMode === 'detail' && selectedUser) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
-            <UsersIcon className="h-8 w-8" />
-            Detalle de Usuario
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Información completa del usuario
-          </p>
+      <div className="flex justify-center">
+        <div className="w-full max-w-4xl space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
+              <UsersIcon className="h-8 w-8" />
+              Detalle de Usuario
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Información completa del usuario
+            </p>
+          </div>
+          <UserDetail
+            user={selectedUser}
+            delegations={delegations}
+            onBack={() => setPageMode('list')}
+            onEdit={handleEditUser}
+            onDelete={handleDeleteUser}
+          />
         </div>
-        <UserDetail
-          user={selectedUser}
-          delegations={delegations}
-          onBack={() => setPageMode('list')}
-          onEdit={handleEditUser}
-          onDelete={handleDeleteUser}
-        />
       </div>
     );
   }
