@@ -1,6 +1,5 @@
-
 import { useNotifications, Notification } from '@/hooks/useNotifications';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuHeader, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Bell, MailCheck } from 'lucide-react';
 import { NotificationItem } from './NotificationItem';
@@ -32,7 +31,7 @@ export const NotificationsDropdown = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80 md:w-96" align="end">
-        <DropdownMenuHeader className="flex justify-between items-center">
+        <div className="flex justify-between items-center">
           <DropdownMenuLabel>Notificaciones</DropdownMenuLabel>
           {unreadCount > 0 && (
             <Button
@@ -48,7 +47,7 @@ export const NotificationsDropdown = () => {
               Marcar todas leídas
             </Button>
           )}
-        </DropdownMenuHeader>
+        </div>
         <DropdownMenuSeparator />
         <ScrollArea className="h-[400px]">
           {isLoading ? (
