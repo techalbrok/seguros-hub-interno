@@ -93,10 +93,10 @@ export const CategoryManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-sidebar-primary dark:text-white">
+          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">
             Gestión de Categorías
-          </h2>
-          <p className="text-muted-foreground mt-1">
+          </h1>
+          <p className="text-muted-foreground mt-2">
             Organiza los productos en categorías jerárquicas
           </p>
         </div>

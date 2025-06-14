@@ -65,7 +65,7 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">
           Bienvenido, {user?.user_metadata?.name || user?.email}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mt-2">
           Panel de control del sistema de gestión interno
         </p>
       </div>
