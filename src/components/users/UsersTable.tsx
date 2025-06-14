@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -6,12 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Delegation } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface UsersTableProps {
   users: User[];
@@ -70,6 +71,7 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selecte
               <TableCell className="font-medium">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.avatarUrl} alt={user.name} />
                     <AvatarFallback className="bg-primary text-white text-xs">
                       {getInitials(user.name)}
                     </AvatarFallback>
