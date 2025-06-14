@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import Delegations from "./pages/Delegations";
 import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
 import Products from "./pages/Products";
+import Departments from "./pages/Departments";
 
 const queryClient = new QueryClient();
 
@@ -59,15 +59,17 @@ const App = () => (
                 </Layout>
               </AuthGuard>
             } />
+            <Route path="/departments" element={
+              <AuthGuard>
+                <Layout>
+                  <Departments />
+                </Layout>
+              </AuthGuard>
+            } />
             <Route path="/department-content" element={
               <AuthGuard>
                 <Layout>
-                  <div className="text-center py-12">
-                    <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white mb-4">
-                      Contenido por Departamento
-                    </h1>
-                    <p className="text-muted-foreground">Próximamente disponible</p>
-                  </div>
+                  <Departments />
                 </Layout>
               </AuthGuard>
             } />
