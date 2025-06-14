@@ -26,12 +26,12 @@ export const useNavigationShortcuts = () => {
   const fetchShortcuts = async () => {
     try {
       const { data, error } = await supabase
-        .from('navigation_shortcuts')
+        .from('navigation_shortcuts' as any)
         .select('*')
         .order('order_position', { ascending: true });
 
       if (error) throw error;
-      setShortcuts(data || []);
+      setShortcuts((data as NavigationShortcut[]) || []);
     } catch (error) {
       console.error('Error fetching shortcuts:', error);
       toast({
@@ -48,14 +48,14 @@ export const useNavigationShortcuts = () => {
     setCreating(true);
     try {
       const { data, error } = await supabase
-        .from('navigation_shortcuts')
+        .from('navigation_shortcuts' as any)
         .insert([shortcut])
         .select()
         .single();
 
       if (error) throw error;
 
-      setShortcuts(prev => [...prev, data]);
+      setShortcuts(prev => [...prev, data as NavigationShortcut]);
       toast({
         title: "Acceso directo creado",
         description: "El acceso directo se ha creado correctamente",
@@ -76,7 +76,7 @@ export const useNavigationShortcuts = () => {
     setUpdating(true);
     try {
       const { data, error } = await supabase
-        .from('navigation_shortcuts')
+        .from('navigation_shortcuts' as any)
         .update(updates)
         .eq('id', id)
         .select()
@@ -84,7 +84,7 @@ export const useNavigationShortcuts = () => {
 
       if (error) throw error;
 
-      setShortcuts(prev => prev.map(s => s.id === id ? data : s));
+      setShortcuts(prev => prev.map(s => s.id === id ? data as NavigationShortcut : s));
       toast({
         title: "Acceso directo actualizado",
         description: "El acceso directo se ha actualizado correctamente",
@@ -104,7 +104,7 @@ export const useNavigationShortcuts = () => {
   const deleteShortcut = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('navigation_shortcuts')
+        .from('navigation_shortcuts' as any)
         .delete()
         .eq('id', id);
 
