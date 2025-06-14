@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Edit, Globe, Mail, User, Calendar } from "lucide-react";
 import type { Company } from "@/types";
+import { CompanySpecifications } from "./CompanySpecifications";
 
 interface CompanyDetailProps {
   company: Company;
@@ -113,6 +114,15 @@ export const CompanyDetail = ({ company, onEdit, onBack }: CompanyDetailProps) =
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Especificaciones</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CompanySpecifications company={company} />
         </CardContent>
       </Card>
     </div>

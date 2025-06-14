@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -36,7 +35,7 @@ export interface Company {
   brokerAccess: string;
   commercialManager: string;
   managerEmail: string;
-  specifications?: CompanySpecification[];
+  specifications: CompanySpecification[];
   createdAt: Date;
   updatedAt: Date;
 }

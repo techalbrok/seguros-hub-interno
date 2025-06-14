@@ -1,8 +1,7 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { Company } from "@/types";
+import type { Company, CompanySpecification } from "@/types";
 
 interface CreateCompanyData {
   name: string;
@@ -16,6 +15,15 @@ interface UpdateCompanyData extends CreateCompanyData {
   id: string;
 }
 
+// Transform DB row to CompanySpecification interface
+const transformDbRowToCompanySpecification = (row: any): CompanySpecification => ({
+  id: row.id,
+  companyId: row.company_id,
+  category: row.category,
+  content: row.content,
+  order: row.order_position,
+});
+
 // Transform database row to Company interface
 const transformDbRowToCompany = (row: any): Company => ({
   id: row.id,
@@ -26,6 +34,9 @@ const transformDbRowToCompany = (row: any): Company => ({
   managerEmail: row.manager_email,
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
+  specifications: Array.isArray(row.company_specifications)
+    ? row.company_specifications.map(transformDbRowToCompanySpecification)
+    : [],
 });
 
 export const useCompanies = () => {
@@ -50,8 +61,9 @@ export const useCompanies = () => {
 
       const { data, error } = await supabase
         .from("companies")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*, company_specifications(*)")
+        .order("name", { ascending: true })
+        .order("order_position", { referencedTable: 'company_specifications', ascending: true });
 
       if (error) {
         console.error("Error fetching companies:", error);
