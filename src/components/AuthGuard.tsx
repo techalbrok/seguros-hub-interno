@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface AuthGuardProps {
 export const AuthGuard = ({ children }: AuthGuardProps) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  useSessionTimeout();
 
   useEffect(() => {
     if (!loading && !user) {

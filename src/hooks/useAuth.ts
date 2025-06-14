@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -124,7 +123,7 @@ export const useAuth = () => {
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (options?: { quiet?: boolean }) => {
     try {
       const { error } = await supabase.auth.signOut();
       
@@ -138,10 +137,12 @@ export const useAuth = () => {
         return false;
       }
 
-      toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
-      });
+      if (!options?.quiet) {
+        toast({
+          title: "Sesión cerrada",
+          description: "Has cerrado sesión correctamente",
+        });
+      }
       return true;
     } catch (error) {
       console.error('Error signing out:', error);
