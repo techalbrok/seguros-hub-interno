@@ -1,5 +1,5 @@
 
-import type { Product } from "@/types";
+import type { Product, ProductCategory } from "@/types";
 import { ProductCard } from "@/components/ProductCard";
 
 interface ProductListProps {
@@ -11,6 +11,7 @@ interface ProductListProps {
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
   onView: (product: Product) => void;
+  categories: ProductCategory[];
 }
 
 export const ProductList = ({
@@ -21,7 +22,8 @@ export const ProductList = ({
   selectedCategory,
   onEdit,
   onDelete,
-  onView
+  onView,
+  categories,
 }: ProductListProps) => {
   if (isLoading) {
     return (
@@ -50,6 +52,7 @@ export const ProductList = ({
           onEdit={onEdit} 
           onDelete={onDelete} 
           onView={onView} 
+          categories={categories}
         />
       ))}
     </div>
