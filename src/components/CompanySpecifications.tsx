@@ -60,7 +60,7 @@ export const CompanySpecifications = ({ company }: CompanySpecificationsProps) =
                       </Button>
                        <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="destructive-ghost" size="sm">
+                          <Button variant="destructive-outline" size="sm">
                             <Trash2 className="h-4 w-4 mr-1" /> Eliminar
                           </Button>
                         </AlertDialogTrigger>
