@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,21 +8,25 @@ import { RichTextEditor } from '@/components/RichTextEditor';
 import { ImageUpload } from '@/components/ImageUpload';
 import { EntitySelector } from '@/components/EntitySelector';
 import { News, CreateNewsData } from '@/hooks/useNews';
-import { useCompanies } from '@/hooks/useCompanies';
-import { useProductCategories } from '@/hooks/useProductCategories';
-import { useProducts } from '@/hooks/useProducts';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import type { Company, ProductCategory } from '@/types';
 
 interface NewsFormProps {
   news?: News;
   onSubmit: (data: CreateNewsData) => Promise<boolean>;
   onCancel: () => void;
+  companies: Company[];
+  categories: ProductCategory[];
+  products: Array<{ id: string; title: string; }>;
 }
 
 export const NewsForm: React.FC<NewsFormProps> = ({
   news,
   onSubmit,
-  onCancel
+  onCancel,
+  companies,
+  categories,
+  products
 }) => {
   const [formData, setFormData] = useState<CreateNewsData>({
     title: '',
@@ -36,9 +39,6 @@ export const NewsForm: React.FC<NewsFormProps> = ({
   });
   const [submitting, setSubmitting] = useState(false);
   
-  const { companies } = useCompanies();
-  const { categories } = useProductCategories();
-  const { products } = useProducts();
   const { uploadImage, uploading } = useImageUpload('news');
 
   useEffect(() => {

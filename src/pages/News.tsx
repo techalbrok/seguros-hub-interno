@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,7 +92,14 @@ const NewsPage = () => {
   };
 
   if (viewMode === 'create' || viewMode === 'edit') {
-    return <NewsForm news={selectedNews || undefined} onSubmit={handleSubmit} onCancel={handleCancel} />;
+    return <NewsForm
+      news={selectedNews || undefined}
+      onSubmit={handleSubmit}
+      onCancel={handleCancel}
+      companies={companies}
+      categories={categories}
+      products={products}
+    />;
   }
 
   if (viewMode === 'detail' && selectedNews) {
