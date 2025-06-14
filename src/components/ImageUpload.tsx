@@ -23,7 +23,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div>
+    <div className="space-y-3">
       <Label htmlFor="featured_image">{label}</Label>
       <div className="space-y-4">
         {imageUrl && (
@@ -56,7 +56,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           />
           <Label
             htmlFor="image-upload"
-            className="flex items-center space-x-2 cursor-pointer bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-md"
+            className="flex items-center space-x-2 cursor-pointer bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-md transition-colors"
           >
             {uploading ? (
               <Upload className="w-4 h-4 animate-spin" />
