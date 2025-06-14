@@ -26,45 +26,54 @@ serve(async (req) => {
       }
     )
 
-    const { name, email, password, role, delegationId, permissions, isFirstUser } = await req.json()
+    const { name, email, password, role, delegationId, permissions } = await req.json()
 
-    console.log('Creating user with service role key:', { name, email, role, isFirstUser })
+    console.log('Creating user with service role key:', { name, email, role })
 
-    // If this is not the first user, check authentication
-    if (!isFirstUser) {
-      const authHeader = req.headers.get('Authorization')
-      if (!authHeader) {
-        return new Response(
-          JSON.stringify({ error: 'No authorization header provided' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
+    // Check authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'No authorization header provided' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      const token = authHeader.replace('Bearer ', '')
-      const { data, error: userError } = await supabaseClient.auth.getUser(token)
-      const user = data.user
+    const token = authHeader.replace('Bearer ', '')
+    const { data, error: userError } = await supabaseClient.auth.getUser(token)
+    const user = data.user
 
-      if (userError || !user) {
-        console.error('Auth error:', userError)
-        return new Response(
-          JSON.stringify({ error: 'Invalid authentication token' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
+    if (userError || !user) {
+      console.error('Auth error:', userError)
+      return new Response(
+        JSON.stringify({ error: 'Token de autenticación inválido' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      // Check if the current user is admin
-      const { data: userRole } = await supabaseClient
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single()
+    // Check if the current user is admin
+    const { data: userRole } = await supabaseClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
 
-      if (!userRole || userRole.role !== 'admin') {
-        return new Response(
-          JSON.stringify({ error: 'Unauthorized: Admin access required' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
+    if (!userRole || userRole.role !== 'admin') {
+      return new Response(
+        JSON.stringify({ error: 'No autorizado: Se requiere acceso de administrador' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Check if user already exists
+    const { data: existingAuth } = await supabaseClient.auth.admin.listUsers()
+    const userExists = existingAuth.users.some(u => u.email === email)
+    
+    if (userExists) {
+      return new Response(
+        JSON.stringify({ error: 'Ya existe un usuario con este email' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     // Create user in auth with service role key
@@ -85,7 +94,7 @@ serve(async (req) => {
 
     if (!authData.user) {
       return new Response(
-        JSON.stringify({ error: 'No user returned from creation' }),
+        JSON.stringify({ error: 'No se pudo crear el usuario' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -106,50 +115,52 @@ serve(async (req) => {
       if (profileError) {
         console.error('Error updating profile:', profileError)
         return new Response(
-          JSON.stringify({ error: 'Error updating profile: ' + profileError.message }),
+          JSON.stringify({ error: 'Error actualizando perfil: ' + profileError.message }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
     }
 
-    // Create user role
-    console.log('Creating user role:', role)
-    const { error: roleError } = await supabaseClient
-      .from('user_roles')
-      .insert({
-        user_id: authData.user.id,
-        role: role,
-      })
+    // Update user role (the trigger creates 'user' by default, so update if needed)
+    if (role !== 'user') {
+      console.log('Updating user role to:', role)
+      const { error: roleError } = await supabaseClient
+        .from('user_roles')
+        .update({ role: role })
+        .eq('user_id', authData.user.id)
 
-    if (roleError) {
-      console.error('Error creating user role:', roleError)
-      return new Response(
-        JSON.stringify({ error: 'Error creating user role: ' + roleError.message }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      if (roleError) {
+        console.error('Error updating user role:', roleError)
+        return new Response(
+          JSON.stringify({ error: 'Error actualizando rol: ' + roleError.message }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
-    // Create user permissions for each section
-    const permissionsToInsert = Object.entries(permissions).map(([section, perms]: [string, any]) => ({
-      user_id: authData.user.id,
-      section,
-      can_create: perms.canCreate,
-      can_edit: perms.canEdit,
-      can_delete: perms.canDelete,
-      can_view: perms.canView,
-    }))
+    // Create user permissions for each section (only if not admin)
+    if (role !== 'admin') {
+      const permissionsToInsert = Object.entries(permissions).map(([section, perms]: [string, any]) => ({
+        user_id: authData.user.id,
+        section,
+        can_create: perms.canCreate,
+        can_edit: perms.canEdit,
+        can_delete: perms.canDelete,
+        can_view: perms.canView,
+      }))
 
-    console.log('Creating user permissions:', permissionsToInsert)
-    const { error: permissionsError } = await supabaseClient
-      .from('user_permissions')
-      .insert(permissionsToInsert)
+      console.log('Creating user permissions:', permissionsToInsert)
+      const { error: permissionsError } = await supabaseClient
+        .from('user_permissions')
+        .insert(permissionsToInsert)
 
-    if (permissionsError) {
-      console.error('Error creating user permissions:', permissionsError)
-      return new Response(
-        JSON.stringify({ error: 'Error creating user permissions: ' + permissionsError.message }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      if (permissionsError) {
+        console.error('Error creating user permissions:', permissionsError)
+        return new Response(
+          JSON.stringify({ error: 'Error creando permisos: ' + permissionsError.message }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
     return new Response(

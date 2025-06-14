@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Profile, UserRole, UserPermission, Delegation } from '@/types';
@@ -54,13 +55,30 @@ export const useUsers = () => {
         const userRole = roles?.find(role => role.user_id === profile.id);
         const userPermissions = permissions?.filter(perm => perm.user_id === profile.id);
         
-        // Calculate combined permissions by checking if ANY permission section allows the action
-        const combinedPermissions = {
-          canCreate: userPermissions?.some(p => p.can_create) || false,
-          canEdit: userPermissions?.some(p => p.can_edit) || false,
-          canDelete: userPermissions?.some(p => p.can_delete) || false,
-          canView: userPermissions?.some(p => p.can_view) || true,
+        // Calculate combined permissions - if user is admin, give all permissions
+        let combinedPermissions = {
+          canCreate: false,
+          canEdit: false,
+          canDelete: false,
+          canView: true,
         };
+
+        if (userRole?.role === 'admin') {
+          combinedPermissions = {
+            canCreate: true,
+            canEdit: true,
+            canDelete: true,
+            canView: true,
+          };
+        } else if (userPermissions && userPermissions.length > 0) {
+          // For regular users, combine permissions across all sections
+          combinedPermissions = {
+            canCreate: userPermissions.some(p => p.can_create),
+            canEdit: userPermissions.some(p => p.can_edit),
+            canDelete: userPermissions.some(p => p.can_delete),
+            canView: userPermissions.some(p => p.can_view),
+          };
+        }
 
         return {
           id: profile.id,
@@ -135,59 +153,15 @@ export const useUsers = () => {
       // Get current session for authorization
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      console.log('Current session:', session ? 'Session exists' : 'No session');
-      console.log('Session error:', sessionError);
-      
       if (sessionError) {
         console.error('Session error:', sessionError);
         throw new Error('Error al verificar la sesión: ' + sessionError.message);
       }
       
       if (!session) {
-        console.log('No active session found');
-        // If no users exist yet, create the first admin user directly
-        const existingUsersCount = users.length;
-        console.log('Existing users count:', existingUsersCount);
-        
-        if (existingUsersCount === 0) {
-          console.log('No users exist, attempting to create first admin user');
-          // For the first user, we'll try to create without authentication
-          const { data, error } = await supabase.functions.invoke('create-user', {
-            body: {
-              name: userData.name,
-              email: userData.email,
-              password: userData.password,
-              role: 'admin', // First user should always be admin
-              delegationId: userData.delegationId,
-              permissions: userData.permissions,
-              isFirstUser: true, // Special flag for first user creation
-            },
-          });
-
-          if (error) {
-            console.error('Error calling create-user function:', error);
-            throw error;
-          }
-
-          if (data?.error) {
-            console.error('Error from create-user function:', data.error);
-            throw new Error(data.error);
-          }
-
-          console.log('First user created successfully:', data);
-          toast({
-            title: "Primer usuario creado",
-            description: "El primer usuario administrador ha sido creado exitosamente. Por favor, inicia sesión.",
-          });
-
-          await fetchUsers();
-          return true;
-        } else {
-          throw new Error('Debes iniciar sesión como administrador para crear nuevos usuarios');
-        }
+        throw new Error('Debes iniciar sesión como administrador para crear nuevos usuarios');
       }
 
-      // If we have a session, proceed with normal user creation
       // Check if current user is admin
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

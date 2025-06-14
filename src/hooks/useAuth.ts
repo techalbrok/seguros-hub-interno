@@ -33,20 +33,32 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error('Sign in error:', error);
+        let errorMessage = error.message;
+        
+        // Provide more user-friendly error messages
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Email o contraseña incorrectos';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Por favor, confirma tu email antes de iniciar sesión';
+        }
+        
         toast({
           title: "Error de autenticación",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
         return false;
       }
 
+      console.log('Sign in successful:', data.user?.email);
       toast({
         title: "Sesión iniciada",
         description: "Has iniciado sesión correctamente",
@@ -60,6 +72,8 @@ export const useAuth = () => {
         variant: "destructive",
       });
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,6 +82,7 @@ export const useAuth = () => {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
+        console.error('Sign out error:', error);
         toast({
           title: "Error",
           description: error.message,
