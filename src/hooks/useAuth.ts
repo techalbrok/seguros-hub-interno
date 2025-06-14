@@ -8,25 +8,44 @@ interface Profile {
   name: string;
 }
 
+type UserRole = 'admin' | 'user' | null;
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [role, setRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('name')
       .eq('id', userId)
       .single();
     
-    if (error) {
-      console.error('Error fetching profile:', error.message);
+    if (profileError) {
+      console.error('Error fetching profile:', profileError.message);
       setProfile(null);
-    } else if (data) {
-      setProfile(data as Profile);
+    } else if (profileData) {
+      setProfile(profileData as Profile);
+    }
+
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+
+    if (roleError && roleError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error fetching user role:', roleError.message);
+      setRole(null);
+    } else if (roleData) {
+      setRole(roleData.role);
+    } else {
+      // Default to 'user' if no role is found for safety
+      setRole('user');
     }
   }, []);
 
@@ -41,6 +60,7 @@ export const useAuth = () => {
           setTimeout(() => fetchProfile(session.user.id), 0);
         } else {
           setProfile(null);
+          setRole(null);
         }
       }
     );
@@ -138,6 +158,8 @@ export const useAuth = () => {
     user,
     session,
     profile,
+    role,
+    isAdmin: role === 'admin',
     loading,
     signIn,
     signOut,

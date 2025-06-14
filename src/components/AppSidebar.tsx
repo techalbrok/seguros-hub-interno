@@ -1,53 +1,10 @@
-
-import { useState } from "react";
-import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link, Settings } from "lucide-react";
+import { Users, Calendar, Settings } from "lucide-react";
 import { NavLink, useLocation, Link as RouterLink } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NavigationShortcuts } from "@/components/NavigationShortcuts";
 import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
-
-const navigationItems = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: Calendar
-  },
-  {
-    title: "Usuarios",
-    url: "/users",
-    icon: Users
-  },
-  {
-    title: "Delegaciones",
-    url: "/delegations",
-    icon: User
-  },
-  {
-    title: "Compañías",
-    url: "/companies",
-    icon: Link
-  },
-  {
-    title: "Productos",
-    url: "/products",
-    icon: Edit
-  },
-  {
-    title: "Departamentos",
-    url: "/department-content",
-    icon: Image
-  },
-  {
-    title: "Noticias",
-    url: "/news",
-    icon: Newspaper
-  },
-  {
-    title: "Configuración",
-    url: "/settings",
-    icon: Settings
-  }
-];
+import { useAuth } from "@/hooks/useAuth";
+import { navigationItems } from "./navigationItems";
 
 export function AppSidebar() {
   const { state } = useSidebar();
@@ -55,6 +12,7 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
   const { config } = useBrokerageConfig();
+  const { isAdmin } = useAuth();
   const logoUrl = config?.logo_url;
   const brokerageName = config?.name || "Intranet Correduría";
 
@@ -71,6 +29,10 @@ export function AppSidebar() {
       ? `${baseClass} bg-sidebar-accent text-sidebar-primary font-medium border-r-2 border-primary` 
       : `${baseClass} hover:bg-sidebar-accent/50 text-sidebar-foreground`;
   };
+
+  const visibleNavigationItems = isAdmin
+    ? navigationItems
+    : navigationItems.filter(item => item.url !== '/settings');
 
   return (
     <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border`} collapsible="icon">
@@ -96,7 +58,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {navigationItems.map(item => (
+              {visibleNavigationItems.map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="h-10">
                     <NavLink to={item.url} className={getNavClass(item.url)}>

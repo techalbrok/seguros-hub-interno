@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Delegation } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UsersTableProps {
   users: User[];
@@ -28,6 +29,8 @@ const getRoleColor = (role: string) => {
 };
 
 export const UsersTable = ({ users, delegations, onViewUser, onEditUser }: UsersTableProps) => {
+  const { isAdmin } = useAuth();
+
   return (
     <Table>
       <TableHeader>
@@ -36,7 +39,7 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser }: Users
           <TableHead>Rol</TableHead>
           <TableHead>Delegación</TableHead>
           <TableHead>Permisos</TableHead>
-          <TableHead>Acciones</TableHead>
+          {isAdmin && <TableHead>Acciones</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -85,16 +88,18 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser }: Users
                   )}
                 </div>
               </TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => onViewUser(user)}>
-                    Ver
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => onEditUser(user)}>
-                    Editar
-                  </Button>
-                </div>
-              </TableCell>
+              {isAdmin && (
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => onViewUser(user)}>
+                      Ver
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => onEditUser(user)}>
+                      Editar
+                    </Button>
+                  </div>
+                </TableCell>
+              )}
             </TableRow>
           );
         })}

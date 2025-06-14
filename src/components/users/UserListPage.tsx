@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { UsersStats } from "./UsersStats";
 import { UsersListView } from "./UsersListView";
 import { User, Delegation } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UserListPageProps {
   users: User[];
@@ -22,6 +23,8 @@ export const UserListPage = ({
   onEditUser,
   onDeleteUser,
 }: UserListPageProps) => {
+  const { isAdmin } = useAuth();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -34,10 +37,12 @@ export const UserListPage = ({
             Administra usuarios, roles y permisos del sistema
           </p>
         </div>
-        <Button className="corporate-button" onClick={onSetPageMode}>
-          <Plus className="h-4 w-4 mr-2" />
-          Crear Usuario
-        </Button>
+        {isAdmin && (
+          <Button className="corporate-button" onClick={onSetPageMode}>
+            <Plus className="h-4 w-4 mr-2" />
+            Crear Usuario
+          </Button>
+        )}
       </div>
 
       <UsersStats users={users} />
