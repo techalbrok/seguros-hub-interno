@@ -103,6 +103,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         applyColor('--sidebar-primary', config.accent_color_dark);
         applyColor('--header-color-dark', config.primary_color_dark);
       }
+
+      const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+      if (favicon && config.logo_url) {
+        favicon.href = config.logo_url;
+      }
     }
   }, [theme, config]);
 
