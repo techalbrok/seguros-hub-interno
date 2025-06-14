@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,8 @@ import { ProductDetail } from "@/components/ProductDetail";
 import { CategoryManagement } from "@/components/CategoryManagement";
 import { useProducts } from "@/hooks/useProducts";
 import type { Product } from "@/types";
+import { useProductCategories } from "@/hooks/useProductCategories";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -18,6 +19,7 @@ const Products = () => {
   const [activeTab, setActiveTab] = useState("products");
   const [showForm, setShowForm] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const {
     products,
@@ -28,8 +30,38 @@ const Products = () => {
     isCreating,
     isUpdating
   } = useProducts();
+  const { categories: productCategories } = useProductCategories();
 
-  const filteredProducts = products.filter(product => product.title.toLowerCase().includes(searchTerm.toLowerCase()) || (product.process && product.process.toLowerCase().includes(searchTerm.toLowerCase())) || (product.strengths && product.strengths.toLowerCase().includes(searchTerm.toLowerCase())));
+  const getDescendantCategoryIds = (parentId: string): string[] => {
+    const descendants: string[] = [];
+    const children = productCategories.filter(cat => cat.parentId === parentId);
+    
+    for (const child of children) {
+      descendants.push(child.id);
+      descendants.push(...getDescendantCategoryIds(child.id));
+    }
+    
+    return descendants;
+  };
+
+  const filteredProducts = products.filter(product => {
+    const searchMatch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.process && product.process.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (product.strengths && product.strengths.toLowerCase().includes(searchTerm.toLowerCase()));
+  
+    if (!selectedCategory) {
+      return searchMatch;
+    }
+  
+    if (!product.categoryId) {
+      return false;
+    }
+  
+    const categoryIdsToFilter = [selectedCategory, ...getDescendantCategoryIds(selectedCategory)];
+    const categoryMatch = categoryIdsToFilter.includes(product.categoryId);
+    
+    return searchMatch && categoryMatch;
+  });
   
   const handleAddNew = () => {
     setSelectedProduct(null);
@@ -106,9 +138,29 @@ const Products = () => {
         <TabsContent value="products" className="space-y-6">
           {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex items-center gap-2 flex-1 max-w-md">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Buscar productos..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="flex-1" />
+            <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 w-full">
+              <div className="relative w-full sm:flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Buscar productos..." 
+                  value={searchTerm} 
+                  onChange={e => setSearchTerm(e.target.value)} 
+                  className="pl-10 w-full"
+                />
+              </div>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-[240px]">
+                  <SelectValue placeholder="Todas las categorías" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todas las categorías</SelectItem>
+                  {productCategories.map(category => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {"—".repeat(category.level > 1 ? category.level - 1 : 0)} {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center gap-2">
@@ -130,7 +182,7 @@ const Products = () => {
               <p>Cargando productos...</p>
             </div> : filteredProducts.length === 0 ? <div className="text-center py-12">
               <p className="text-muted-foreground">
-                {searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda.' : 'No hay productos disponibles.'}
+                {searchTerm || selectedCategory ? 'No se encontraron productos que coincidan con tu búsqueda.' : 'No hay productos disponibles.'}
               </p>
             </div> : <div className={viewType === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
               {filteredProducts.map(product => <ProductCard key={product.id} product={product} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />)}
