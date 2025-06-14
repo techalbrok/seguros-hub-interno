@@ -1,76 +1,56 @@
-
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
 import { Link } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
 export const Header = () => {
-  const { theme, toggleTheme } = useTheme();
-  const { user, signOut } = useAuth();
-  const { config, loading } = useBrokerageConfig();
+  const {
+    theme,
+    toggleTheme
+  } = useTheme();
+  const {
+    user,
+    signOut
+  } = useAuth();
+  const {
+    config,
+    loading
+  } = useBrokerageConfig();
   const [isAdmin, setIsAdmin] = useState(false);
-
   useEffect(() => {
     const checkAdminRole = async () => {
       if (!user) return;
-      
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-      
+      const {
+        data,
+        error
+      } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single();
       if (!error && data) {
         setIsAdmin(data.role === 'admin');
       }
     };
-
     checkAdminRole();
   }, [user]);
-
   const handleSignOut = async () => {
     await signOut();
   };
-
   const brokerageName = config?.name || "Intranet Correduría";
   const logoUrl = config?.logo_url;
-
-  return (
-    <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+  return <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="flex items-center justify-between h-full px-6">
         <div className="flex items-center space-x-4">
-          {logoUrl && (
-            <img 
-              src={logoUrl} 
-              alt={`Logo de ${brokerageName}`}
-              className="h-8 w-auto object-contain"
-            />
-          )}
-          <h1 className="text-xl font-semibold text-sidebar-primary dark:text-white">
+          {logoUrl && <img src={logoUrl} alt={`Logo de ${brokerageName}`} className="h-8 w-auto object-contain" />}
+          <h1 className="text-sidebar-primary dark:text-white text-lg font-thin">
             {brokerageName}
           </h1>
         </div>
         
         <div className="flex items-center space-x-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleTheme}
-            className="transition-all duration-200 hover:scale-105"
-          >
+          <Button variant="outline" size="sm" onClick={toggleTheme} className="transition-all duration-200 hover:scale-105">
             {theme === 'light' ? '🌙' : '☀️'}
           </Button>
           
@@ -108,24 +88,18 @@ export const Header = () => {
                   Mi Perfil
                 </Link>
               </DropdownMenuItem>
-              {isAdmin && (
-                <DropdownMenuItem className="cursor-pointer" asChild>
+              {isAdmin && <DropdownMenuItem className="cursor-pointer" asChild>
                   <Link to="/settings">
                     Configuración
                   </Link>
-                </DropdownMenuItem>
-              )}
+                </DropdownMenuItem>}
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="cursor-pointer text-red-600" 
-                onClick={handleSignOut}
-              >
+              <DropdownMenuItem className="cursor-pointer text-red-600" onClick={handleSignOut}>
                 Cerrar Sesión
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
