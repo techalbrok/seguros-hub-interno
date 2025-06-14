@@ -1,7 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ProductBasicInfo } from "@/components/ProductBasicInfo";
 import { ProductDocumentUpload } from "@/components/ProductDocumentUpload";
 import { ProductRichTextFields } from "@/components/ProductRichTextFields";
@@ -10,21 +10,47 @@ import type { Product } from "@/types";
 interface ProductFormProps {
   product?: Product;
   onSubmit: (data: any) => void;
-  onCancel: () => void;
   isLoading?: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductFormProps) => {
+export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }: ProductFormProps) => {
   const [formData, setFormData] = useState({
-    title: product?.title || "",
-    process: product?.process || "",
-    strengths: product?.strengths || "",
-    observations: product?.observations || "",
-    categoryId: product?.categoryId || "",
-    companyId: product?.companyId || "",
+    title: "",
+    process: "",
+    strengths: "",
+    observations: "",
+    categoryId: "",
+    companyId: "",
   });
 
   const [documents, setDocuments] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      if (product) {
+        setFormData({
+          title: product.title || "",
+          process: product.process || "",
+          strengths: product.strengths || "",
+          observations: product.observations || "",
+          categoryId: product.categoryId || "",
+          companyId: product.companyId || "",
+        });
+      } else {
+        setFormData({
+          title: "",
+          process: "",
+          strengths: "",
+          observations: "",
+          categoryId: "",
+          companyId: "",
+        });
+      }
+      setDocuments([]);
+    }
+  }, [product, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,18 +58,17 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>{product ? "Editar Producto" : "Nuevo Producto"}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{product ? "Editar Producto" : "Nuevo Producto"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ProductBasicInfo 
               formData={formData}
               onFormDataChange={setFormData}
             />
-
             <ProductDocumentUpload
               documents={documents}
               onDocumentsChange={setDocuments}
@@ -55,16 +80,16 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading }: ProductF
             onFormDataChange={setFormData}
           />
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onCancel}>
+          <DialogFooter className="sticky bottom-0 bg-background py-4 -mx-6 px-6">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Guardando..." : product ? "Actualizar" : "Crear"}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 };

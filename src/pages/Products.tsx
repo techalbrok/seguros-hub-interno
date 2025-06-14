@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,13 +10,15 @@ import { ProductDetail } from "@/components/ProductDetail";
 import { CategoryManagement } from "@/components/CategoryManagement";
 import { useProducts } from "@/hooks/useProducts";
 import type { Product } from "@/types";
-type ViewMode = 'list' | 'form' | 'detail';
+
 const Products = () => {
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState("products");
+  const [showForm, setShowForm] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+
   const {
     products,
     isLoading,
@@ -25,45 +28,63 @@ const Products = () => {
     isCreating,
     isUpdating
   } = useProducts();
-  const filteredProducts = products.filter(product => product.title.toLowerCase().includes(searchTerm.toLowerCase()) || product.process && product.process.toLowerCase().includes(searchTerm.toLowerCase()) || product.strengths && product.strengths.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const filteredProducts = products.filter(product => product.title.toLowerCase().includes(searchTerm.toLowerCase()) || (product.process && product.process.toLowerCase().includes(searchTerm.toLowerCase())) || (product.strengths && product.strengths.toLowerCase().includes(searchTerm.toLowerCase())));
+  
   const handleAddNew = () => {
     setSelectedProduct(null);
-    setViewMode('form');
+    setShowForm(true);
   };
+  
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
-    setViewMode('form');
+    setShowDetail(false);
+    setShowForm(true);
   };
+  
   const handleView = (product: Product) => {
     setSelectedProduct(product);
-    setViewMode('detail');
+    setShowDetail(true);
   };
+  
   const handleDelete = async (id: string) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
       deleteProduct(id);
     }
   };
+  
   const handleSubmit = (data: any) => {
+    const mutationOptions = {
+      onSuccess: () => {
+        setShowForm(false);
+        setSelectedProduct(null);
+      }
+    };
+
     if (selectedProduct) {
       updateProduct({
         ...data,
         id: selectedProduct.id
-      });
+      }, mutationOptions);
     } else {
-      createProduct(data);
+      createProduct(data, mutationOptions);
     }
-    setViewMode('list');
   };
-  const handleCancel = () => {
-    setSelectedProduct(null);
-    setViewMode('list');
+
+  const onFormOpenChange = (isOpen: boolean) => {
+    setShowForm(isOpen);
+    if (!isOpen) {
+      setSelectedProduct(null);
+    }
   };
-  if (viewMode === 'form') {
-    return <ProductForm product={selectedProduct} onSubmit={handleSubmit} onCancel={handleCancel} isLoading={isCreating || isUpdating} />;
-  }
-  if (viewMode === 'detail' && selectedProduct) {
-    return <ProductDetail product={selectedProduct} onClose={handleCancel} onEdit={handleEdit} />;
-  }
+
+  const onDetailOpenChange = (isOpen: boolean) => {
+    setShowDetail(isOpen);
+    if (!isOpen) {
+      setSelectedProduct(null);
+    }
+  };
+
   return <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -120,6 +141,21 @@ const Products = () => {
           <CategoryManagement />
         </TabsContent>
       </Tabs>
+      
+      <ProductForm
+        open={showForm}
+        onOpenChange={onFormOpenChange}
+        product={selectedProduct || undefined}
+        onSubmit={handleSubmit}
+        isLoading={isCreating || isUpdating}
+      />
+
+      <ProductDetail
+        open={showDetail}
+        onOpenChange={onDetailOpenChange}
+        product={selectedProduct}
+        onEdit={handleEdit}
+      />
     </div>;
 };
 export default Products;
