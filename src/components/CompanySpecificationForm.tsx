@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { useCompanySpecifications } from "@/hooks/useCompanySpecifications";
-import type { CompanySpecification } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { CompanySpecification, SpecificationCategory } from "@/types";
 
 interface CompanySpecificationFormProps {
   companyId: string;
+  specificationCategories: SpecificationCategory[];
   specification?: CompanySpecification | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -18,36 +20,46 @@ interface CompanySpecificationFormProps {
 
 export const CompanySpecificationForm = ({
   companyId,
+  specificationCategories,
   specification,
   open,
   onOpenChange,
   onSuccess,
 }: CompanySpecificationFormProps) => {
-  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("");
+  const [categoryId, setCategoryId] = useState<string | undefined>();
   const [content, setContent] = useState("");
   const { createSpecification, updateSpecification, isCreating, isUpdating } = useCompanySpecifications();
 
   useEffect(() => {
     if (specification) {
-      setCategory(specification.category);
+      setTitle(specification.title);
       setContent(specification.content);
+      setCategoryId(specification.categoryId || undefined);
     } else {
-      setCategory("");
+      setTitle("");
       setContent("");
+      setCategoryId(undefined);
     }
-  }, [specification]);
+  }, [specification, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const specData = {
+        title,
+        content,
+        category_id: categoryId,
+    };
+
     if (specification) {
-      updateSpecification({ id: specification.id, category, content }, {
+      updateSpecification({ id: specification.id, ...specData }, {
         onSuccess: () => {
           onSuccess();
           onOpenChange(false);
         }
       });
     } else {
-      createSpecification({ company_id: companyId, category, content }, {
+      createSpecification({ company_id: companyId, ...specData }, {
         onSuccess: () => {
           onSuccess();
           onOpenChange(false);
@@ -67,15 +79,31 @@ export const CompanySpecificationForm = ({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoría *</Label>
-            <Input
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-              placeholder="Ej: Detalles Técnicos"
-            />
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Título *</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                placeholder="Ej: Cobertura de Responsabilidad Civil"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoría</Label>
+              <Select value={categoryId} onValueChange={(value) => setCategoryId(value === 'none' ? undefined : value)}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Seleccionar categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sin Categoría</SelectItem>
+                  {specificationCategories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="space-y-2">
             <RichTextEditor
@@ -89,7 +117,7 @@ export const CompanySpecificationForm = ({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!category || !content || isLoading}>
+            <Button type="submit" disabled={!title || !content || isLoading}>
               {isLoading ? "Guardando..." : specification ? "Actualizar" : "Crear"}
             </Button>
           </DialogFooter>

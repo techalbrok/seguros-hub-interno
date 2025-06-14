@@ -6,15 +6,17 @@ import type { CompanySpecification } from "@/types";
 
 interface CreateSpecData {
   company_id: string;
-  category: string;
+  title: string;
   content: string;
+  category_id?: string | null;
   order_position?: number;
 }
 
 interface UpdateSpecData {
   id: string;
-  category?: string;
+  title?: string;
   content?: string;
+  category_id?: string | null;
   order_position?: number;
 }
 
@@ -50,7 +52,7 @@ export const useCompanySpecifications = () => {
     mutationFn: async ({ id, ...updateData }: UpdateSpecData) => {
       const { data, error } = await supabase
         .from("company_specifications")
-        .update(updateData)
+        .update({ ...updateData, updated_at: new Date().toISOString() })
         .eq("id", id)
         .select()
         .single();

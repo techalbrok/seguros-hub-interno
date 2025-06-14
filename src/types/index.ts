@@ -36,6 +36,7 @@ export interface Company {
   commercialManager: string;
   managerEmail: string;
   specifications: CompanySpecification[];
+  specificationCategories: SpecificationCategory[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,9 +44,18 @@ export interface Company {
 export interface CompanySpecification {
   id: string;
   companyId: string;
-  category: string;
+  title: string;
+  categoryId: string | null;
   content: string;
   order?: number;
+  updatedAt?: Date;
+}
+
+export interface SpecificationCategory {
+  id: string;
+  companyId: string;
+  name: string;
+  order: number;
 }
 
 export interface ProductCategory {

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { Company, CompanySpecification } from "@/types";
+import type { Company, CompanySpecification, SpecificationCategory } from "@/types";
 
 interface CreateCompanyData {
   name: string;
@@ -19,9 +19,18 @@ interface UpdateCompanyData extends CreateCompanyData {
 const transformDbRowToCompanySpecification = (row: any): CompanySpecification => ({
   id: row.id,
   companyId: row.company_id,
-  category: row.category,
+  title: row.title,
+  categoryId: row.category_id,
   content: row.content,
   order: row.order_position,
+  updatedAt: new Date(row.updated_at),
+});
+
+const transformDbRowToSpecificationCategory = (row: any): SpecificationCategory => ({
+    id: row.id,
+    companyId: row.company_id,
+    name: row.name,
+    order: row.order_position,
 });
 
 // Transform database row to Company interface
@@ -36,6 +45,9 @@ const transformDbRowToCompany = (row: any): Company => ({
   updatedAt: new Date(row.updated_at),
   specifications: Array.isArray(row.company_specifications)
     ? row.company_specifications.map(transformDbRowToCompanySpecification)
+    : [],
+  specificationCategories: Array.isArray(row.specification_categories)
+    ? row.specification_categories.map(transformDbRowToSpecificationCategory)
     : [],
 });
 
@@ -61,9 +73,10 @@ export const useCompanies = () => {
 
       const { data, error } = await supabase
         .from("companies")
-        .select("*, company_specifications(*)")
+        .select("*, company_specifications(*), specification_categories(*)")
         .order("name", { ascending: true })
-        .order("order_position", { referencedTable: 'company_specifications', ascending: true });
+        .order("order_position", { referencedTable: 'company_specifications', ascending: true })
+        .order("order_position", { referencedTable: 'specification_categories', ascending: true });
 
       if (error) {
         console.error("Error fetching companies:", error);

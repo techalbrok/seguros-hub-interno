@@ -127,30 +127,43 @@ export type Database = {
       }
       company_specifications: {
         Row: {
-          category: string
+          category_id: string | null
           company_id: string
           content: string
           created_at: string
           id: string
           order_position: number | null
+          title: string
+          updated_at: string
         }
         Insert: {
-          category: string
+          category_id?: string | null
           company_id: string
           content: string
           created_at?: string
           id?: string
           order_position?: number | null
+          title: string
+          updated_at?: string
         }
         Update: {
-          category?: string
+          category_id?: string | null
           company_id?: string
           content?: string
           created_at?: string
           id?: string
           order_position?: number | null
+          title?: string
+          updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "company_specifications_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "specification_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "company_specifications_company_id_fkey"
             columns: ["company_id"]
@@ -634,6 +647,41 @@ export type Database = {
             columns: ["delegation_id"]
             isOneToOne: false
             referencedRelation: "delegations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specification_categories: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          name: string
+          order_position: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          name: string
+          order_position?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          order_position?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specification_categories_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
