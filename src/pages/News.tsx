@@ -98,10 +98,7 @@ const NewsPage = () => {
           <p className="text-muted-foreground mb-4">
             {searchTerm ? 'No se encontraron noticias que coincidan con tu búsqueda.' : 'No hay noticias disponibles.'}
           </p>
-          {!searchTerm && <Button onClick={handleCreate}>
-              <Plus className="w-4 h-4 mr-2" />
-              Crear Primera Noticia
-            </Button>}
+          {!searchTerm}
         </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredNews.map(newsItem => <NewsCard key={newsItem.id} news={newsItem} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />)}
         </div>}
