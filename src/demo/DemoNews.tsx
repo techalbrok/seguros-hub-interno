@@ -22,11 +22,9 @@ import { NewsCardSkeleton } from "@/components/skeletons/NewsSkeletons";
 import { Plus, Search } from 'lucide-react';
 
 import type { News, CreateNewsData } from "@/hooks/useNews";
-import type { ProductCategory, Product } from "@/types";
+import type { ProductCategory, Product, Company } from "@/types";
 
 const DEMO_NEWS_KEY = "demo_news_list";
-
-interface DemoCompany { id: string; name: string; }
 
 const demoCategories: ProductCategory[] = [
   { id: 'cat1', name: 'Seguros de Coche', parentId: null, level: 1, documents: [] },
@@ -34,9 +32,31 @@ const demoCategories: ProductCategory[] = [
   { id: 'cat3', name: 'Seguros de Vida', parentId: null, level: 1, documents: [] },
 ];
 
-const demoCompanies: DemoCompany[] = [
-    { id: 'comp1', name: 'Aseguradora Líder' },
-    { id: 'comp2', name: 'Protección Global Seguros' }
+const demoCompanies: Company[] = [
+    { 
+        id: 'comp1', 
+        name: 'Aseguradora Líder',
+        commercialWebsite: 'https://www.lider.com',
+        brokerAccess: 'Acceso Corredores',
+        commercialManager: 'Juan Pérez',
+        managerEmail: 'juan.perez@lider.com',
+        specifications: [],
+        specificationCategories: [],
+        createdAt: new Date('2022-01-01'),
+        updatedAt: new Date('2025-05-01'),
+    },
+    { 
+        id: 'comp2', 
+        name: 'Protección Global Seguros',
+        commercialWebsite: 'https://www.proteccionglobal.com',
+        brokerAccess: 'Portal Mediadores',
+        commercialManager: 'Ana García',
+        managerEmail: 'ana.garcia@proteccionglobal.com',
+        specifications: [],
+        specificationCategories: [],
+        createdAt: new Date('2021-03-15'),
+        updatedAt: new Date('2025-06-10'),
+    }
 ];
 
 const demoProducts: Array<{id: string; title: string;}> = [
