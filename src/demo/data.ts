@@ -1,4 +1,3 @@
-
 import type { SystemAlert } from '@/hooks/useSystemAlerts';
 import type { User, Delegation, Company, Product } from '@/types';
 import type { News } from '@/hooks/useNews';
@@ -65,10 +64,8 @@ export const demoData = {
         {
             id: 'demo-delegation-1',
             name: 'Delegación Central',
-            city: 'Madrid',
-            address: 'Calle Principal 123',
-            postal_code: '28001',
-            phone: '910111222',
+            legalName: 'Delegación Central S.A.',
+            contactPerson: 'Gerente Central',
             email: 'central@demo.com',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -76,10 +73,8 @@ export const demoData = {
         {
             id: 'demo-delegation-2',
             name: 'Delegación Norte',
-            city: 'Barcelona',
-            address: 'Avenida Diagonal 456',
-            postal_code: '08001',
-            phone: '930333444',
+            legalName: 'Delegación Norte S.L.',
+            contactPerson: 'Gerente Norte',
             email: 'norte@demo.com',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -114,9 +109,11 @@ export const demoData = {
     products: [
         {
             id: 'demo-product-1',
-            name: 'Seguro de Coche Total',
+            title: 'Seguro de Coche Total',
             description: 'Cobertura completa para tu vehículo.',
             details: '<p>Este seguro lo cubre todo, desde daños propios hasta asistencia en viaje.</p>',
+            process: '<p>Proceso de contratación rápido y sencillo.</p>',
+            strengths: '<p>La mejor relación calidad-precio del mercado.</p>',
             company_id: 'demo-company-1',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -124,9 +121,11 @@ export const demoData = {
         },
         {
             id: 'demo-product-2',
-            name: 'Seguro de Hogar Plus',
+            title: 'Seguro de Hogar Plus',
             description: 'Protege tu hogar y tus pertenencias.',
             details: '<p>Cubre incendios, robos, daños por agua y responsabilidad civil.</p>',
+            process: '<p>Inspección y alta en menos de 48 horas.</p>',
+            strengths: '<p>Asistencia 24/7 y peritos propios.</p>',
             company_id: 'demo-company-2',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),

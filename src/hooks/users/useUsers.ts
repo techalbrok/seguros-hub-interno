@@ -1,4 +1,3 @@
-
 import { useQueryClient } from "@tanstack/react-query";
 import { User } from '@/types';
 import { useUserQueries } from './useUserQueries';
@@ -16,8 +15,7 @@ export const useUsers = () => {
         id: `demo-user-${uuidv4()}`,
         name: data.name,
         email: data.email,
-        phone: data.phone,
-        delegation_id: data.delegation_id,
+        delegation_id: data.delegationId,
         role: data.role,
         avatar_url: '/placeholder.svg',
         created_at: new Date().toISOString(),

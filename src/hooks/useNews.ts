@@ -1,6 +1,5 @@
 
-import { useNews as useRealNews } from './news';
-import type { News, CreateNewsData } from './news';
+import { useNews as useRealNews, CreateNewsData, News } from './news';
 import { useDemoMode } from './useDemoMode';
 import { useToast } from './use-toast';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,7 +11,7 @@ export const useNews = () => {
     const { user, profile } = useAuth();
     
     if (isDemo) {
-        const createNews = (data: CreateNewsData) => {
+        const createNews = async (data: CreateNewsData) => {
             const newNews = {
                 id: `demo-news-${uuidv4()}`,
                 ...data,
@@ -22,17 +21,20 @@ export const useNews = () => {
                 author: { name: profile?.name || 'Admin Demo' }
             };
             setDemoData({ ...demoData, news: [newNews, ...demoData.news] });
+            return true;
         };
         
-        const updateNews = (data: Partial<News> & { id: string }) => {
+        const updateNews = async (id: string, data: Partial<News>) => {
             setDemoData({
                 ...demoData,
-                news: demoData.news.map(n => n.id === data.id ? { ...n, ...data, updated_at: new Date().toISOString() } : n)
+                news: demoData.news.map(n => n.id === id ? { ...n, ...data, updated_at: new Date().toISOString() } : n)
             });
+            return true;
         };
         
-        const deleteNews = (id: string) => {
+        const deleteNews = async (id: string) => {
             setDemoData({ ...demoData, news: demoData.news.filter(n => n.id !== id) });
+            return true;
         };
         
         return {
@@ -48,7 +50,13 @@ export const useNews = () => {
         };
     }
 
-    return useRealNews();
+    const realNews = useRealNews();
+    
+    const updateNewsWrapper = async (id: string, data: any) => {
+        return realNews.updateNews({ id, ...data });
+    }
+
+    return { ...realNews, updateNews: updateNewsWrapper };
 };
 
 export type { News, CreateNewsData };
