@@ -35,6 +35,9 @@ export const UserListPage = ({
   } = useAuth();
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const canCreateUsers = permissions?.users?.canCreate ?? false;
+  const canEditUsers = permissions?.users?.canEdit ?? false;
+  const canDeleteUsers = permissions?.users?.canDelete ?? false;
+
   return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -60,7 +63,15 @@ export const UserListPage = ({
 
       <UsersStats users={users} />
 
-      <UsersListView users={users} delegations={delegations} loading={loading} onViewUser={onViewUser} onEditUser={onEditUser} onDeleteUser={onDeleteUser} onBulkDelete={onBulkDelete} />
+      <UsersListView 
+        users={users} 
+        delegations={delegations} 
+        loading={loading} 
+        onViewUser={onViewUser} 
+        onEditUser={canEditUsers ? onEditUser : undefined} 
+        onDeleteUser={canDeleteUsers ? onDeleteUser : undefined} 
+        onBulkDelete={canDeleteUsers ? onBulkDelete : undefined} 
+      />
 
       <UserImportDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onBulkCreate={onBulkCreate} delegations={delegations} />
     </div>;

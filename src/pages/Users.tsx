@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const CreateUserPage = lazy(() => import('@/components/users/CreateUserPage').then(m => ({ default: m.CreateUserPage })));
 const EditUserPage = lazy(() => import('@/components/users/EditUserPage').then(m => ({ default: m.EditUserPage })));
@@ -24,12 +25,16 @@ type PageMode = 'list' | 'create' | 'detail' | 'edit';
 
 const Users = () => {
   const { users, delegations, loading, createUser, updateUser, deleteUser } = useUsers();
+  const { permissions } = useAuth();
   const [pageMode, setPageMode] = useState<PageMode>('list');
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const { toast } = useToast();
 
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | string[] | null>(null);
+
+  const canEditUsers = permissions?.users?.canEdit ?? false;
+  const canDeleteUsers = permissions?.users?.canDelete ?? false;
 
   const handleCreateUser = async (userData: CreateUserData) => {
     const success = await createUser(userData);
@@ -166,8 +171,8 @@ const Users = () => {
           user={selectedUser}
           delegations={delegations}
           onBack={() => setPageMode('list')}
-          onEdit={handleEditUser}
-          onDelete={handleDeleteRequest}
+          onEdit={canEditUsers ? handleEditUser : undefined}
+          onDelete={canDeleteUsers ? handleDeleteRequest : undefined}
         />
       );
     }

@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -12,12 +13,14 @@ import { Button } from "@/components/ui/button";
 import { User, Delegation } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, Edit, Trash2 } from "lucide-react";
 
 interface UsersTableProps {
   users: User[];
   delegations: Delegation[];
   onViewUser: (user: User) => void;
-  onEditUser: (user: User) => void;
+  onEditUser?: (user: User) => void;
+  onDeleteUser?: (userId: string) => void;
   selectedUserIds: string[];
   onSelectUser: (userId: string, selected: boolean) => void;
   onSelectAll: (selected: boolean) => void;
@@ -32,11 +35,12 @@ const getRoleColor = (role: string) => {
   return role === 'admin' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground';
 };
 
-export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selectedUserIds, onSelectUser, onSelectAll, areAllOnPageSelected }: UsersTableProps) => {
+export const UsersTable = ({ users, delegations, onViewUser, onEditUser, onDeleteUser, selectedUserIds, onSelectUser, onSelectAll, areAllOnPageSelected }: UsersTableProps) => {
   const { permissions } = useAuth();
   const canEditUsers = permissions?.users?.canEdit ?? false;
+  const canDeleteUsers = permissions?.users?.canDelete ?? false;
   const canViewUsers = permissions?.users?.canView ?? true;
-  const showActions = canEditUsers || canViewUsers;
+  const showActions = onEditUser || onViewUser || onDeleteUser;
 
   return (
     <Table>
@@ -54,7 +58,7 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selecte
           <TableHead>Rol</TableHead>
           <TableHead>Delegación</TableHead>
           <TableHead>Permisos</TableHead>
-          {showActions && <TableHead>Acciones</TableHead>}
+          {showActions && <TableHead className="text-right">Acciones</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -114,16 +118,24 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selecte
               </TableCell>
               {showActions && (
                 <TableCell>
-                  <div className="flex space-x-2">
-                    {canViewUsers && (
-                        <Button variant="outline" size="sm" onClick={() => onViewUser(user)}>
-                        Ver
+                  <div className="flex space-x-2 justify-end">
+                    {onViewUser && (
+                        <Button variant="outline" size="icon" onClick={() => onViewUser(user)}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">Ver</span>
                         </Button>
                     )}
-                    {canEditUsers && (
-                        <Button variant="outline" size="sm" onClick={() => onEditUser(user)}>
-                        Editar
+                    {onEditUser && (
+                        <Button variant="outline" size="icon" onClick={() => onEditUser(user)}>
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
                         </Button>
+                    )}
+                    {onDeleteUser && (
+                      <Button variant="destructive-outline" size="icon" onClick={() => onDeleteUser(user.id)}>
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Eliminar</span>
+                      </Button>
                     )}
                   </div>
                 </TableCell>
