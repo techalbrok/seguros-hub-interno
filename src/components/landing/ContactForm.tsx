@@ -1,4 +1,3 @@
-
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -27,8 +26,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Por favor, introduce una dirección de email válida.",
   }),
-  privacyPolicy: z.literal(true, {
-    errorMap: () => ({ message: "Debes aceptar la política de privacidad." }),
+  privacyPolicy: z.boolean().refine((val) => val === true, {
+    message: "Debes aceptar la política de privacidad.",
   }),
 })
 
