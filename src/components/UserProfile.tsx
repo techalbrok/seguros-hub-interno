@@ -12,9 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 import { User as UserType, Delegation } from "@/types";
 import { AvatarUpload } from "./AvatarUpload";
 import { sections } from "@/components/users/PermissionsFormSection";
+import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
 
 export const UserProfile = () => {
   const { user, profile: authProfile } = useAuth();
+  const { config: brokerageConfig } = useBrokerageConfig();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -233,6 +235,14 @@ export const UserProfile = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
+          {brokerageConfig && (
+            <div className="flex items-center gap-3 mb-4 border-b pb-4">
+              {brokerageConfig.logo_url && (
+                <img src={brokerageConfig.logo_url} alt={`Logo de ${brokerageConfig.name}`} className="h-10 w-auto object-contain" />
+              )}
+              <h2 className="text-xl font-semibold text-sidebar-primary dark:text-white">{brokerageConfig.name}</h2>
+            </div>
+          )}
           <div className="flex items-center space-x-4">
             <AvatarUpload
               currentAvatarUrl={userProfile.avatarUrl}
