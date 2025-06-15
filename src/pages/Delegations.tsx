@@ -1,34 +1,20 @@
+
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useDelegations } from "@/hooks/useDelegations";
 import { DelegationForm } from "@/components/DelegationForm";
 import { DelegationDetail } from "@/components/DelegationDetail";
-import { DelegationCard } from "@/components/DelegationCard";
 import { Delegation } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 import { DelegationImportDialog, CreateDelegationData } from "@/components/delegations/DelegationImportDialog";
 import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
-import { 
-  Plus, 
-  Search, 
-  Grid3X3, 
-  List, 
-  Building,
-  MapPin,
-  Phone,
-  Mail,
-  Globe,
-  User,
-  Eye,
-  Edit,
-  Trash2,
-  Upload
-} from "lucide-react";
+import { DelegationsPageHeader } from "@/components/delegations/DelegationsPageHeader";
+import { DelegationsControls } from "@/components/delegations/DelegationsControls";
+import { DelegationsGrid } from "@/components/delegations/DelegationsGrid";
+import { DelegationsList } from "@/components/delegations/DelegationsList";
+import { DelegationsEmptyState } from "@/components/delegations/DelegationsEmptyState";
+import { DelegationsLoading } from "@/components/delegations/DelegationsLoading";
 
 const Delegations = () => {
   const { delegations, loading, createDelegation, updateDelegation, deleteDelegation } = useDelegations();
@@ -105,181 +91,52 @@ const Delegations = () => {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white">
-            Gestión de {t.plural}
-          </h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+    return <DelegationsLoading t={t} />;
   }
-
-  const renderGridView = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredDelegations.map((delegation) => (
-        <DelegationCard
-          key={delegation.id}
-          delegation={delegation}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onView={handleView}
-        />
-      ))}
-    </div>
-  );
-
-  const renderListView = () => (
-    <div className="space-y-4">
-      {filteredDelegations.map((delegation) => (
-        <Card key={delegation.id} className="hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Building className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sidebar-primary dark:text-white">
-                    {delegation.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{delegation.legalName}</p>
-                  <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                    <div className="flex items-center space-x-1">
-                      <User className="h-3 w-3" />
-                      <span>{delegation.contactPerson}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Phone className="h-3 w-3" />
-                      <span>{delegation.phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Mail className="h-3 w-3" />
-                      <span>{delegation.email}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <Button size="sm" variant="outline" onClick={() => handleView(delegation)}>
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleEdit(delegation)}>
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleDelete(delegation.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white">
-            Gestión de {t.plural}
-          </h1>
-          <p className="text-muted-foreground">
-            Gestiona las {t.plural.toLowerCase()} y su información
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
-            <Upload className="h-4 w-4 mr-2" />
-            Importar CSV
-          </Button>
-          <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nueva {t.singular}
-          </Button>
-        </div>
-      </div>
+      <DelegationsPageHeader 
+        t={t} 
+        onImportClick={() => setIsImportDialogOpen(true)}
+        onCreateClick={handleCreate}
+      />
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <span>{t.plural}</span>
-              <Badge variant="secondary">
-                {filteredDelegations.length} de {delegations.length}
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardTitle>
+          <DelegationsControls
+            t={t}
+            filteredCount={filteredDelegations.length}
+            totalCount={delegations.length}
+            viewMode={viewMode}
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+            onViewModeChange={setViewMode}
+          />
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder={`Buscar ${t.plural.toLowerCase()}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
           {filteredDelegations.length === 0 ? (
-            <div className="text-center py-12">
-              <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-sidebar-primary dark:text-white mb-2">
-                {searchTerm ? `No se encontraron ${t.plural.toLowerCase()}` : `No hay ${t.plural.toLowerCase()}`}
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                {searchTerm
-                  ? "Intenta con otros términos de búsqueda"
-                  : `Comienza creando tu primera ${t.singular.toLowerCase()}`
-                }
-              </p>
-              {!searchTerm && (
-                <Button onClick={handleCreate}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nueva {t.singular}
-                </Button>
-              )}
-            </div>
+            <DelegationsEmptyState
+              t={t}
+              hasSearchTerm={!!searchTerm}
+              onCreateClick={handleCreate}
+            />
           ) : (
-            <div>
-              {viewMode === 'grid' ? renderGridView() : renderListView()}
-            </div>
+            viewMode === 'grid' ? (
+              <DelegationsGrid 
+                delegations={filteredDelegations}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onView={handleView}
+              />
+            ) : (
+              <DelegationsList 
+                delegations={filteredDelegations}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onView={handleView}
+              />
+            )
           )}
         </CardContent>
       </Card>
