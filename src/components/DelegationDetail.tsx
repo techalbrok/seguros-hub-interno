@@ -1,9 +1,9 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Delegation } from "@/types";
 import { MapPin, Phone, Mail, Globe, User, Building } from "lucide-react";
+import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
 
 interface DelegationDetailProps {
   delegation: Delegation | null;
@@ -14,6 +14,8 @@ interface DelegationDetailProps {
 
 export const DelegationDetail = ({ delegation, open, onOpenChange, onEdit }: DelegationDetailProps) => {
   if (!delegation) return null;
+  const { config } = useBrokerageConfig();
+  const t = config?.terminology?.delegation || defaultTerminology.delegation;
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('es-ES', {
@@ -119,7 +121,7 @@ export const DelegationDetail = ({ delegation, open, onOpenChange, onEdit }: Del
                 Cerrar
               </Button>
               <Button onClick={onEdit}>
-                Editar Delegación
+                Editar {t.singular}
               </Button>
             </div>
           )}

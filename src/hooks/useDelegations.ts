@@ -1,12 +1,14 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { Delegation } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
 
 export const useDelegations = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { config } = useBrokerageConfig();
+  const t = config?.terminology?.delegation || defaultTerminology.delegation;
 
   const {
     data: delegations = [],
@@ -96,15 +98,15 @@ export const useDelegations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
       toast({
-        title: "Delegación creada",
-        description: "La delegación ha sido creada exitosamente",
+        title: `${t.singular} creada`,
+        description: `La ${t.singular.toLowerCase()} ha sido creada exitosamente`,
       });
     },
     onError: (error: any) => {
       console.error('Error creating delegation:', error);
       toast({
         title: "Error",
-        description: error.message || "No se pudo crear la delegación",
+        description: error.message || `No se pudo crear la ${t.singular.toLowerCase()}`,
         variant: "destructive",
       });
     },
@@ -137,15 +139,15 @@ export const useDelegations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
       toast({
-        title: "Delegación actualizada",
-        description: "Los datos de la delegación han sido actualizados",
+        title: `${t.singular} actualizada`,
+        description: `Los datos de la ${t.singular.toLowerCase()} han sido actualizados`,
       });
     },
     onError: (error: any) => {
       console.error('Error updating delegation:', error);
       toast({
         title: "Error",
-        description: "No se pudo actualizar la delegación",
+        description: `No se pudo actualizar la ${t.singular.toLowerCase()}`,
         variant: "destructive",
       });
     },
@@ -168,15 +170,15 @@ export const useDelegations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
       toast({
-        title: "Delegación eliminada",
-        description: "La delegación ha sido eliminada exitosamente",
+        title: `${t.singular} eliminada`,
+        description: `La ${t.singular.toLowerCase()} ha sido eliminada exitosamente`,
       });
     },
     onError: (error: any) => {
       console.error('Error deleting delegation:', error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar la delegación",
+        description: `No se pudo eliminar la ${t.singular.toLowerCase()}`,
         variant: "destructive",
       });
     },

@@ -12,6 +12,7 @@ import { DelegationCard } from "@/components/DelegationCard";
 import { Delegation } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 import { DelegationImportDialog, CreateDelegationData } from "@/components/delegations/DelegationImportDialog";
+import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
 import { 
   Plus, 
   Search, 
@@ -41,6 +42,8 @@ const Delegations = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { toast } = useToast();
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const { config } = useBrokerageConfig();
+  const t = config?.terminology?.delegation || defaultTerminology.delegation;
 
   const filteredDelegations = delegations.filter(delegation =>
     delegation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -94,7 +97,7 @@ const Delegations = () => {
   
     toast({
       title: "Importación completada",
-      description: `${successfulCreations} de ${delegationsData.length} delegaciones creadas exitosamente. ${failedCreations > 0 ? `Fallaron ${failedCreations}.` : ''}`,
+      description: `${successfulCreations} de ${delegationsData.length} ${t.plural.toLowerCase()} creadas exitosamente. ${failedCreations > 0 ? `Fallaron ${failedCreations}.` : ''}`,
       variant: failedCreations > 0 ? 'destructive' : 'default'
     });
   
@@ -106,7 +109,7 @@ const Delegations = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white">
-            Gestión de Delegaciones
+            Gestión de {t.plural}
           </h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -196,10 +199,10 @@ const Delegations = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white">
-            Gestión de Delegaciones
+            Gestión de {t.plural}
           </h1>
           <p className="text-muted-foreground">
-            Gestiona las delegaciones y su información
+            Gestiona las {t.plural.toLowerCase()} y su información
           </p>
         </div>
         <div className="flex gap-2">
@@ -209,7 +212,7 @@ const Delegations = () => {
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="h-4 w-4 mr-2" />
-            Nueva Delegación
+            Nueva {t.singular}
           </Button>
         </div>
       </div>
@@ -218,7 +221,7 @@ const Delegations = () => {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span>Delegaciones</span>
+              <span>{t.plural}</span>
               <Badge variant="secondary">
                 {filteredDelegations.length} de {delegations.length}
               </Badge>
@@ -246,7 +249,7 @@ const Delegations = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Buscar delegaciones..."
+                placeholder={`Buscar ${t.plural.toLowerCase()}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -258,18 +261,18 @@ const Delegations = () => {
             <div className="text-center py-12">
               <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium text-sidebar-primary dark:text-white mb-2">
-                {searchTerm ? "No se encontraron delegaciones" : "No hay delegaciones"}
+                {searchTerm ? `No se encontraron ${t.plural.toLowerCase()}` : `No hay ${t.plural.toLowerCase()}`}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {searchTerm
                   ? "Intenta con otros términos de búsqueda"
-                  : "Comienza creando tu primera delegación"
+                  : `Comienza creando tu primera ${t.singular.toLowerCase()}`
                 }
               </p>
               {!searchTerm && (
                 <Button onClick={handleCreate}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Nueva Delegación
+                  Nueva {t.singular}
                 </Button>
               )}
             </div>
@@ -298,9 +301,9 @@ const Delegations = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar delegación?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar {t.singular.toLowerCase()}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. La delegación será eliminada permanentemente.
+              Esta acción no se puede deshacer. La {t.singular.toLowerCase()} será eliminada permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

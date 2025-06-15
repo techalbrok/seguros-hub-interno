@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Delegation } from "@/types";
+import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
 
 interface DelegationFormProps {
   delegation?: Delegation;
@@ -32,6 +32,8 @@ export const DelegationForm = ({ delegation, open, onOpenChange, onSubmit }: Del
     contactPerson: "",
   });
   const [loading, setLoading] = useState(false);
+  const { config } = useBrokerageConfig();
+  const t = config?.terminology?.delegation || defaultTerminology.delegation;
 
   useEffect(() => {
     if (delegation) {
@@ -87,7 +89,7 @@ export const DelegationForm = ({ delegation, open, onOpenChange, onSubmit }: Del
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
-            {delegation ? "Editar Delegación" : "Nueva Delegación"}
+            {delegation ? `Editar ${t.singular}` : `Nueva ${t.singular}`}
           </DialogTitle>
         </DialogHeader>
 
@@ -99,7 +101,7 @@ export const DelegationForm = ({ delegation, open, onOpenChange, onSubmit }: Del
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                placeholder="Nombre de la delegación"
+                placeholder={`Nombre de la ${t.singular.toLowerCase()}`}
                 required
               />
             </div>

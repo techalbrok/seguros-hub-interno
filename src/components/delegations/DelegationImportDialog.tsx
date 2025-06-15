@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Papa from 'papaparse';
@@ -21,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useBrokerageConfig, defaultTerminology } from '@/hooks/useBrokerageConfig';
 
 export interface CreateDelegationData {
   name: string;
@@ -44,6 +44,8 @@ export const DelegationImportDialog = ({ open, onOpenChange, onBulkCreate }: Del
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedDelegation[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { config } = useBrokerageConfig();
+  const t = config?.terminology?.delegation || defaultTerminology.delegation;
 
   const resetState = () => {
     setFile(null);
@@ -112,9 +114,9 @@ export const DelegationImportDialog = ({ open, onOpenChange, onBulkCreate }: Del
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) resetState(); onOpenChange(isOpen); }}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Importar Delegaciones desde CSV</DialogTitle>
+          <DialogTitle>Importar {t.plural} desde CSV</DialogTitle>
           <DialogDescription>
-            Sube un fichero CSV con las delegaciones a crear. Las columnas requeridas son: <strong>name, legal_name, address, phone, email, contact_person</strong>. Opcionalmente: <strong>website</strong>.
+            Sube un fichero CSV con las {t.plural.toLowerCase()} a crear. Las columnas requeridas son: <strong>name, legal_name, address, phone, email, contact_person</strong>. Opcionalmente: <strong>website</strong>.
           </DialogDescription>
         </DialogHeader>
 
@@ -153,7 +155,7 @@ export const DelegationImportDialog = ({ open, onOpenChange, onBulkCreate }: Del
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <AlertTitle className="text-green-800 dark:text-green-300">¡Todo correcto!</AlertTitle>
                   <AlertDescription className="text-green-700 dark:text-green-400">
-                    Se importarán {validCount} delegaciones.
+                    Se importarán {validCount} {t.plural.toLowerCase()}.
                   </AlertDescription>
                 </Alert>
             )}
@@ -212,7 +214,7 @@ export const DelegationImportDialog = ({ open, onOpenChange, onBulkCreate }: Del
                 onClick={handleImport} 
                 disabled={!file || validCount === 0 || isProcessing}
             >
-                {isProcessing ? 'Importando...' : `Importar ${validCount} delegaciones`}
+                {isProcessing ? 'Importando...' : `Importar ${validCount} ${t.plural.toLowerCase()}`}
             </Button>
         </DialogFooter>
       </DialogContent>
