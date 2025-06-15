@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
@@ -13,6 +12,8 @@ import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } f
 import { Link } from 'react-router-dom';
 import { useBrokerageConfig, defaultTerminology } from '@/hooks/useBrokerageConfig';
 import { SystemAlerts } from '@/components/SystemAlerts';
+import { RecentNewsWidget } from '@/components/dashboard/RecentNewsWidget';
+import { FeaturedCompaniesWidget } from '@/components/dashboard/FeaturedCompaniesWidget';
 
 const Dashboard = () => {
   const {
@@ -131,6 +132,12 @@ const Dashboard = () => {
             </Link>
           ))}
         </div>
+        
+        <div className="mt-8 grid gap-8 lg:grid-cols-2 relative z-10">
+          <RecentNewsWidget />
+          <FeaturedCompaniesWidget />
+        </div>
+
       </div>
     </div>
   );
