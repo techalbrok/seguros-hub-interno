@@ -1,8 +1,9 @@
-
 import { useState, lazy, Suspense } from "react";
 import { useUsers } from "@/hooks/useUsers";
-import { User as UserType } from "@/types";
+import { User as UserType, Delegation } from "@/types";
 import { UserListPage } from "@/components/users/UserListPage";
+import { useToast } from "@/components/ui/use-toast";
+import { CreateUserData } from "@/hooks/users";
 
 const CreateUserPage = lazy(() => import('@/components/users/CreateUserPage').then(m => ({ default: m.CreateUserPage })));
 const EditUserPage = lazy(() => import('@/components/users/EditUserPage').then(m => ({ default: m.EditUserPage })));
@@ -15,13 +16,29 @@ const Users = () => {
   const { users, delegations, loading, createUser, updateUser, deleteUser } = useUsers();
   const [pageMode, setPageMode] = useState<PageMode>('list');
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+  const { toast } = useToast();
 
-  const handleCreateUser = async (userData: any) => {
+  const handleCreateUser = async (userData: CreateUserData) => {
     const success = await createUser(userData);
     if (success) {
       setPageMode('list');
     }
     return success;
+  };
+  
+  const handleBulkCreateUsers = async (usersData: CreateUserData[]) => {
+    const results = await Promise.allSettled(usersData.map(userData => createUser(userData)));
+  
+    const successfulCreations = results.filter(r => r.status === 'fulfilled' && r.value).length;
+    const failedCreations = results.length - successfulCreations;
+  
+    toast({
+      title: "Importación completada",
+      description: `${successfulCreations} de ${usersData.length} usuarios creados exitosamente. ${failedCreations > 0 ? `Fallaron ${failedCreations}.` : ''}`,
+      variant: failedCreations > 0 ? 'destructive' : 'default'
+    });
+  
+    return { successfulCreations, failedCreations };
   };
 
   const handleEditUser = (user: UserType) => {
@@ -134,6 +151,7 @@ const Users = () => {
         onEditUser={handleEditUser}
         onDeleteUser={handleDeleteUser}
         onBulkDelete={handleBulkDelete}
+        onBulkCreate={handleBulkCreateUsers}
       />
     );
   };

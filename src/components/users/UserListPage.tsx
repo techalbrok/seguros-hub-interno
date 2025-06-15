@@ -1,9 +1,13 @@
-import { Users as UsersIcon, Plus } from "lucide-react";
+
+import { useState } from 'react';
+import { Users as UsersIcon, Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UsersStats } from "./UsersStats";
 import { UsersListView } from "./UsersListView";
 import { User, Delegation } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
+import { UserImportDialog } from './UserImportDialog';
+import { CreateUserData } from '@/hooks/users/types';
 
 interface UserListPageProps {
   users: User[];
@@ -14,6 +18,7 @@ interface UserListPageProps {
   onEditUser: (user: User) => void;
   onDeleteUser: (userId: string) => void;
   onBulkDelete: (userIds: string[]) => void;
+  onBulkCreate: (users: CreateUserData[]) => Promise<any>;
 }
 
 export const UserListPage = ({
@@ -25,8 +30,10 @@ export const UserListPage = ({
   onEditUser,
   onDeleteUser,
   onBulkDelete,
+  onBulkCreate,
 }: UserListPageProps) => {
   const { isAdmin } = useAuth();
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -41,10 +48,16 @@ export const UserListPage = ({
           </p>
         </div>
         {isAdmin && (
-          <Button className="corporate-button self-start sm:self-auto" onClick={onSetPageMode}>
-            <Plus className="h-4 w-4 mr-2" />
-            Crear Usuario
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 self-start sm:self-auto">
+            <Button variant="outline" className="corporate-button" onClick={() => setIsImportDialogOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Importar CSV
+            </Button>
+            <Button className="corporate-button" onClick={onSetPageMode}>
+              <Plus className="h-4 w-4 mr-2" />
+              Crear Usuario
+            </Button>
+          </div>
         )}
       </div>
 
@@ -58,6 +71,13 @@ export const UserListPage = ({
         onEditUser={onEditUser}
         onDeleteUser={onDeleteUser}
         onBulkDelete={onBulkDelete}
+      />
+
+      <UserImportDialog 
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        onBulkCreate={onBulkCreate}
+        delegations={delegations}
       />
     </div>
   );
