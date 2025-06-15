@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -27,7 +28,7 @@ export const LandingHero = () => {
           </p>
           
           <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-            <Link to="/demo">
+            <Link to="/demo/login">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 Demo
               </Button>

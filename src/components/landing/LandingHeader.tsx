@@ -10,7 +10,7 @@ export const LandingHeader = () => {
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
           <nav className="flex items-center space-x-2">
-            <Link to="/demo">
+            <Link to="/demo/login">
               <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
                 Demo
               </Button>
