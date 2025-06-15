@@ -2,6 +2,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { Users, Calendar, Newspaper, Briefcase, Building, Building2, Package } from "lucide-react";
+import { DemoNavigationShortcuts } from "./DemoNavigationShortcuts";
 
 const navItems = [
   { to: "/demo/dashboard", label: "Dashboard", icon: Calendar },
@@ -61,7 +62,9 @@ export const DemoSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <DemoNavigationShortcuts />
       </SidebarContent>
     </Sidebar>
   );
 };
+
