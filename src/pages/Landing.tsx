@@ -2,6 +2,9 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingHero } from "@/components/landing/LandingHero";
 import { LandingFeatures } from "@/components/landing/LandingFeatures";
+import { LandingAudience } from "@/components/landing/LandingAudience";
+import { LandingBenefits } from "@/components/landing/LandingBenefits";
+import { LandingTech } from "@/components/landing/LandingTech";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
 const LandingPage = () => {
@@ -11,6 +14,9 @@ const LandingPage = () => {
             <main className="flex-1">
                 <LandingHero />
                 <LandingFeatures />
+                <LandingAudience />
+                <LandingBenefits />
+                <LandingTech />
             </main>
             <LandingFooter />
         </div>

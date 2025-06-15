@@ -3,19 +3,19 @@ import { Users, Building, Building2, Package, Briefcase, Newspaper } from "lucid
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 const features = [
-  { icon: Users, title: "Gestión de Equipos", description: "Control total sobre usuarios, roles y permisos para todo tu personal." },
-  { icon: Building, title: "Sucursales y Oficinas", description: "Administra múltiples localizaciones y sus equipos desde un panel centralizado." },
-  { icon: Building2, title: "Red de Proveedores", description: "Mantén una base de datos unificada de compañías, partners y colaboradores." },
-  { icon: Package, title: "Catálogo de Productos", description: "Cataloga y consulta rápidamente la información de los productos o servicios que ofreces." },
-  { icon: Briefcase, title: "Departamentos", description: "Organiza la información y los recursos internos por departamentos para una mayor eficiencia." },
-  { icon: Newspaper, title: "Comunicación Interna", description: "Mantén a todo tu equipo informado con un portal de noticias y comunicados fácil de usar." },
+  { icon: Users, title: "Gestión de Equipos", description: "Control total sobre usuarios, roles y permisos." },
+  { icon: Building, title: "Gestión de Oficinas/Sucursales", description: "Administra múltiples ubicaciones desde un panel centralizado." },
+  { icon: Building2, title: "Red de Proveedores", description: "Base de datos completa de proveedores y partners." },
+  { icon: Package, title: "Catálogo de Productos/Servicios", description: "Organiza y gestiona tu oferta comercial de forma eficiente." },
+  { icon: Briefcase, title: "Departamentos Internos", description: "Estructura organizacional clara y eficiente para tus equipos." },
+  { icon: Newspaper, title: "Comunicación Interna", description: "Un portal de noticias y comunicados corporativos fácil de usar." },
 ];
 
 export const LandingFeatures = () => {
   return (
     <section className="container py-24 sm:py-32 bg-muted/40 dark:bg-muted/20">
       <div className="text-center mb-12">
-        <h2 className="text-3xl sm:text-4xl font-bold">Una solución, infinitas posibilidades</h2>
+        <h2 className="text-3xl sm:text-4xl font-bold text-sidebar-primary dark:text-white">Una solución, infinitas posibilidades</h2>
         <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
           HubCore se adapta a tu negocio. Nuestras herramientas están diseñadas para escalar y evolucionar contigo, optimizando cada área de tu empresa.
         </p>
