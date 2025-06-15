@@ -6,8 +6,8 @@ import { Building, User, Phone, Mail, Eye, Edit, Trash2 } from "lucide-react";
 
 interface DelegationsListProps {
   delegations: Delegation[];
-  onEdit: (delegation: Delegation) => void;
-  onDelete: (delegationId: string) => void;
+  onEdit?: (delegation: Delegation) => void;
+  onDelete?: (delegationId: string) => void;
   onView: (delegation: Delegation) => void;
 }
 
@@ -46,12 +46,16 @@ export const DelegationsList = ({ delegations, onEdit, onDelete, onView }: Deleg
               <Button size="sm" variant="outline" onClick={() => onView(delegation)}>
                 <Eye className="h-4 w-4" />
               </Button>
-              <Button size="sm" variant="outline" onClick={() => onEdit(delegation)}>
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => onDelete(delegation.id)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {onEdit && (
+                <Button size="sm" variant="outline" onClick={() => onEdit(delegation)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+              )}
+              {onDelete && (
+                <Button size="sm" variant="outline" onClick={() => onDelete(delegation.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>

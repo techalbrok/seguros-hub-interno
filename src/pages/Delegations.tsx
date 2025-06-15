@@ -14,9 +14,14 @@ import { DelegationsGrid } from "@/components/delegations/DelegationsGrid";
 import { DelegationsList } from "@/components/delegations/DelegationsList";
 import { DelegationsEmptyState } from "@/components/delegations/DelegationsEmptyState";
 import { DelegationsLoading } from "@/components/delegations/DelegationsLoading";
+import { useAuth } from "@/hooks/useAuth";
 
 const Delegations = () => {
   const { delegations, loading, createDelegation, updateDelegation, deleteDelegation } = useDelegations();
+  const { permissions } = useAuth();
+  const canCreateDelegations = permissions?.delegations?.canCreate ?? false;
+  const canEditDelegations = permissions?.delegations?.canEdit ?? false;
+  const canDeleteDelegations = permissions?.delegations?.canDelete ?? false;
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation | null>(null);
   const [editingDelegation, setEditingDelegation] = useState<Delegation | null>(null);
@@ -107,8 +112,8 @@ const Delegations = () => {
         <DelegationDetail
           delegation={selectedDelegation}
           onBack={handleBackFromDetail}
-          onEdit={() => handleEdit(selectedDelegation)}
-          onDelete={() => handleDelete(selectedDelegation.id)}
+          onEdit={canEditDelegations ? (() => handleEdit(selectedDelegation)) : undefined}
+          onDelete={canDeleteDelegations ? (() => handleDelete(selectedDelegation.id)) : undefined}
         />
         <DelegationForm
           delegation={editingDelegation}
@@ -140,8 +145,8 @@ const Delegations = () => {
     <div className="space-y-6">
       <DelegationsPageHeader 
         t={t} 
-        onImportClick={() => setIsImportDialogOpen(true)}
-        onCreateClick={handleCreate}
+        onImportClick={canCreateDelegations ? () => setIsImportDialogOpen(true) : undefined}
+        onCreateClick={canCreateDelegations ? handleCreate : undefined}
       />
 
       <Card>
@@ -161,21 +166,21 @@ const Delegations = () => {
             <DelegationsEmptyState
               t={t}
               hasSearchTerm={!!searchTerm}
-              onCreateClick={handleCreate}
+              onCreateClick={canCreateDelegations ? handleCreate : undefined}
             />
           ) : (
             viewMode === 'grid' ? (
               <DelegationsGrid 
                 delegations={filteredDelegations}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                onEdit={canEditDelegations ? handleEdit : undefined}
+                onDelete={canDeleteDelegations ? handleDelete : undefined}
                 onView={handleView}
               />
             ) : (
               <DelegationsList 
                 delegations={filteredDelegations}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                onEdit={canEditDelegations ? handleEdit : undefined}
+                onDelete={canDeleteDelegations ? handleDelete : undefined}
                 onView={handleView}
               />
             )
