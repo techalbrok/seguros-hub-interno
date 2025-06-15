@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -9,8 +8,8 @@ export interface Department {
   responsible_name: string;
   responsible_email?: string;
   description?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export const useDepartments = () => {
@@ -37,7 +36,11 @@ export const useDepartments = () => {
       }
 
       console.log("Departments fetched successfully:", data);
-      return data as Department[];
+      return data.map(d => ({
+        ...d,
+        created_at: new Date(d.created_at),
+        updated_at: new Date(d.updated_at)
+      })) as Department[];
     },
   });
 
@@ -55,8 +58,13 @@ export const useDepartments = () => {
         console.error("Error creating department:", error);
         throw error;
       }
-
-      return data as Department;
+      
+      const result = data as any;
+      return {
+        ...result,
+        created_at: new Date(result.created_at),
+        updated_at: new Date(result.updated_at),
+      } as Department;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments"] });
@@ -85,7 +93,13 @@ export const useDepartments = () => {
         .single();
 
       if (error) throw error;
-      return data as Department;
+      
+      const result = data as any;
+      return {
+        ...result,
+        created_at: new Date(result.created_at),
+        updated_at: new Date(result.updated_at),
+      } as Department;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments"] });
