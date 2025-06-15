@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Department } from "@/hooks/useDepartments";
 import { DepartmentCard } from "@/components/DepartmentCard";
 import { DepartmentForm } from "@/components/DepartmentForm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Search, Grid, List, Edit, Trash2 } from 'lucide-react';
@@ -260,7 +259,7 @@ export const DemoDepartments = () => {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
                 onClick={confirmDelete}
-                variant="destructive"
+                className={buttonVariants({ variant: "destructive" })}
             >
                 Sí, eliminar
             </AlertDialogAction>

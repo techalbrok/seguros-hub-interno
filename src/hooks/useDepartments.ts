@@ -85,9 +85,10 @@ export const useDepartments = () => {
 
   const updateDepartmentMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Department> }) => {
+      const { created_at, updated_at, ...otherUpdates } = updates;
       const { data, error } = await supabase
         .from('departments')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...otherUpdates, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();
