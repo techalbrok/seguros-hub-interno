@@ -20,57 +20,69 @@ serve(async (req) => {
     const hostnameRaw = Deno.env.get('MAILRELAY_ACCOUNT_HOSTNAME') || ''
     const groupIdRaw = Deno.env.get('MAILRELAY_GROUP_ID') || ''
 
-    // Mostrar los secretos usados
+    // Mostrar los secretos usados y loggear si falta alguno
+    const missingSecrets = []
+    if (!apiKey) missingSecrets.push("MAILRELAY_API_KEY")
+    if (!hostnameRaw) missingSecrets.push("MAILRELAY_ACCOUNT_HOSTNAME")
+    if (!groupIdRaw) missingSecrets.push("MAILRELAY_GROUP_ID")
+    if (missingSecrets.length) {
+      console.error('Faltan secrets necesarios:', missingSecrets)
+      return new Response(
+        JSON.stringify({ error: `Faltan secrets: ${missingSecrets.join(', ')}` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
     console.log('MailRelay params loaded:', {
       apiKeyPresent: !!apiKey,
       hostnameRaw,
       groupIdRaw,
     })
 
-    if (!apiKey || !hostnameRaw || !groupIdRaw) {
-      return new Response(
-        JSON.stringify({ error: 'MailRelay API key, hostname o group ID no está configurado.' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      )
-    }
-
-    // Sanitizamos el hostname: solo subdominio
+    // Sanitizar subdominio:
     let account = hostnameRaw
-      .trim()
       .replace(/^https?:\/\//, "")
       .replace(/\.ipzmarketing\.com.*/i, "")
-      .replace(/[\/\s]+$/, "");
-
-    // En caso de que el usuario meta directamente el subdominio
-    if (account.includes(".")) {
-      account = account.split(".")[0]
-    }
-    // reconstruct hostname
+      .replace(/[\/\s]+$/, "")
+    if (account.includes(".")) account = account.split(".")[0]
     const cleanHostname = `${account}.ipzmarketing.com`
+    const apiUrl = `https://${cleanHostname}/api/v1/subscribers`
+    const confirmationUrl = `https://${cleanHostname}/api/v1/confirmation_emails`
     console.log("Hostname limpio para MailRelay:", cleanHostname)
     
-    // Validamos y convertimos a entero el groupId
-    const groupId = Number(String(groupIdRaw).trim())
+    // Group id seguro (int)
+    const groupId = parseInt(String(groupIdRaw).trim(), 10)
     if (isNaN(groupId)) {
       return new Response(
         JSON.stringify({ error: 'MAILRELAY_GROUP_ID debe ser un número entero válido.' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
-    // Solo dejamos el correo/limpio
-    const apiUrl = `https://${cleanHostname}/api/v1/subscribers`
-    const confirmationUrl = `https://${cleanHostname}/api/v1/confirmation_emails`
 
+    // Validar email y nombre
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return new Response(
+        JSON.stringify({ error: 'Email es obligatorio y debe ser válido.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
+      return new Response(
+        JSON.stringify({ error: 'El nombre es obligatorio y debe tener al menos 2 caracteres.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    // Payload estricto según MailRelay (no campos extra)
     const subscriberPayload = {
-      email: String(email || '').trim().toLowerCase(),
-      name: String(name || '').trim(),
-      group_ids: [groupId],
+      email: email.trim().toLowerCase(),
+      name: name.trim(),
+      group_ids: [groupId], // array de int
       status: "pending",
       send_confirmation_email: true,
     }
-    console.log('Payload para MailRelay:', JSON.stringify(subscriberPayload, null, 2))
+    console.log('Payload para MailRelay (POST /api/v1/subscribers):', subscriberPayload)
 
-    // --- PRIMERA LLAMADA: crear/actualizar suscriptor ---
+    // --- LLAMADA PRINCIPAL ---
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -80,39 +92,31 @@ serve(async (req) => {
       body: JSON.stringify(subscriberPayload),
     });
 
+    const responseText = await response.text()
     let data: any = null
-    let errorDetails: any = null
-    let rawResponse: string | null = null
-
     try {
-      data = await response.clone().json()
-    } catch (err) {
-      try {
-        rawResponse = await response.clone().text()
-      } catch {
-        rawResponse = "(no response text)"
-      }
-      errorDetails = { raw: rawResponse }
+      data = JSON.parse(responseText)
+    } catch {
+      data = null
     }
 
-    // Loggar TODO sobre la respuesta de mailrelay directamente
-    console.log("API MailRelay status:", response.status, "data:", JSON.stringify(data), "raw:", rawResponse)
+    // Log completo del response, statusCode y body
+    console.log("API MailRelay status:", response.status, "body:", responseText)
 
     if (!response.ok || (data && data.errors)) {
       let errorMessage = 'Error desconocido en MailRelay'
-      if (data && data.errors) {
-        errorMessage = JSON.stringify(data.errors)
-      }
+      if (data && data.errors) errorMessage = JSON.stringify(data.errors)
       console.error('MailRelay API Error:', errorMessage)
+
       return new Response(
         JSON.stringify({ error: errorMessage, details: data }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
 
-    // Si devolvió un id de suscriptor, forzamos reenvío de confirmación
-    if (data && data.id) {
-      console.log("Intentando forzar envío re-confirmación con id:", data.id)
+    // Si devolvió un id de suscriptor, reenvío forzado de confirmación
+    if (data && typeof data.id !== "undefined") {
+      console.log("Intentando reenvío de confirmación con id:", data.id)
       try {
         const confirmationResponse = await fetch(confirmationUrl, {
           method: 'POST',
@@ -122,11 +126,11 @@ serve(async (req) => {
           },
           body: JSON.stringify({ subscriber_id: data.id }),
         });
+        const bodyConfirm = await confirmationResponse.text()
         if (confirmationResponse.ok) {
-          console.log('Reenvío de confirmación OK')
+          console.log('Reenvío de confirmación OK', bodyConfirm)
         } else {
-          const confirmationError = await confirmationResponse.text()
-          console.error('Error en reenvío de confirmación:', confirmationError)
+          console.error('Error en reenvío confirmación:', bodyConfirm)
         }
       } catch (e) {
         console.error('Excepción intentando reenviar confirmación:', e)
