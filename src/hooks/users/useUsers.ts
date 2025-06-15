@@ -15,7 +15,7 @@ export const useUsers = () => {
         id: `demo-user-${uuidv4()}`,
         name: data.name,
         email: data.email,
-        delegation_id: data.delegationId,
+        delegationId: data.delegationId,
         role: data.role,
         avatar_url: '/placeholder.svg',
         created_at: new Date().toISOString(),

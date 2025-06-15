@@ -1,4 +1,3 @@
-
 import { useNews as useRealNews, CreateNewsData, News } from './news';
 import { useDemoMode } from './useDemoMode';
 import { useToast } from './use-toast';
@@ -53,7 +52,7 @@ export const useNews = () => {
     const realNews = useRealNews();
     
     const updateNewsWrapper = async (id: string, data: any) => {
-        return realNews.updateNews({ id, ...data });
+        return realNews.updateNews(id, data);
     }
 
     return { ...realNews, updateNews: updateNewsWrapper };
