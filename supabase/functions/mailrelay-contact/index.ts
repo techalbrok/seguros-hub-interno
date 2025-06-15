@@ -23,7 +23,16 @@ serve(async (req) => {
       throw new Error('MailRelay API key or hostname not configured.')
     }
 
-    const response = await fetch(`https://${hostname}.ipzmarketing.com/api/v1/subscribers`, {
+    // Clean up hostname to ensure we only have the account part
+    const account = hostname
+      .replace(/^https?:\/\//, '') // remove protocol
+      .replace(/\.ipzmarketing\.com/, '') // remove domain part
+      .replace(/\/$/, ''); // remove trailing slash
+
+    const apiUrl = `https://${account}.ipzmarketing.com/api/v1/subscribers`;
+    console.log('Attempting to call MailRelay API at:', apiUrl);
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,3 +66,4 @@ serve(async (req) => {
     })
   }
 })
+
