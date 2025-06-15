@@ -1,3 +1,4 @@
+
 import { useDemoAuth } from "./DemoAuthContext";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -54,7 +55,7 @@ export const DemoHeader = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" asChild>
-                <Link to="/settings">
+                <Link to="/demo/dashboard?page=settings">
                   Configuración
                 </Link>
               </DropdownMenuItem>
