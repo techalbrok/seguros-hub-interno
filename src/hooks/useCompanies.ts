@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, CompanySpecification, SpecificationCategory } from "@/types";
 
-interface CreateCompanyData {
+export interface CreateCompanyData {
   name: string;
   commercialWebsite?: string;
   brokerAccess: string;
@@ -196,6 +196,49 @@ export const useCompanies = () => {
     },
   });
 
+  const bulkCreateCompaniesMutation = useMutation({
+    mutationFn: async (companiesData: CreateCompanyData[]) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user?.user) {
+        throw new Error("User must be authenticated to create companies");
+      }
+
+      const dataToInsert = companiesData.map(c => ({
+        name: c.name,
+        commercial_website: c.commercialWebsite,
+        broker_access: c.brokerAccess,
+        commercial_manager: c.commercialManager,
+        manager_email: c.managerEmail,
+      }));
+
+      const { data, error } = await supabase
+        .from("companies")
+        .insert(dataToInsert)
+        .select();
+
+      if (error) {
+        console.error("Error bulk creating companies:", error);
+        throw error;
+      }
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      toast({
+        title: "Éxito",
+        description: `${data.length} compañías importadas correctamente.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error en la importación",
+        description: "No se pudieron importar las compañías. Revisa la consola para más detalles.",
+        variant: "destructive",
+      });
+      console.error("Error bulk creating companies:", error);
+    },
+  });
+
   return {
     companies,
     isLoading,
@@ -206,5 +249,7 @@ export const useCompanies = () => {
     isCreating: createCompanyMutation.isPending,
     isUpdating: updateCompanyMutation.isPending,
     isDeleting: deleteCompanyMutation.isPending,
+    bulkCreateCompanies: bulkCreateCompaniesMutation.mutateAsync,
+    isBulkCreating: bulkCreateCompaniesMutation.isPending,
   };
 };

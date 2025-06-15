@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useCompanies } from "@/hooks/useCompanies";
+import { useCompanies, CreateCompanyData } from "@/hooks/useCompanies";
 import { CompanyForm } from "@/components/CompanyForm";
 import { CompanyDetail } from "@/components/CompanyDetail";
 import { CompaniesHeader } from "@/components/CompaniesHeader";
@@ -21,6 +21,7 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { AppPagination } from "@/components/ui/AppPagination";
 import { CompanyCardSkeleton, CompanyListSkeleton } from "@/components/skeletons/CompanySkeletons";
+import { CompanyImportDialog } from "@/components/companies/CompanyImportDialog";
 
 type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
@@ -37,6 +38,7 @@ export default function Companies() {
     isCreating,
     isUpdating,
     isDeleting,
+    bulkCreateCompanies,
   } = useCompanies();
   const [currentView, setCurrentView] = useState<CurrentView>("main");
   const [displayMode, setDisplayMode] = useState<DisplayMode>("grid");
@@ -46,6 +48,7 @@ export default function Companies() {
   const [searchTerm, setSearchTerm] = useState("");
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   const filteredCompanies = companies.filter(company => company.name.toLowerCase().includes(searchTerm.toLowerCase()) || company.commercialManager.toLowerCase().includes(searchTerm.toLowerCase()) || company.managerEmail.toLowerCase().includes(searchTerm.toLowerCase()));
   
@@ -119,6 +122,11 @@ export default function Companies() {
     }
   };
 
+  const handleBulkCreateCompanies = async (companiesData: CreateCompanyData[]) => {
+    if (!bulkCreateCompanies) return;
+    await bulkCreateCompanies(companiesData);
+  };
+
   const handleAddNewCompanyClick = () => {
     setEditingCompany(null);
     setShowForm(true);
@@ -178,7 +186,7 @@ export default function Companies() {
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      <CompaniesHeader onAddNewCompany={handleAddNewCompanyClick} />
+      <CompaniesHeader onAddNewCompany={handleAddNewCompanyClick} onImport={() => setIsImportDialogOpen(true)} />
 
       <Card>
         <CardHeader>
@@ -224,6 +232,11 @@ export default function Companies() {
         isLoading={isCreating || isUpdating}
       />
       {deleteConfirmationDialog}
+      <CompanyImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        onBulkCreate={handleBulkCreateCompanies}
+      />
     </div>
   );
 }
