@@ -14,11 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
+import { Checkbox } from "@/components/ui/checkbox"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -27,8 +27,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Por favor, introduce una dirección de email válida.",
   }),
-  message: z.string().min(10, {
-    message: "El mensaje debe tener al menos 10 caracteres.",
+  privacyPolicy: z.literal(true, {
+    errorMap: () => ({ message: "Debes aceptar la política de privacidad." }),
   }),
 })
 
@@ -41,30 +41,30 @@ export const ContactForm = () => {
     defaultValues: {
       name: "",
       email: "",
-      message: "",
+      privacyPolicy: false,
     },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
-    const { name, email, message } = values
+    const { name, email } = values
     
     const { error } = await supabase.functions.invoke('mailrelay-contact', {
-      body: { name, email, message },
+      body: { name, email },
     })
 
     setIsSubmitting(false)
 
     if (error) {
       toast({
-        title: "Error al enviar el mensaje",
+        title: "Error en la suscripción",
         description: "Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.",
         variant: "destructive",
       })
     } else {
       toast({
-        title: "¡Mensaje enviado!",
-        description: "Gracias por contactarnos. Te responderemos lo antes posible.",
+        title: "¡Suscripción completada!",
+        description: "Gracias por suscribirte. Revisa tu bandeja de entrada para confirmar tu email.",
       })
       form.reset()
     }
@@ -101,18 +101,21 @@ export const ContactForm = () => {
         />
         <FormField
           control={form.control}
-          name="message"
+          name="privacyPolicy"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mensaje</FormLabel>
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Textarea
-                  placeholder="Cuéntanos cómo podemos ayudarte..."
-                  className="resize-none"
-                  {...field}
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormMessage />
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  Acepto la <a href="#" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 hover:text-blue-800">política de privacidad</a>.
+                </FormLabel>
+                <FormMessage />
+              </div>
             </FormItem>
           )}
         />
@@ -120,10 +123,10 @@ export const ContactForm = () => {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Enviando...
+              Suscribiendo...
             </>
           ) : (
-            "Enviar Mensaje"
+            "Suscribirme al boletín"
           )}
         </Button>
       </form>

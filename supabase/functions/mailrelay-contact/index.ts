@@ -13,8 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    const { name, email, message } = await req.json()
-    console.log(`New contact form submission: ${name} <${email}>. Message: ${message}`);
+    const { name, email } = await req.json()
+    console.log(`New subscription: ${name} <${email}>.`);
 
     const apiKey = Deno.env.get('MAILRELAY_API_KEY')
     const hostname = Deno.env.get('MAILRELAY_ACCOUNT_HOSTNAME')
@@ -41,8 +41,6 @@ serve(async (req) => {
       body: JSON.stringify({
         email: email,
         name: name,
-        // The message is logged, but not sent to MailRelay as there's no standard field for it.
-        // Custom fields would be needed for this.
       }),
     })
 
@@ -66,4 +64,3 @@ serve(async (req) => {
     })
   }
 })
-
