@@ -1,4 +1,3 @@
-
 import { useDemoAuth } from "./DemoAuthContext";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -50,7 +49,7 @@ export const DemoHeader = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer" asChild>
-                <Link to="/demo/profile">
+                <Link to="/demo/dashboard?page=profile">
                   Mi Perfil
                 </Link>
               </DropdownMenuItem>

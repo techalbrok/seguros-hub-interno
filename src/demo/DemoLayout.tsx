@@ -8,7 +8,8 @@ import DemoProfile from './DemoProfile';
 
 export const DemoLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const isProfilePage = location.pathname === '/demo/profile';
+  const params = new URLSearchParams(location.search);
+  const showProfile = params.get('page') === 'profile';
 
   return (
     <SidebarProvider>
@@ -17,7 +18,7 @@ export const DemoLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex-1 flex flex-col">
           <DemoHeader />
           <main className="flex-1 p-4 md:p-6 space-y-6">
-            {isProfilePage ? <DemoProfile /> : children}
+            {showProfile ? <DemoProfile /> : children}
           </main>
         </div>
       </div>
