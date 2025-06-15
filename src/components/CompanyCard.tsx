@@ -52,9 +52,11 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
         </div>
         <div className="mt-2">
           <Badge variant="secondary" className="text-xs">
-            Acceso: {company.brokerAccess.length > 30 
-              ? `${company.brokerAccess.slice(0, 30)}...` 
-              : company.brokerAccess}
+            Acceso: {company.brokerAccess
+              ? (company.brokerAccess.length > 30 
+                ? `${company.brokerAccess.slice(0, 30)}...` 
+                : company.brokerAccess)
+              : 'No disponible'}
           </Badge>
         </div>
       </CardContent>
