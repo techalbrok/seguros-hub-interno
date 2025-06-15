@@ -1,6 +1,8 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { User, Delegation } from '@/types';
+import { sections } from '@/components/users/PermissionsFormSection';
 
 export const useUserQueries = () => {
   const {
@@ -51,31 +53,29 @@ export const useUserQueries = () => {
       // Combine data
       const combinedUsers: User[] = profiles?.map((profile: any) => {
         const userRole = roles?.find(role => role.user_id === profile.id);
-        const userPermissions = permissions?.filter(perm => perm.user_id === profile.id);
+        const userPermissionsList = permissions?.filter(perm => perm.user_id === profile.id);
         
-        // Calculate combined permissions - if user is admin, give all permissions
-        let combinedPermissions = {
-          canCreate: false,
-          canEdit: false,
-          canDelete: false,
-          canView: true,
-        };
+        const detailedPermissions: User['permissions'] = {};
 
         if (userRole?.role === 'admin') {
-          combinedPermissions = {
-            canCreate: true,
-            canEdit: true,
-            canDelete: true,
-            canView: true,
-          };
-        } else if (userPermissions && userPermissions.length > 0) {
-          // For regular users, combine permissions across all sections
-          combinedPermissions = {
-            canCreate: userPermissions.some(p => p.can_create),
-            canEdit: userPermissions.some(p => p.can_edit),
-            canDelete: userPermissions.some(p => p.can_delete),
-            canView: userPermissions.some(p => p.can_view),
-          };
+          sections.forEach(section => {
+            detailedPermissions[section.key] = {
+              canCreate: true,
+              canEdit: true,
+              canDelete: true,
+              canView: true,
+            };
+          });
+        } else {
+          sections.forEach(section => {
+            const dbPerm = userPermissionsList?.find(p => p.section === section.key);
+            detailedPermissions[section.key] = {
+              canCreate: dbPerm?.can_create || false,
+              canEdit: dbPerm?.can_edit || false,
+              canDelete: dbPerm?.can_delete || false,
+              canView: dbPerm?.can_view !== false, // Default to true unless explicitly false
+            };
+          });
         }
 
         return {
@@ -85,7 +85,7 @@ export const useUserQueries = () => {
           role: userRole?.role || 'user',
           delegationId: profile.delegation_id,
           avatarUrl: profile.avatar_url,
-          permissions: combinedPermissions,
+          permissions: detailedPermissions,
           createdAt: new Date(profile.created_at),
           updatedAt: new Date(profile.updated_at),
         };

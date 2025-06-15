@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -116,6 +115,41 @@ export const useUserMutations = () => {
         if (roleError) {
           console.error('Error updating role:', roleError);
           throw roleError;
+        }
+      }
+
+      // Update permissions if changed
+      if (updates.permissions) {
+        // Delete old permissions
+        const { error: deleteError } = await supabase
+          .from('user_permissions')
+          .delete()
+          .eq('user_id', userId);
+
+        if (deleteError) {
+          console.error('Error deleting old permissions:', deleteError);
+          throw deleteError;
+        }
+
+        // Insert new permissions
+        const permissionsToInsert = Object.entries(updates.permissions).map(([section, perms]) => ({
+          user_id: userId,
+          section: section,
+          can_create: perms.canCreate,
+          can_edit: perms.canEdit,
+          can_delete: perms.canDelete,
+          can_view: perms.canView,
+        }));
+
+        if (permissionsToInsert.length > 0) {
+          const { error: insertError } = await supabase
+            .from('user_permissions')
+            .insert(permissionsToInsert);
+
+          if (insertError) {
+            console.error('Error inserting new permissions:', insertError);
+            throw insertError;
+          }
         }
       }
     },

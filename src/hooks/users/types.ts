@@ -14,5 +14,6 @@ export interface UpdateUserData {
     name?: string;
     role?: 'admin' | 'user';
     delegationId?: string;
+    permissions?: Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
   };
 }

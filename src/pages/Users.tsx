@@ -71,6 +71,7 @@ const Users = () => {
       name: userData.name,
       role: userData.role,
       delegationId: userData.delegationId,
+      permissions: userData.permissions,
     });
     
     if (success) {

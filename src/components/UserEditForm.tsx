@@ -26,18 +26,7 @@ export const UserEditForm = ({ user, delegations, onSubmit, onCancel }: UserEdit
     delegationId: user.delegationId || 'none',
   });
 
-  const [permissions, setPermissions] = useState<Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>>(() => {
-    const initial: Record<string, any> = {};
-    sections.forEach(section => {
-      initial[section.key] = {
-        canCreate: user.role === 'admin' ? true : false,
-        canEdit: user.role === 'admin' ? true : false,
-        canDelete: user.role === 'admin' ? true : false,
-        canView: true,
-      };
-    });
-    return initial;
-  });
+  const [permissions, setPermissions] = useState<Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>>(user.permissions);
 
   const [loading, setLoading] = useState(false);
 

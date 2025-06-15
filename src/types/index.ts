@@ -5,12 +5,12 @@ export interface User {
   role: 'admin' | 'user';
   delegationId?: string;
   avatarUrl?: string;
-  permissions: {
+  permissions: Record<string, {
     canCreate: boolean;
     canEdit: boolean;
     canDelete: boolean;
     canView: boolean;
-  };
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
