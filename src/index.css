@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -313,7 +312,7 @@
   }
 
   .sidebar-header {
-    @apply bg-gradient-to-r from-sidebar-background to-sidebar-background/95 backdrop-blur-sm;
+    @apply bg-gradient-to-r from-sidebar to-sidebar/95 backdrop-blur-sm;
     border-bottom: 1px solid hsl(var(--sidebar-border) / 0.6);
   }
 
