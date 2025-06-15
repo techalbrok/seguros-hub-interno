@@ -16,6 +16,10 @@ import { DemoAuthGuard } from "./demo/DemoAuthGuard";
 import { DemoDashboard } from "./demo/DemoDashboard";
 import { DemoUsers } from "./demo/DemoUsers";
 import { DemoDelegations } from "./demo/DemoDelegations";
+import { DemoCompanies } from "./demo/DemoCompanies";
+import { DemoProducts } from "./demo/DemoProducts";
+import { DemoDepartments } from "./demo/DemoDepartments";
+import { DemoNews } from "./demo/DemoNews";
 
 const Index = lazy(() => import("./pages/Index"));
 const Landing = lazy(() => import("./pages/Landing"));
@@ -75,6 +79,42 @@ const App = () => (
                     <DemoAuthGuard>
                       <DemoLayout>
                         <DemoDelegations />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/companies" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoCompanies />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/products" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoProducts />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/departments" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoDepartments />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/news" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoNews />
                       </DemoLayout>
                     </DemoAuthGuard>
                   </DemoAuthProvider>

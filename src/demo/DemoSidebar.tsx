@@ -5,7 +5,10 @@ const navItems = [
   { to: "/demo/dashboard", label: "Dashboard" },
   { to: "/demo/users", label: "Usuarios" },
   { to: "/demo/delegations", label: "Delegaciones" },
-  // Puedes seguir agregando secciones demo aquí
+  { to: "/demo/companies", label: "Compañías" },
+  { to: "/demo/products", label: "Productos" },
+  { to: "/demo/departments", label: "Departamentos" },
+  { to: "/demo/news", label: "Noticias" },
 ];
 
 export const DemoSidebar = () => (
