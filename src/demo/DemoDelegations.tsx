@@ -1,5 +1,9 @@
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus, Building } from "lucide-react";
+import { useDemoAuth } from "./DemoAuthContext";
 
 interface DemoDelegation {
   id: string;
@@ -12,6 +16,7 @@ const demoDefaultDelegations: DemoDelegation[] = [
 ];
 
 export const DemoDelegations = () => {
+  const { user: authUser } = useDemoAuth();
   const [delegations, setDelegations] = useState<DemoDelegation[]>([]);
 
   useEffect(() => {
@@ -23,6 +28,8 @@ export const DemoDelegations = () => {
     localStorage.setItem(DEMO_DELEGATIONS_KEY, JSON.stringify(delegations));
   }, [delegations]);
 
+  const isAdmin = authUser?.role === 'admin';
+
   const addDelegation = () => {
     const name = prompt("Nombre de la delegación:");
     if (name) {
@@ -31,45 +38,66 @@ export const DemoDelegations = () => {
   };
 
   const deleteDelegation = (id: string) => {
-    setDelegations(d => d.filter(dl => dl.id !== id));
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta delegación?")) {
+        setDelegations(d => d.filter(dl => dl.id !== id));
+    }
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Delegaciones Demo</h2>
-      <button className="mb-4 px-3 py-1 rounded bg-primary text-white" onClick={addDelegation}>
-        Añadir Delegación
-      </button>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100 dark:bg-gray-800">
-            <th className="p-2">Nombre</th>
-            <th className="p-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {delegations.map(d => (
-            <tr key={d.id}>
-              <td className="p-2">{d.name}</td>
-              <td className="p-2">
-                <button
-                  className="text-red-600 hover:underline"
-                  onClick={() => deleteDelegation(d.id)}
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-          {delegations.length === 0 && (
-            <tr>
-              <td colSpan={2} className="text-center p-4">
-                No hay delegaciones demo.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
+            <Building className="h-7 w-7 sm:h-8 sm:w-8" />
+            Gestión de Delegaciones (Demo)
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Administra las delegaciones de la demo
+          </p>
+        </div>
+        {isAdmin && (
+            <Button onClick={addDelegation}>
+              <Plus className="h-4 w-4 mr-2" />
+              Añadir Delegación
+            </Button>
+        )}
+      </div>
+
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              {isAdmin && <TableHead className="text-right w-32">Acciones</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {delegations.map(d => (
+              <TableRow key={d.id}>
+                <TableCell className="font-medium">{d.name}</TableCell>
+                {isAdmin && (
+                  <TableCell className="text-right">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => deleteDelegation(d.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+            {delegations.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={isAdmin ? 2 : 1} className="text-center h-24">
+                  No hay delegaciones demo.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
