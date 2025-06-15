@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
@@ -13,6 +12,7 @@ import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } f
 import { Link } from 'react-router-dom';
 import { useBrokerageConfig, defaultTerminology } from '@/hooks/useBrokerageConfig';
 import { SystemAlerts } from '@/components/SystemAlerts';
+
 const Dashboard = () => {
   const {
     user,
