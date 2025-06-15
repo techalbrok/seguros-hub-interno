@@ -9,6 +9,7 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { PageLoader } from "@/components/PageLoader";
 import { AuthProvider } from "@/hooks/useAuth";
+import { BrokerageConfigProvider } from "./contexts/BrokerageConfigContext";
 import { DemoAuthProvider } from "./demo/DemoAuthContext";
 import { DemoLayout } from "./demo/DemoLayout";
 import { DemoLogin } from "./demo/DemoLogin";
@@ -47,150 +48,152 @@ const App = () => (
       <Sonner />
       <ThemeProvider>
         <AuthProvider>
-          <BrowserRouter>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/landing" element={<Landing />} />
-                <Route path="/demo/login" element={
-                  <DemoAuthProvider>
-                    <DemoLogin />
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/dashboard" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoDashboard />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/users" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoUsers />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/delegations" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoDelegations />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/companies" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoCompanies />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/products" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoProducts />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/departments" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoDepartments />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo/news" element={
-                  <DemoAuthProvider>
-                    <DemoAuthGuard>
-                      <DemoLayout>
-                        <DemoNews />
-                      </DemoLayout>
-                    </DemoAuthGuard>
-                  </DemoAuthProvider>
-                } />
-                <Route path="/demo" element={<Demo />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/update-password" element={<UpdatePassword />} />
-                <Route path="/" element={<Index />} />
-                <Route path="/dashboard" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/profile" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Profile />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/settings" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Settings />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/users" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Users />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/delegations" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Delegations />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/companies" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Companies />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/products" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Products />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/departments" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Departments />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/news" element={
-                  <AuthGuard>
-                    <Layout>
-                      <News />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
+          <BrokerageConfigProvider>
+            <BrowserRouter>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/landing" element={<Landing />} />
+                  <Route path="/demo/login" element={
+                    <DemoAuthProvider>
+                      <DemoLogin />
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/dashboard" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoDashboard />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/users" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoUsers />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/delegations" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoDelegations />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/companies" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoCompanies />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/products" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoProducts />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/departments" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoDepartments />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo/news" element={
+                    <DemoAuthProvider>
+                      <DemoAuthGuard>
+                        <DemoLayout>
+                          <DemoNews />
+                        </DemoLayout>
+                      </DemoAuthGuard>
+                    </DemoAuthProvider>
+                  } />
+                  <Route path="/demo" element={<Demo />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/update-password" element={<UpdatePassword />} />
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/profile" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Profile />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/settings" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Settings />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/users" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Users />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/delegations" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Delegations />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/companies" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Companies />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/products" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Products />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/departments" element={
+                    <AuthGuard>
+                      <Layout>
+                        <Departments />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="/news" element={
+                    <AuthGuard>
+                      <Layout>
+                        <News />
+                      </Layout>
+                    </AuthGuard>
+                  } />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </BrokerageConfigProvider>
         </AuthProvider>
       </ThemeProvider>
     </TooltipProvider>
