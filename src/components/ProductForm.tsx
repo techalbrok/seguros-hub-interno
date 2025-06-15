@@ -80,7 +80,7 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
             onFormDataChange={setFormData}
           />
 
-          <DialogFooter className="sticky bottom-0 bg-background py-4 -mx-6 px-6">
+          <DialogFooter className="sticky bottom-0 bg-background py-4 -mx-4 px-4 md:-mx-6 md:px-6 border-t -mb-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancelar
             </Button>

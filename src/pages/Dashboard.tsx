@@ -14,12 +14,12 @@ import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
-  const { users } = useUsers();
-  const { delegations } = useDelegations();
-  const { companies } = useCompanies();
-  const { products } = useProducts();
-  const { departments } = useDepartments();
-  const { news } = useNews();
+  const { users, loading: loadingUsers } = useUsers();
+  const { delegations, loading: loadingDelegations } = useDelegations();
+  const { companies, loading: loadingCompanies } = useCompanies();
+  const { products, loading: loadingProducts } = useProducts();
+  const { departments, loading: loadingDepartments } = useDepartments();
+  const { news, loading: loadingNews } = useNews();
 
   const stats = [
     {
@@ -27,42 +27,48 @@ const Dashboard = () => {
       value: users.length.toString(),
       icon: Users,
       description: 'Total de usuarios registrados',
-      href: '/users'
+      href: '/users',
+      loading: loadingUsers
     },
     {
       title: 'Delegaciones',
       value: delegations.length.toString(),
       icon: Building,
       description: 'Delegaciones activas',
-      href: '/delegations'
+      href: '/delegations',
+      loading: loadingDelegations
     },
     {
       title: 'Compañías',
       value: companies.length.toString(),
       icon: Building2,
       description: 'Compañías registradas',
-      href: '/companies'
+      href: '/companies',
+      loading: loadingCompanies
     },
     {
       title: 'Productos',
       value: products.length.toString(),
       icon: Package,
       description: 'Productos disponibles',
-      href: '/products'
+      href: '/products',
+      loading: loadingProducts
     },
     {
       title: 'Departamentos',
       value: departments.length.toString(),
       icon: Briefcase,
       description: 'Departamentos activos',
-      href: '/departments'
+      href: '/departments',
+      loading: loadingDepartments
     },
     {
       title: 'Noticias',
       value: news.length.toString(),
       icon: Newspaper,
       description: 'Noticias publicadas',
-      href: '/news'
+      href: '/news',
+      loading: loadingNews
     }
   ];
 
@@ -78,23 +84,25 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {stats.map((stat) => (
+        {stats.map((stat, index) => (
           <Link 
             to={stat.href} 
             key={stat.title} 
-            className="block transition-transform duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg"
+            className="block transition-transform duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg animate-fade-in"
+            style={{ animationDelay: `${index * 50}ms` }}
           >
             <StatCard
               title={stat.title}
               value={stat.value}
               icon={stat.icon}
               description={stat.description}
+              loading={stat.loading}
             />
           </Link>
         ))}
       </div>
 
-      <Card>
+      <Card className="animate-fade-in" style={{ animationDelay: `${stats.length * 50}ms` }}>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <FileText className="w-5 h-5" />
