@@ -6,37 +6,37 @@ const audienceItems = [
   {
     icon: Building2,
     title: "Empresas de servicios financieros",
-    description: "Gestiona carteras de clientes, productos financieros y equipos comerciales distribuidos con control total sobre la información sensible.",
+    description: "Centraliza la información de tus clientes y productos. Administra equipos comerciales y controla el acceso a datos sensibles.",
     color: "from-blue-500 to-blue-600"
   },
   {
     icon: Users,
     title: "Consultorías y asesorías",
-    description: "Centraliza conocimiento, organiza equipos de expertos y mantén un catálogo actualizado de servicios y metodologías.",
+    description: "Organiza a tus consultores en equipos, gestiona un catálogo de servicios y centraliza la documentación y metodologías de la empresa.",
     color: "from-purple-500 to-purple-600"
   },
   {
     icon: Package,
     title: "Distribuidoras y comercializadoras",
-    description: "Controla inventarios, gestiona redes de proveedores y optimiza la comunicación entre sucursales y equipos de ventas.",
+    description: "Gestiona tu red de proveedores y un catálogo de productos. Facilita la comunicación entre tus equipos de ventas y sucursales.",
     color: "from-green-500 to-green-600"
   },
   {
     icon: MapPin,
     title: "Empresas con múltiples sucursales",
-    description: "Unifica la gestión de todas tus ubicaciones, estandariza procesos y mantén comunicación fluida entre sedes.",
+    description: "Administra todas tus sucursales desde una única plataforma. Comparte información y noticias relevantes con todas las sedes.",
     color: "from-orange-500 to-orange-600"
   },
   {
     icon: Network,
     title: "Organizaciones con equipos distribuidos",
-    description: "Facilita la colaboración remota, centraliza recursos compartidos y mantén a todos los equipos alineados y productivos.",
+    description: "Proporciona a tus equipos remotos acceso a la información y recursos que necesitan para trabajar de forma coordinada.",
     color: "from-indigo-500 to-indigo-600"
   },
   {
     icon: Briefcase,
     title: "Cualquier empresa que gestione proveedores",
-    description: "Organiza tu red de partners, optimiza procesos de compras y mantén relaciones comerciales sólidas y documentadas.",
+    description: "Mantén una base de datos organizada de tus proveedores, sus contactos y los productos o servicios que ofrecen.",
     color: "from-pink-500 to-pink-600"
   },
 ];
@@ -110,3 +110,4 @@ export const LandingAudience = () => {
     </section>
   );
 };
+
