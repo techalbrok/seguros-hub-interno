@@ -21,6 +21,7 @@ interface DemoUserType {
   delegationId?: string;
   avatarUrl?: string;
   createdAt: Date;
+  updatedAt: Date;
   permissions: Record<string, {
     canCreate: boolean;
     canEdit: boolean;
@@ -36,8 +37,8 @@ const adminPermissions = { users: { canCreate: true, canEdit: true, canDelete: t
 const userPermissions = { users: { canCreate: false, canEdit: false, canDelete: false, canView: true }, delegations: { canCreate: false, canEdit: false, canDelete: false, canView: true }, companies: { canCreate: false, canEdit: false, canDelete: false, canView: true }, products: { canCreate: false, canEdit: false, canDelete: false, canView: true }, department_content: { canCreate: false, canEdit: false, canDelete: false, canView: true }, news: { canCreate: false, canEdit: false, canDelete: false, canView: true }, };
 
 const demoDefaultUsers: DemoUserType[] = [
-  { id: "1", name: "Ana Demo", email: "ana@demo.com", role: "admin", createdAt: new Date(), permissions: adminPermissions, delegationId: "1" },
-  { id: "2", name: "Luis Demo", email: "luis@demo.com", role: "user", createdAt: new Date(), permissions: userPermissions, delegationId: "2" },
+  { id: "1", name: "Ana Demo", email: "ana@demo.com", role: "admin", createdAt: new Date(), updatedAt: new Date(), permissions: adminPermissions, delegationId: "1" },
+  { id: "2", name: "Luis Demo", email: "luis@demo.com", role: "user", createdAt: new Date(), updatedAt: new Date(), permissions: userPermissions, delegationId: "2" },
 ];
 const demoDefaultDelegations = [{ id: "1", name: "Central Demo" }, { id: "2", name: "Sucursal Norte Demo" }];
 
@@ -52,7 +53,7 @@ export const DemoUsers = () => {
     const storedUsers = localStorage.getItem(DEMO_USERS_KEY);
     const storedDelegations = localStorage.getItem(DEMO_DELEGATIONS_KEY);
     
-    setUsers(storedUsers ? JSON.parse(storedUsers).map((u: any) => ({ ...u, createdAt: new Date(u.createdAt) })) : demoDefaultUsers);
+    setUsers(storedUsers ? JSON.parse(storedUsers).map((u: any) => ({ ...u, createdAt: new Date(u.createdAt), updatedAt: new Date(u.updatedAt || u.createdAt) })) : demoDefaultUsers);
     setDelegations(storedDelegations ? JSON.parse(storedDelegations) : demoDefaultDelegations);
   }, []);
 
@@ -67,6 +68,7 @@ export const DemoUsers = () => {
       ...userData,
       id: Math.random().toString(36).slice(2),
       createdAt: new Date(),
+      updatedAt: new Date(),
       avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${userData.name}`,
     };
     setUsers(u => [...u, newUser]);
@@ -75,8 +77,7 @@ export const DemoUsers = () => {
   };
   
   const handleUpdateSubmit = async (userData: UpdateUserData) => {
-    if (!selectedUser) return false;
-    setUsers(users => users.map(u => u.id === selectedUser.id ? { ...u, ...userData, id: u.id, email: u.email, createdAt: u.createdAt } : u));
+    setUsers(users => users.map(u => u.id === userData.userId ? { ...u, ...userData.updates, updatedAt: new Date() } : u));
     setMode('list');
     setSelectedUser(null);
     return true;
