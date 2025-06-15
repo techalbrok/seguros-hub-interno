@@ -1,8 +1,7 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/hooks/useAuth';
 
 export type SystemAlert = Database['public']['Tables']['system_alerts']['Row'];
 export type NewSystemAlert = Database['public']['Tables']['system_alerts']['Insert'];
