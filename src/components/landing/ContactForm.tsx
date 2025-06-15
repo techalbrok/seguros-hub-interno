@@ -130,7 +130,7 @@ export const ContactForm = ({ onOpenLegalModal }: ContactFormProps) => {
               Suscribiendo...
             </>
           ) : (
-            "Suscribirme al boletín"
+            "Quiero recibir más información sobre HubCore"
           )}
         </Button>
       </form>
