@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { getDemoData, setDemoData } from './localStorage';
-import type { DemoData } from './data';
+import { getDemoData, setDemoData, DemoData } from './localStorage';
 
 export const useDemoStorage = () => {
     const [data, setData] = useState<DemoData>(getDemoData());

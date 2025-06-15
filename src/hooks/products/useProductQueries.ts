@@ -2,21 +2,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { transformDbRowToProduct } from "./utils";
-import { useDemoMode } from "../useDemoMode";
 
 export const useProductQueries = () => {
-  const { isDemo, demoData } = useDemoMode();
-
   const {
     data: products = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["products", isDemo],
+    queryKey: ["products"],
     queryFn: async () => {
-      if (isDemo) {
-        return demoData.products;
-      }
       const { data, error } = await supabase
         .from("products")
         .select(`
@@ -33,5 +27,5 @@ export const useProductQueries = () => {
     },
   });
 
-  return { products, isLoading: isDemo ? false : isLoading, error };
+  return { products, isLoading, error };
 };
