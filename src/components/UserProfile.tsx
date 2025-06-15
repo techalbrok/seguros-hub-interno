@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User as UserType, Delegation } from "@/types";
 import { AvatarUpload } from "./AvatarUpload";
+import { sections } from "@/components/users/PermissionsFormSection";
 
 export const UserProfile = () => {
   const { user, profile: authProfile } = useAuth();
@@ -60,16 +61,27 @@ export const UserProfile = () => {
 
       if (permissionsError) throw permissionsError;
 
-      // Transform permissions to the expected format
-      const permissionsMap = permissions.reduce((acc, perm) => {
-        acc[perm.section] = {
-          canCreate: perm.can_create,
-          canEdit: perm.can_edit,
-          canDelete: perm.can_delete,
-          canView: perm.can_view,
-        };
-        return acc;
-      }, {} as Record<string, any>);
+      const detailedPermissions: UserType['permissions'] = {};
+      if (roleData.role === 'admin') {
+        sections.forEach(section => {
+          detailedPermissions[section.key] = {
+            canCreate: true,
+            canEdit: true,
+            canDelete: true,
+            canView: true,
+          };
+        });
+      } else {
+        sections.forEach(section => {
+          const dbPerm = permissions.find(p => p.section === section.key);
+          detailedPermissions[section.key] = {
+            canCreate: dbPerm?.can_create || false,
+            canEdit: dbPerm?.can_edit || false,
+            canDelete: dbPerm?.can_delete || false,
+            canView: dbPerm?.can_view !== false, // Default to true unless explicitly false
+          };
+        });
+      }
 
       const userProfileData: UserType = {
         id: profile.id,
@@ -78,12 +90,7 @@ export const UserProfile = () => {
         avatarUrl: profile.avatar_url,
         role: roleData.role,
         delegationId: profile.delegation_id,
-        permissions: {
-          canCreate: roleData.role === 'admin',
-          canEdit: roleData.role === 'admin',
-          canDelete: roleData.role === 'admin',
-          canView: true,
-        },
+        permissions: detailedPermissions,
         createdAt: new Date(profile.created_at),
         updatedAt: new Date(profile.updated_at),
       };
