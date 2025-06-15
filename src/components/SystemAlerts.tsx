@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useSystemAlerts } from '@/hooks/useSystemAlerts';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle, Info, TriangleAlert, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import type { SystemAlert } from '@/hooks/useSystemAlertsManager';
 
 const alertIcons = {
     info: <Info className="h-5 w-5" />,
@@ -22,31 +22,46 @@ const alertVariants = {
 
 export const SystemAlerts = () => {
     const { alerts, isLoading } = useSystemAlerts();
-    const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
+    const [visibleAlerts, setVisibleAlerts] = useState<SystemAlert[]>([]);
+    const [dismissingAlerts, setDismissingAlerts] = useState<string[]>([]);
 
     useEffect(() => {
         const storedDismissed = localStorage.getItem('dismissedSystemAlerts');
-        if (storedDismissed) {
-            setDismissedAlerts(JSON.parse(storedDismissed));
-        }
-    }, []);
+        const dismissedIds = storedDismissed ? JSON.parse(storedDismissed) : [];
+        setVisibleAlerts(alerts.filter(alert => !dismissedIds.includes(alert.id)));
+    }, [alerts]);
 
     const handleDismiss = (alertId: string) => {
-        const newDismissed = [...dismissedAlerts, alertId];
-        setDismissedAlerts(newDismissed);
-        localStorage.setItem('dismissedSystemAlerts', JSON.stringify(newDismissed));
+        setDismissingAlerts(prev => [...prev, alertId]);
+
+        setTimeout(() => {
+            const storedDismissed = localStorage.getItem('dismissedSystemAlerts');
+            const dismissedIds = storedDismissed ? JSON.parse(storedDismissed) : [];
+            if (!dismissedIds.includes(alertId)) {
+                const newDismissed = [...dismissedIds, alertId];
+                localStorage.setItem('dismissedSystemAlerts', JSON.stringify(newDismissed));
+            }
+            setVisibleAlerts(prev => prev.filter(a => a.id !== alertId));
+            setDismissingAlerts(prev => prev.filter(id => id !== alertId));
+        }, 300); // Corresponds to fade-out animation duration
     };
 
-    const visibleAlerts = alerts.filter(alert => !dismissedAlerts.includes(alert.id));
+    if (isLoading) {
+        return null;
+    }
 
-    if (isLoading || visibleAlerts.length === 0) {
+    if (visibleAlerts.length === 0) {
         return null;
     }
 
     return (
-        <div className="space-y-4 animate-fade-in">
-            {visibleAlerts.map(alert => (
-                <Alert key={alert.id} className={`${alertVariants[alert.type]}`}>
+        <div className="space-y-4">
+            {visibleAlerts.map((alert, index) => (
+                <Alert
+                    key={alert.id}
+                    className={`${alertVariants[alert.type]} ${dismissingAlerts.includes(alert.id) ? 'animate-fade-out' : 'animate-fade-in'}`}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                >
                     <div className="flex items-start gap-4">
                         <div className="pt-0.5 text-current">
                             {alertIcons[alert.type]}
@@ -67,6 +82,7 @@ export const SystemAlerts = () => {
                             size="icon"
                             className="h-7 w-7 -mr-2 -mt-2 shrink-0 text-current/70 hover:bg-black/5 hover:text-current dark:hover:bg-white/10"
                             onClick={() => handleDismiss(alert.id)}
+                            disabled={dismissingAlerts.includes(alert.id)}
                         >
                             <X className="h-5 w-5" />
                             <span className="sr-only">Descartar</span>
