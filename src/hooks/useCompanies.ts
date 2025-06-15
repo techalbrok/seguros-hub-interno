@@ -161,11 +161,9 @@ export const useCompanies = () => {
     mutationFn: async (companyData: UpdateCompanyData) => {
       if (isDemo) {
         const updatedCompany: Company = {
+          ...(demoData.companies.find(c => c.id === companyData.id) as Company),
           ...companyData,
-          createdAt: demoData.companies.find(c => c.id === companyData.id)?.createdAt || new Date(),
           updatedAt: new Date(),
-          specifications: [],
-          specificationCategories: [],
         };
         setDemoData({
           ...demoData,

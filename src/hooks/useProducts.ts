@@ -24,8 +24,8 @@ export const useProducts = () => {
        const newProduct: Product = {
         ...data,
         id: `demo-product-${uuidv4()}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         documents: [],
       };
       setDemoData({ ...demoData, products: [...demoData.products, newProduct] });
@@ -35,7 +35,7 @@ export const useProducts = () => {
        setDemoData({
         ...demoData,
         products: demoData.products.map(p =>
-          p.id === data.id ? { ...p, ...data, updatedAt: new Date().toISOString() } : p
+          p.id === data.id ? { ...p, ...data, updatedAt: new Date() } : p
         ),
       });
     };

@@ -21,6 +21,17 @@ const fromDepartment = (department: Partial<Department>) => ({
     description: department.description,
 });
 
+const toDepartment = (dbData: any): Department => ({
+    id: dbData.id,
+    name: dbData.name,
+    responsibleName: dbData.responsible_name,
+    responsibleEmail: dbData.responsible_email,
+    description: dbData.description,
+    createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
+});
+
+
 export const useDepartments = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -49,15 +60,7 @@ export const useDepartments = () => {
       }
 
       console.log("Departments fetched successfully:", data);
-      return data.map(d => ({
-          id: d.id,
-          name: d.name,
-          responsibleName: d.responsible_name,
-          responsibleEmail: d.responsible_email,
-          description: d.description,
-          createdAt: d.created_at,
-          updatedAt: d.updated_at,
-      }));
+      return data.map(toDepartment);
     },
   });
 
@@ -86,7 +89,7 @@ export const useDepartments = () => {
         throw error;
       }
 
-      return data as Department;
+      return toDepartment(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
@@ -123,7 +126,7 @@ export const useDepartments = () => {
         .single();
 
       if (error) throw error;
-      return data as Department;
+      return toDepartment(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });

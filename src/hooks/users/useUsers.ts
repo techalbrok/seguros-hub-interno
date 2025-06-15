@@ -1,3 +1,4 @@
+
 import { useQueryClient } from "@tanstack/react-query";
 import { User } from '@/types';
 import { useUserQueries } from './useUserQueries';
@@ -18,7 +19,9 @@ export const useUsers = () => {
         delegationId: data.delegationId,
         role: data.role,
         avatarUrl: '/placeholder.svg',
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        permissions: null,
       };
       setDemoData({ ...demoData, users: [...demoData.users, newUser] });
       return true;
@@ -27,7 +30,7 @@ export const useUsers = () => {
     const updateUser = async (userId: string, updates: Partial<User>) => {
       setDemoData({
         ...demoData,
-        users: demoData.users.map(u => u.id === userId ? { ...u, ...updates } : u),
+        users: demoData.users.map(u => u.id === userId ? { ...u, ...updates, updatedAt: new Date() } : u),
       });
       return true;
     };

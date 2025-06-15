@@ -1,3 +1,4 @@
+
 import { useQueryClient } from "@tanstack/react-query";
 import { useDelegationsQuery } from './delegations/useDelegationsQuery';
 import { useDelegationMutations } from './delegations/useDelegationMutations';
@@ -13,8 +14,8 @@ export const useDelegations = () => {
       const newDelegation: Delegation = {
         ...data,
         id: `demo-delegation-${uuidv4()}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       setDemoData({ ...demoData, delegations: [...demoData.delegations, newDelegation] });
       return true;
@@ -24,7 +25,7 @@ export const useDelegations = () => {
       setDemoData({
         ...demoData,
         delegations: demoData.delegations.map(d =>
-          d.id === delegationId ? { ...d, ...updates, updatedAt: new Date().toISOString() } : d
+          d.id === delegationId ? { ...d, ...updates, updatedAt: new Date() } : d
         ),
       });
       return true;

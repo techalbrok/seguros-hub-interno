@@ -15,10 +15,14 @@ export const useNews = () => {
             const newNews: News = {
                 id: `demo-news-${uuidv4()}`,
                 ...data,
-                authorId: user?.id || 'demo-user-admin',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                author: { name: profile?.name || 'Admin Demo' }
+                author_id: user?.id || 'demo-user-admin',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                profiles: { name: profile?.name || 'Admin Demo', email: user?.email || 'admin@demo.com' },
+                companies: [],
+                categories: [],
+                products: [],
+                published_at: data.published ? new Date().toISOString() : undefined,
             };
             setDemoData({ ...demoData, news: [newNews, ...demoData.news] });
             return true;
@@ -27,7 +31,7 @@ export const useNews = () => {
         const updateNews = async (id: string, data: Partial<News>) => {
             setDemoData({
                 ...demoData,
-                news: demoData.news.map(n => n.id === id ? { ...n, ...data, updatedAt: new Date().toISOString() } : n)
+                news: demoData.news.map(n => n.id === id ? { ...n, ...data, updated_at: new Date().toISOString() } : n)
             });
             return true;
         };
