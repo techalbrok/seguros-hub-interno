@@ -6,6 +6,7 @@ import { AlertCircle, CheckCircle, Info, TriangleAlert, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import type { SystemAlert } from '@/hooks/useSystemAlertsManager';
+import { useDemoStorage } from '@/demo/useDemoStorage';
 
 const alertIcons = {
     info: <Info className="h-5 w-5" />,
@@ -22,7 +23,24 @@ const alertVariants = {
 };
 
 export const SystemAlerts = () => {
-    const { alerts, isLoading } = useSystemAlerts();
+    const isDemo = window.location.pathname.startsWith('/demo');
+    const realAlerts = useSystemAlerts();
+    const [demoData, setDemoData] = useDemoStorage();
+    
+    const getAlerts = () => {
+        if (isDemo) {
+            const activeAlerts = demoData.system_alerts.filter(alert => {
+                if (!alert.active) return false;
+                if (alert.expires_at && new Date(alert.expires_at) < new Date()) return false;
+                return true;
+            });
+            return { alerts: activeAlerts, isLoading: false };
+        }
+        return realAlerts;
+    };
+    
+    const { alerts, isLoading } = getAlerts();
+
     const [visibleAlerts, setVisibleAlerts] = useState<SystemAlert[]>([]);
     const [dismissingAlerts, setDismissingAlerts] = useState<string[]>([]);
 
