@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { User, Mail, Building, Edit, Trash2, Eye } from 'lucide-react';
 import { User as UserType, Delegation } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserCardProps {
   user: UserType;
@@ -21,6 +23,10 @@ export const UserCard: React.FC<UserCardProps> = ({
   onDelete,
   onView
 }) => {
+  const { permissions } = useAuth();
+  const canEdit = permissions?.users?.canEdit ?? false;
+  const canDelete = permissions?.users?.canDelete ?? false;
+
   const delegation = delegations.find(d => d.id === user.delegationId);
 
   const formatDate = (date: Date) => {
@@ -85,24 +91,28 @@ export const UserCard: React.FC<UserCardProps> = ({
             <Eye className="h-4 w-4 mr-1" />
             Ver
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(user)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            Editar
-          </Button>
-          <Button
-            variant="destructive-outline"
-            size="sm"
-            onClick={() => onDelete(user.id)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Trash2 className="w-4 w-4 mr-1" />
-            Eliminar
-          </Button>
+          {canEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(user)}
+              className="flex-1 min-w-[80px]"
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Editar
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="destructive-outline"
+              size="sm"
+              onClick={() => onDelete(user.id)}
+              className="flex-1 min-w-[80px]"
+            >
+              <Trash2 className="w-4 w-4 mr-1" />
+              Eliminar
+            </Button>
+          )}
         </div>
       </div>
     </Card>
