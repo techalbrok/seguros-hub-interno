@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useDemoAuth } from "./DemoAuthContext";
 import type { Delegation } from "@/types";
@@ -95,7 +94,7 @@ export const DemoDelegations = () => {
     currentPage * delegationsPerPage
   );
 
-  const handleCreateDelegation = (data: DelegationFormData) => {
+  const handleCreateDelegation = async (data: DelegationFormData): Promise<boolean> => {
     const newDelegation: Delegation = {
       ...data,
       id: Math.random().toString(36).slice(2),
@@ -103,19 +102,20 @@ export const DemoDelegations = () => {
       updatedAt: new Date(),
     };
     setDelegations(d => [...d, newDelegation]);
-    setShowForm(false);
+    return true;
   };
   
-  const handleUpdateDelegation = (data: DelegationFormData) => {
+  const handleUpdateDelegation = async (data: DelegationFormData): Promise<boolean> => {
     if (editingDelegation) {
       const updatedDelegation = { ...editingDelegation, ...data, updatedAt: new Date() };
       setDelegations(d => d.map(del => del.id === editingDelegation.id ? updatedDelegation : del));
-      setShowForm(false);
       if (selectedDelegation?.id === editingDelegation.id) {
         setSelectedDelegation(updatedDelegation);
       }
       setEditingDelegation(null);
+      return true;
     }
+    return false;
   };
 
   const handleEditDelegation = (delegation: Delegation) => {
@@ -193,7 +193,12 @@ export const DemoDelegations = () => {
   if (currentView === "detail" && selectedDelegation) {
     return (
       <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <DelegationDetail delegation={selectedDelegation} onBack={handleBackFromDetail} onEdit={isAdmin ? handleEditDelegation : undefined} onDelete={isAdmin ? handleDeleteDelegation : undefined} />
+        <DelegationDetail
+          delegation={selectedDelegation}
+          onBack={handleBackFromDetail}
+          onEdit={isAdmin ? () => handleEditDelegation(selectedDelegation) : undefined}
+          onDelete={isAdmin ? () => handleDeleteDelegation(selectedDelegation.id) : undefined}
+        />
         {isAdmin && <DelegationForm
           open={showForm}
           onOpenChange={onFormOpenChange}
