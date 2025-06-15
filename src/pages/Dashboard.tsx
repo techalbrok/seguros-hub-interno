@@ -16,8 +16,8 @@ const Dashboard = () => {
   const { user, profile } = useAuth();
   const { users, loading: loadingUsers } = useUsers();
   const { delegations, loading: loadingDelegations } = useDelegations();
-  const { companies, loading: loadingCompanies } = useCompanies();
-  const { products, loading: loadingProducts } = useProducts();
+  const { companies, isLoading: loadingCompanies } = useCompanies();
+  const { products, isLoading: loadingProducts } = useProducts();
   const { departments, loading: loadingDepartments } = useDepartments();
   const { news, loading: loadingNews } = useNews();
 
