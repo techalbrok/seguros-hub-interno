@@ -20,9 +20,7 @@ export const LandingContact = ({
               Suscríbete a nuestro boletín
             </span>
           </h2>
-          <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-            Recibe en tu correo las últimas novedades, consejos y ofertas especiales. Solo tienes que dejar tu nombre y email.
-          </p>
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-600 dark:text-gray-300 leading-relaxed">Recibe en tu correo más información sobre HubCore y, si así lo requieres, las últimas novedades, consejos y ofertas especiales. Solo tienes que dejar tu nombre y email.</p>
         </div>
         
         <div className="max-w-2xl mx-auto">
