@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, createContext, useContext, ReactNode 
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
+import { sections } from '@/components/users/PermissionsFormSection';
 
 interface Profile {
   name: string;
@@ -10,6 +11,7 @@ interface Profile {
 }
 
 type UserRole = 'admin' | 'user' | null;
+type UserPermissions = Record<string, { canCreate: boolean; canEdit: boolean; canDelete: boolean; canView: boolean; }>;
 
 interface AuthContextType {
     user: User | null;
@@ -17,6 +19,7 @@ interface AuthContextType {
     profile: Profile | null;
     role: UserRole;
     isAdmin: boolean;
+    permissions: UserPermissions | null;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<boolean>;
     signOut: (options?: { quiet?: boolean | undefined; }) => Promise<boolean>;
@@ -29,6 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [role, setRole] = useState<UserRole>(null);
+    const [permissions, setPermissions] = useState<UserPermissions | null>(null);
     const [loading, setLoading] = useState(true);
     const { toast } = useToast();
 
@@ -55,11 +59,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (roleError && roleError.code !== 'PGRST116') { // PGRST116 = no rows returned
             console.error('Error fetching user role:', roleError.message);
             setRole(null);
+            setPermissions(null);
         } else if (roleData) {
             setRole(roleData.role);
+            
+            if (roleData.role === 'admin') {
+                const adminPermissions: UserPermissions = {};
+                sections.forEach(section => {
+                    adminPermissions[section.key] = { canCreate: true, canEdit: true, canDelete: true, canView: true };
+                });
+                setPermissions(adminPermissions);
+            } else {
+                const { data: permissionsData, error: permissionsError } = await supabase
+                    .from('user_permissions')
+                    .select('*')
+                    .eq('user_id', userId);
+
+                if (permissionsError) {
+                    console.error('Error fetching user permissions:', permissionsError.message);
+                    setPermissions(null);
+                } else if (permissionsData && permissionsData.length > 0) {
+                    const userPermissions: UserPermissions = {};
+                    sections.forEach(section => {
+                        const dbPerm = permissionsData.find(p => p.section === section.key);
+                        userPermissions[section.key] = {
+                            canCreate: dbPerm?.can_create || false,
+                            canEdit: dbPerm?.can_edit || false,
+                            canDelete: dbPerm?.can_delete || false,
+                            canView: dbPerm?.can_view !== false,
+                        };
+                    });
+                    setPermissions(userPermissions);
+                } else {
+                    // No specific permissions, set defaults (all false except view)
+                    const defaultPermissions: UserPermissions = {};
+                    sections.forEach(section => {
+                      defaultPermissions[section.key] = { canCreate: false, canEdit: false, canDelete: false, canView: true };
+                    });
+                    setPermissions(defaultPermissions);
+                }
+            }
         } else {
             // Default to 'user' if no role is found for safety
             setRole('user');
+            // No role, so set default permissions
+            const defaultPermissions: UserPermissions = {};
+            sections.forEach(section => {
+              defaultPermissions[section.key] = { canCreate: false, canEdit: false, canDelete: false, canView: true };
+            });
+            setPermissions(defaultPermissions);
         }
     }, []);
 
@@ -74,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 } else {
                     setProfile(null);
                     setRole(null);
+                    setPermissions(null);
                 }
             }
         );
@@ -170,6 +219,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         profile,
         role,
         isAdmin: role === 'admin',
+        permissions,
         loading,
         signIn,
         signOut,

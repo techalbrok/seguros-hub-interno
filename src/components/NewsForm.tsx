@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,9 +39,11 @@ export const NewsForm: React.FC<NewsFormProps> = ({
     product_ids: []
   });
   const [submitting, setSubmitting] = useState(false);
-  const { isAdmin } = useAuth();
+  const { permissions } = useAuth();
   
   const { uploadImage, uploading } = useImageUpload('news');
+
+  const canPerformAction = (news ? permissions?.news?.canEdit : permissions?.news?.canCreate) ?? false;
 
   useEffect(() => {
     console.log('NewsForm - Setting form data from news:', news);
@@ -123,7 +124,7 @@ export const NewsForm: React.FC<NewsFormProps> = ({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <fieldset disabled={!isAdmin} className="space-y-6">
+          <fieldset disabled={!canPerformAction} className="space-y-6">
             <div>
               <Label htmlFor="title">Título *</Label>
               <Input
@@ -212,13 +213,13 @@ export const NewsForm: React.FC<NewsFormProps> = ({
           </fieldset>
           
           <div className="flex gap-4">
-            {isAdmin && (
+            {canPerformAction && (
               <Button type="submit" disabled={submitting}>
                 {submitting ? 'Guardando...' : (news ? 'Actualizar' : 'Crear')} Noticia
               </Button>
             )}
             <Button type="button" variant="outline" onClick={onCancel}>
-              {isAdmin ? 'Cancelar' : 'Volver'}
+              {canPerformAction ? 'Cancelar' : 'Volver'}
             </Button>
           </div>
         </form>

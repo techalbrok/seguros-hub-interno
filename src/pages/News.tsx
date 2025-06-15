@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { useProductCategories } from '@/hooks/useProductCategories';
 import { useProducts } from '@/hooks/useProducts';
 import { NewsCardSkeleton } from '@/components/skeletons/NewsSkeletons';
 import { AppPagination } from '@/components/ui/AppPagination';
+import { useAuth } from '@/hooks/useAuth';
 
 type ViewMode = 'list' | 'create' | 'edit' | 'detail';
 
@@ -38,6 +40,9 @@ const NewsPage = () => {
   const { companies } = useCompanies();
   const { categories } = useProductCategories();
   const { products } = useProducts();
+  const { permissions } = useAuth();
+
+  const canCreateNews = permissions?.news?.canCreate ?? false;
 
   const filteredNews = news.filter(item => {
     const searchTermMatch = !searchTerm ||
@@ -125,10 +130,12 @@ const NewsPage = () => {
             Administra las noticias de la correduría
           </p>
         </div>
-        <Button onClick={handleCreate} className="shrink-0">
-          <Plus className="w-4 h-4 mr-2" />
-          Nueva Noticia
-        </Button>
+        {canCreateNews && (
+          <Button onClick={handleCreate} className="shrink-0">
+            <Plus className="w-4 h-4 mr-2" />
+            Nueva Noticia
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

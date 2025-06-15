@@ -31,9 +31,10 @@ export const UserListPage = ({
   onBulkCreate
 }: UserListPageProps) => {
   const {
-    isAdmin
+    permissions
   } = useAuth();
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const canCreateUsers = permissions?.users?.canCreate ?? false;
   return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -45,7 +46,7 @@ export const UserListPage = ({
             Administra usuarios, roles y permisos del sistema
           </p>
         </div>
-        {isAdmin && <div className="flex flex-col sm:flex-row gap-2 self-start sm:self-auto">
+        {canCreateUsers && <div className="flex flex-col sm:flex-row gap-2 self-start sm:self-auto">
             <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Importar CSV

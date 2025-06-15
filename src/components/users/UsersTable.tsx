@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -34,7 +33,10 @@ const getRoleColor = (role: string) => {
 };
 
 export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selectedUserIds, onSelectUser, onSelectAll, areAllOnPageSelected }: UsersTableProps) => {
-  const { isAdmin } = useAuth();
+  const { permissions } = useAuth();
+  const canEditUsers = permissions?.users?.canEdit ?? false;
+  const canViewUsers = permissions?.users?.canView ?? true;
+  const showActions = canEditUsers || canViewUsers;
 
   return (
     <Table>
@@ -52,7 +54,7 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selecte
           <TableHead>Rol</TableHead>
           <TableHead>Delegación</TableHead>
           <TableHead>Permisos</TableHead>
-          {isAdmin && <TableHead>Acciones</TableHead>}
+          {showActions && <TableHead>Acciones</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -110,15 +112,19 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, selecte
                   )}
                 </div>
               </TableCell>
-              {isAdmin && (
+              {showActions && (
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => onViewUser(user)}>
-                      Ver
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => onEditUser(user)}>
-                      Editar
-                    </Button>
+                    {canViewUsers && (
+                        <Button variant="outline" size="sm" onClick={() => onViewUser(user)}>
+                        Ver
+                        </Button>
+                    )}
+                    {canEditUsers && (
+                        <Button variant="outline" size="sm" onClick={() => onEditUser(user)}>
+                        Editar
+                        </Button>
+                    )}
                   </div>
                 </TableCell>
               )}
