@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationsDropdown } from "./notifications/NotificationsDropdown";
 import { SidebarTrigger } from "./ui/sidebar";
+import { useEffect } from "react";
 
 export const Header = () => {
   const {
@@ -25,6 +26,23 @@ export const Header = () => {
   const {
     config
   } = useBrokerageConfig();
+
+  useEffect(() => {
+    if (config) {
+      const root = document.documentElement;
+
+      const primaryColor = theme === 'dark' ? config.primary_color_dark : config.primary_color_light;
+      const accentColor = theme === 'dark' ? config.accent_color_dark : config.accent_color_light;
+
+      if (primaryColor) {
+        root.style.setProperty('--color-primary', primaryColor);
+      }
+      
+      if (accentColor) {
+        root.style.setProperty('--color-accent', accentColor);
+      }
+    }
+  }, [config, theme]);
   
   const handleSignOut = async () => {
     await signOut();
