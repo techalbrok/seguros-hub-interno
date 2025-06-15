@@ -35,27 +35,36 @@ export const NavigationShortcuts = () => {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-2">
+      <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-2 sidebar-group-label">
         {!collapsed && "Accesos Directos"}
       </SidebarGroupLabel>
       <SidebarGroupContent>
-        <SidebarMenu className="space-y-1">
-          {activeShortcuts.map((shortcut) => {
+        <SidebarMenu className="space-y-1 nav-menu">
+          {activeShortcuts.map((shortcut, index) => {
             const IconComponent = getIcon(shortcut.icon || "external-link");
 
             if (isExternal(shortcut.url)) {
               // Enlace externo (abre en nueva pestaña)
               return (
-                <SidebarMenuItem key={shortcut.id}>
-                  <SidebarMenuButton asChild className="h-10">
+                <SidebarMenuItem key={shortcut.id} className="nav-item-wrapper">
+                  <SidebarMenuButton asChild className="h-12 nav-menu-button">
                     <a 
                       href={shortcut.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex items-center w-full transition-colors duration-200 hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                      className="flex items-center w-full transition-all duration-300 ease-out relative group/nav-item hover:text-sidebar-accent-foreground text-sidebar-foreground nav-item-inactive"
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <IconComponent className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
-                      {!collapsed && <span className="truncate">{shortcut.title}</span>}
+                      <div className="nav-icon-wrapper">
+                        <IconComponent className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0 transition-all duration-300`} />
+                      </div>
+                      {!collapsed && (
+                        <span className="nav-text truncate transition-all duration-300">
+                          {shortcut.title}
+                        </span>
+                      )}
+                      <div className="nav-indicator" />
+                      <div className="nav-glow" />
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -63,14 +72,23 @@ export const NavigationShortcuts = () => {
             } else {
               // Enlace interno (SPA navigation)
               return (
-                <SidebarMenuItem key={shortcut.id}>
-                  <SidebarMenuButton asChild className="h-10">
+                <SidebarMenuItem key={shortcut.id} className="nav-item-wrapper">
+                  <SidebarMenuButton asChild className="h-12 nav-menu-button">
                     <Link 
                       to={shortcut.url}
-                      className="flex items-center w-full transition-colors duration-200 hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                      className="flex items-center w-full transition-all duration-300 ease-out relative group/nav-item hover:text-sidebar-accent-foreground text-sidebar-foreground nav-item-inactive"
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <IconComponent className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
-                      {!collapsed && <span className="truncate">{shortcut.title}</span>}
+                      <div className="nav-icon-wrapper">
+                        <IconComponent className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0 transition-all duration-300`} />
+                      </div>
+                      {!collapsed && (
+                        <span className="nav-text truncate transition-all duration-300">
+                          {shortcut.title}
+                        </span>
+                      )}
+                      <div className="nav-indicator" />
+                      <div className="nav-glow" />
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

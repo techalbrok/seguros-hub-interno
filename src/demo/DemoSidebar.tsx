@@ -25,36 +25,48 @@ export const DemoSidebar = () => {
   };
 
   const getNavClass = (path: string) => {
-    const baseClass = "flex items-center w-full transition-colors duration-200";
+    const baseClass = "flex items-center w-full transition-all duration-300 ease-out relative group/nav-item";
     return isActive(path) 
-      ? `${baseClass} bg-sidebar-accent text-sidebar-primary font-medium border-r-2 border-primary` 
-      : `${baseClass} hover:bg-sidebar-accent/50 text-sidebar-foreground`;
+      ? `${baseClass} text-sidebar-primary font-medium nav-item-active` 
+      : `${baseClass} hover:text-sidebar-accent-foreground text-sidebar-foreground nav-item-inactive`;
   };
 
   return (
-    <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border hidden sm:flex`} collapsible="icon">
-      <div className={`flex items-center border-b border-sidebar-border ${
+    <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border sidebar-enhanced hidden sm:flex`} collapsible="icon">
+      <div className={`flex items-center border-b border-sidebar-border/50 sidebar-header ${
           collapsed
           ? 'justify-center p-2'
           : 'justify-between p-4'
         }`}>
         {!collapsed && <div className="font-bold text-lg">Demo</div>}
-        <SidebarTrigger className="h-8 w-8 flex-shrink-0" />
+        <SidebarTrigger className="h-8 w-8 flex-shrink-0 sidebar-trigger" />
       </div>
 
-      <SidebarContent className="px-2 py-2 sm:py-4">
+      <SidebarContent className="px-2 py-2 sm:py-4 sidebar-content">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-1 sm:mb-2">
+          <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-1 sm:mb-2 sidebar-group-label">
             {!collapsed && "Navegación"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {navItems.map(item => (
-                <SidebarMenuItem key={item.to}>
-                  <SidebarMenuButton asChild className="h-10">
-                    <NavLink to={item.to} className={getNavClass(item.to)}>
-                      <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
-                      {!collapsed && <span className="truncate">{item.label}</span>}
+            <SidebarMenu className="space-y-1 nav-menu">
+              {navItems.map((item, index) => (
+                <SidebarMenuItem key={item.to} className="nav-item-wrapper">
+                  <SidebarMenuButton asChild className="h-12 nav-menu-button">
+                    <NavLink 
+                      to={item.to} 
+                      className={getNavClass(item.to)}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="nav-icon-wrapper">
+                        <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0 transition-all duration-300`} />
+                      </div>
+                      {!collapsed && (
+                        <span className="nav-text truncate transition-all duration-300">
+                          {item.label}
+                        </span>
+                      )}
+                      <div className="nav-indicator" />
+                      <div className="nav-glow" />
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -67,4 +79,3 @@ export const DemoSidebar = () => {
     </Sidebar>
   );
 };
-
