@@ -22,6 +22,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { AppPagination } from "@/components/ui/AppPagination";
 import { CompanyCardSkeleton, CompanyListSkeleton } from "@/components/skeletons/CompanySkeletons";
 import { CompanyImportDialog } from "@/components/companies/CompanyImportDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
@@ -40,6 +41,12 @@ export default function Companies() {
     isDeleting,
     bulkCreateCompanies,
   } = useCompanies();
+
+  const { permissions } = useAuth();
+  const canCreate = permissions?.companies?.canCreate ?? false;
+  const canEdit = permissions?.companies?.canEdit ?? false;
+  const canDelete = permissions?.companies?.canDelete ?? false;
+
   const [currentView, setCurrentView] = useState<CurrentView>("main");
   const [displayMode, setDisplayMode] = useState<DisplayMode>("grid");
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
@@ -60,6 +67,7 @@ export default function Companies() {
   );
   
   const handleCreateCompany = (data: CompanyFormData) => {
+    if (!canCreate) return;
     createCompany(data, {
       onSuccess: () => {
         setShowForm(false);
@@ -68,6 +76,7 @@ export default function Companies() {
   };
 
   const handleUpdateCompany = (data: CompanyFormData) => {
+    if (!canEdit) return;
     if (editingCompany) {
       updateCompany({
         ...data,
@@ -85,6 +94,7 @@ export default function Companies() {
   };
 
   const handleEditCompany = (company: Company) => {
+    if (!canEdit) return;
     setEditingCompany(company);
     setShowForm(true);
   };
@@ -95,6 +105,7 @@ export default function Companies() {
   };
 
   const handleDeleteCompany = (id: string) => {
+    if (!canDelete) return;
     const company = companies.find((c) => c.id === id);
     if (company) {
       setCompanyToDelete(company);
@@ -123,11 +134,12 @@ export default function Companies() {
   };
 
   const handleBulkCreateCompanies = async (companiesData: CreateCompanyData[]) => {
-    if (!bulkCreateCompanies) return;
+    if (!canCreate || !bulkCreateCompanies) return;
     await bulkCreateCompanies(companiesData);
   };
 
   const handleAddNewCompanyClick = () => {
+    if (!canCreate) return;
     setEditingCompany(null);
     setShowForm(true);
   };
@@ -171,7 +183,11 @@ export default function Companies() {
   if (currentView === "detail" && selectedCompany) {
     return (
       <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <CompanyDetail company={selectedCompany} onEdit={handleEditCompany} onBack={handleBackFromDetail} />
+        <CompanyDetail
+          company={selectedCompany}
+          onEdit={canEdit ? handleEditCompany : undefined}
+          onBack={handleBackFromDetail}
+        />
         <CompanyForm
           open={showForm}
           onOpenChange={onFormOpenChange}
@@ -186,11 +202,20 @@ export default function Companies() {
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      <CompaniesHeader onAddNewCompany={handleAddNewCompanyClick} onImport={() => setIsImportDialogOpen(true)} />
+      <CompaniesHeader
+        onAddNewCompany={canCreate ? handleAddNewCompanyClick : undefined}
+        onImport={canCreate ? () => setIsImportDialogOpen(true) : undefined}
+      />
 
       <Card>
         <CardHeader>
-          <CompaniesControls searchTerm={searchTerm} onSearchTermChange={setSearchTerm} activeDisplayMode={displayMode} onDisplayModeChange={setDisplayMode} companyCount={filteredCompanies.length} />
+          <CompaniesControls
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+            activeDisplayMode={displayMode}
+            onDisplayModeChange={setDisplayMode}
+            companyCount={filteredCompanies.length}
+          />
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -208,9 +233,19 @@ export default function Companies() {
           ) : (
             <>
               {displayMode === "grid" ? (
-                <CompaniesGrid companies={paginatedCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} />
+                <CompaniesGrid
+                  companies={paginatedCompanies}
+                  onEdit={canEdit ? handleEditCompany : undefined}
+                  onDelete={canDelete ? handleDeleteCompany : undefined}
+                  onView={handleViewCompany}
+                />
               ) : (
-                <CompaniesList companies={paginatedCompanies} onEdit={handleEditCompany} onDelete={handleDeleteCompany} onView={handleViewCompany} />
+                <CompaniesList
+                  companies={paginatedCompanies}
+                  onEdit={canEdit ? handleEditCompany : undefined}
+                  onDelete={canDelete ? handleDeleteCompany : undefined}
+                  onView={handleViewCompany}
+                />
               )}
               {totalPages > 1 && (
                 <AppPagination

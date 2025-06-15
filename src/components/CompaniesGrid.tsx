@@ -4,8 +4,8 @@ import type { Company } from "@/types";
 
 interface CompaniesGridProps {
   companies: Company[];
-  onEdit: (company: Company) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (company: Company) => void;
+  onDelete?: (id: string) => void;
   onView: (company: Company) => void;
 }
 
