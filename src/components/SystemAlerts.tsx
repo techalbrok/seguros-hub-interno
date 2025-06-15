@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useSystemAlerts } from '@/hooks/useSystemAlerts';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -46,6 +47,8 @@ export const SystemAlerts = () => {
         }, 300); // Corresponds to fade-out animation duration
     };
 
+    const isExternalLink = (url: string) => /^(https?:\/\/)/.test(url);
+
     if (isLoading) {
         return null;
     }
@@ -71,9 +74,15 @@ export const SystemAlerts = () => {
                             <AlertDescription>
                                 <p>{alert.message}</p>
                                 {alert.link && alert.link_text && (
-                                    <Link to={alert.link} className="mt-2 inline-block font-semibold underline hover:text-current/80">
-                                        {alert.link_text}
-                                    </Link>
+                                    isExternalLink(alert.link) ? (
+                                        <a href={alert.link} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-semibold underline hover:text-current/80">
+                                            {alert.link_text}
+                                        </a>
+                                    ) : (
+                                        <Link to={alert.link} className="mt-2 inline-block font-semibold underline hover:text-current/80">
+                                            {alert.link_text}
+                                        </Link>
+                                    )
                                 )}
                             </AlertDescription>
                         </div>

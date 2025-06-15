@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const getBadgeVariantForType = (type: SystemAlert['type']): 'default' | 'destructive' | 'secondary' => {
     switch (type) {
@@ -98,66 +99,75 @@ export const SystemAlertsManager = () => {
                 {alerts.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">No hay alertas del sistema.</p>
                 ) : (
-                    <div className="border rounded-lg">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[40%]">Alerta</TableHead>
-                                    <TableHead>Tipo</TableHead>
-                                    <TableHead>Estado</TableHead>
-                                    <TableHead className="text-right">Acciones</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {alerts.map(alert => (
-                                    <TableRow key={alert.id}>
-                                        <TableCell>
-                                            <p className="font-semibold">{alert.title}</p>
-                                            <p className="text-sm text-muted-foreground truncate max-w-xs">{alert.message}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant={getBadgeVariantForType(alert.type)} className="capitalize">
-                                                {alert.type}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant={alert.active ? 'default' : 'outline'}>
-                                                {alert.active ? 'Activa' : 'Inactiva'}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2 justify-end">
-                                                <Button variant="ghost" size="icon" onClick={() => { setSelectedAlert(alert); setDialogOpen(true); }}>
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600">
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader>
-                                                            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                                            <AlertDialogDescription>
-                                                                Esta acción no se puede deshacer. Esto eliminará permanentemente la alerta.
-                                                            </AlertDialogDescription>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDelete(alert.id)}>
-                                                              Eliminar
-                                                            </AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </div>
-                                        </TableCell>
+                    <TooltipProvider>
+                        <div className="border rounded-lg">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[40%]">Alerta</TableHead>
+                                        <TableHead>Tipo</TableHead>
+                                        <TableHead>Estado</TableHead>
+                                        <TableHead className="text-right">Acciones</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                </TableHeader>
+                                <TableBody>
+                                    {alerts.map(alert => (
+                                        <TableRow key={alert.id}>
+                                            <TableCell>
+                                                <p className="font-semibold">{alert.title}</p>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <p className="text-sm text-muted-foreground truncate max-w-xs cursor-help">{alert.message}</p>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p className="max-w-sm">{alert.message}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={getBadgeVariantForType(alert.type)} className="capitalize">
+                                                    {alert.type}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={alert.active ? 'default' : 'outline'}>
+                                                    {alert.active ? 'Activa' : 'Inactiva'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-2 justify-end">
+                                                    <Button variant="ghost" size="icon" onClick={() => { setSelectedAlert(alert); setDialogOpen(true); }}>
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600">
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    Esta acción no se puede deshacer. Esto eliminará permanentemente la alerta.
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleDelete(alert.id)}>
+                                                                  Eliminar
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </TooltipProvider>
                 )}
             </CardContent>
         </Card>
