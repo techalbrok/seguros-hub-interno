@@ -56,10 +56,10 @@ export const LegalNoticeText = () => <>
     <h2>1. Datos Identificativos</h2>
     <p>En cumplimiento con el deber de información recogido en artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico, a continuación se reflejan los siguientes datos:</p>
     <ul>
-      <li><strong>Titular:</strong> HubCore S.L.</li>
-      <li><strong>NIF:</strong> B12345678</li>
-      <li><strong>Domicilio social:</strong> Calle Ficticia 123, 28080 Madrid, España</li>
-      <li><strong>Email de contacto:</strong> legal@hubcore.com</li>
+      <li><strong>Titular:</strong> José Báez Fernández</li>
+      <li><strong>NIF:</strong> 76033673C</li>
+      <li><strong>Domicilio social:</strong> Cáceres</li>
+      <li><strong>Email de contacto:</strong> contacto@josebaezfernandez.com</li>
     </ul>
     
     <h2>2. Objeto</h2>
