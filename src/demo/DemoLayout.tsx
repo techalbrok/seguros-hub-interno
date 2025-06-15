@@ -6,6 +6,7 @@ import { DemoHeader } from './DemoHeader';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import DemoProfile from './DemoProfile';
 import DemoSettings from './DemoSettings';
+import { DemoSystemAlerts } from './DemoSystemAlerts';
 
 export const DemoLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -30,6 +31,7 @@ export const DemoLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex-1 flex flex-col">
           <DemoHeader />
           <main className="flex-1 p-4 md:p-6 space-y-6">
+            <DemoSystemAlerts />
             {renderContent()}
           </main>
         </div>
@@ -37,3 +39,4 @@ export const DemoLayout = ({ children }: { children: React.ReactNode }) => {
     </SidebarProvider>
   );
 };
+
