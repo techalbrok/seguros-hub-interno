@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Delegation } from "@/types";
-import { useAuth } from "@/hooks/useAuth";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, Edit, Trash2 } from "lucide-react";
 
@@ -25,6 +24,7 @@ interface UsersTableProps {
   onSelectUser: (userId: string, selected: boolean) => void;
   onSelectAll: (selected: boolean) => void;
   areAllOnPageSelected: boolean;
+  isAdmin: boolean;
 }
 
 const getInitials = (name: string) => {
@@ -35,25 +35,34 @@ const getRoleColor = (role: string) => {
   return role === 'admin' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground';
 };
 
-export const UsersTable = ({ users, delegations, onViewUser, onEditUser, onDeleteUser, selectedUserIds, onSelectUser, onSelectAll, areAllOnPageSelected }: UsersTableProps) => {
-  const { permissions } = useAuth();
-  const canEditUsers = permissions?.users?.canEdit ?? false;
-  const canDeleteUsers = permissions?.users?.canDelete ?? false;
-  const canViewUsers = permissions?.users?.canView ?? true;
-  const showActions = onEditUser || onViewUser || onDeleteUser;
+export const UsersTable = ({
+  users,
+  delegations,
+  onViewUser,
+  onEditUser,
+  onDeleteUser,
+  selectedUserIds,
+  onSelectUser,
+  onSelectAll,
+  areAllOnPageSelected,
+  isAdmin
+}: UsersTableProps) => {
+  const showActions = !!onEditUser || !!onDeleteUser;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[40px]">
-            <Checkbox
-              checked={areAllOnPageSelected}
-              onCheckedChange={(checked) => onSelectAll(Boolean(checked))}
-              aria-label="Seleccionar todo"
-              disabled={users.length === 0}
-            />
-          </TableHead>
+          {isAdmin && (
+            <TableHead className="w-[40px]">
+              <Checkbox
+                checked={areAllOnPageSelected}
+                onCheckedChange={(checked) => onSelectAll(Boolean(checked))}
+                aria-label="Seleccionar todo"
+                disabled={users.length === 0}
+              />
+            </TableHead>
+          )}
           <TableHead>Usuario</TableHead>
           <TableHead>Rol</TableHead>
           <TableHead>Delegación</TableHead>
@@ -67,13 +76,15 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, onDelet
           const isSelected = selectedUserIds.includes(user.id);
           return (
             <TableRow key={user.id} className="hover:bg-muted/50" data-state={isSelected ? 'selected' : undefined}>
-              <TableCell>
-                <Checkbox
-                  checked={isSelected}
-                  onCheckedChange={(checked) => onSelectUser(user.id, Boolean(checked))}
-                  aria-label={`Seleccionar ${user.name}`}
-                />
-              </TableCell>
+              {isAdmin && (
+                <TableCell>
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={(checked) => onSelectUser(user.id, Boolean(checked))}
+                    aria-label={`Seleccionar ${user.name}`}
+                  />
+                </TableCell>
+              )}
               <TableCell className="font-medium">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
@@ -119,19 +130,17 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, onDelet
               {showActions && (
                 <TableCell>
                   <div className="flex space-x-2 justify-end">
-                    {onViewUser && (
-                        <Button variant="outline" size="icon" onClick={() => onViewUser(user)}>
-                          <Eye className="h-4 w-4" />
-                          <span className="sr-only">Ver</span>
-                        </Button>
+                    <Button variant="outline" size="icon" onClick={() => onViewUser(user)}>
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">Ver</span>
+                    </Button>
+                    {onEditUser && isAdmin && (
+                      <Button variant="outline" size="icon" onClick={() => onEditUser(user)}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Editar</span>
+                      </Button>
                     )}
-                    {onEditUser && (
-                        <Button variant="outline" size="icon" onClick={() => onEditUser(user)}>
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Editar</span>
-                        </Button>
-                    )}
-                    {onDeleteUser && (
+                    {onDeleteUser && isAdmin && (
                       <Button variant="destructive-outline" size="icon" onClick={() => onDeleteUser(user.id)}>
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Eliminar</span>
@@ -147,3 +156,4 @@ export const UsersTable = ({ users, delegations, onViewUser, onEditUser, onDelet
     </Table>
   );
 };
+

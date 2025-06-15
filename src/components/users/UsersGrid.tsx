@@ -7,8 +7,8 @@ interface UsersGridProps {
   users: User[];
   delegations: Delegation[];
   onViewUser: (user: User) => void;
-  onEditUser: (user: User) => void;
-  onDeleteUser: (userId: string) => void;
+  onEditUser?: (user: User) => void;
+  onDeleteUser?: (userId: string) => void;
 }
 
 export const UsersGrid = ({ users, delegations, onViewUser, onEditUser, onDeleteUser }: UsersGridProps) => {

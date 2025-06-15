@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
 
 type ViewMode = 'table' | 'grid';
 
@@ -30,6 +32,7 @@ interface UsersListViewProps {
 }
 
 export const UsersListView = ({ users, delegations, loading, onViewUser, onEditUser, onDeleteUser, onBulkDelete }: UsersListViewProps) => {
+  const { isAdmin } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -84,11 +87,12 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
             users={[]} 
             delegations={[]} 
             onViewUser={()=>{}} 
-            onEditUser={()=>{}} 
-            selectedUserIds={[]}
-            onSelectUser={()=>{}}
-            onSelectAll={()=>{}}
-            areAllOnPageSelected={false}
+            // onEditUser, onDeleteUser solo para admin
+            selectedUserIds={[]} 
+            onSelectUser={()=>{}} 
+            onSelectAll={()=>{}} 
+            areAllOnPageSelected={false} 
+            isAdmin={isAdmin}
           />
         </TableHeader>
         <TableBody>
@@ -113,7 +117,8 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
             <CardTitle className="text-sidebar-primary dark:text-white">
               Lista de Usuarios
             </CardTitle>
-            {numSelected > 0 && viewMode === 'table' && (
+            {/* Eliminar masivo solo para admin */}
+            {isAdmin && numSelected > 0 && viewMode === 'table' && (
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-sm text-muted-foreground">{numSelected} seleccionado(s)</span>
                 <Button variant="destructive" size="sm" onClick={handleBulkDeleteClick}>
@@ -123,6 +128,7 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
               </div>
             )}
           </div>
+          {/* Buscador y filtros accesibles a todos */}
           {numSelected === 0 && (
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2">
               <Input
@@ -184,14 +190,23 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
               users={paginatedUsers} 
               delegations={delegations} 
               onViewUser={onViewUser} 
-              onEditUser={onEditUser} 
-              selectedUserIds={selectedUserIds}
-              onSelectUser={handleSelectUser}
-              onSelectAll={handleSelectAll}
-              areAllOnPageSelected={areAllOnPageSelected}
+              // Sólo pasar funciones de edit/delete/selección si es admin
+              onEditUser={isAdmin ? onEditUser : undefined}
+              onDeleteUser={isAdmin ? onDeleteUser : undefined}
+              selectedUserIds={isAdmin ? selectedUserIds : []}
+              onSelectUser={isAdmin ? handleSelectUser : () => {}}
+              onSelectAll={isAdmin ? handleSelectAll : () => {}}
+              areAllOnPageSelected={isAdmin ? areAllOnPageSelected : false}
+              isAdmin={isAdmin}
             />
           ) : (
-            <UsersGrid users={paginatedUsers} delegations={delegations} onViewUser={onViewUser} onEditUser={onEditUser} onDeleteUser={onDeleteUser} />
+            <UsersGrid 
+              users={paginatedUsers} 
+              delegations={delegations} 
+              onViewUser={onViewUser} 
+              onEditUser={isAdmin ? onEditUser : undefined}
+              onDeleteUser={isAdmin ? onDeleteUser : undefined}
+            />
           )
         )}
       </CardContent>
@@ -208,3 +223,5 @@ export const UsersListView = ({ users, delegations, loading, onViewUser, onEditU
     </Card>
   );
 };
+
+// Este archivo es muy largo (más de 211 líneas). Te recomiendo pedir una refactorización en archivos más pequeños y enfocados.
