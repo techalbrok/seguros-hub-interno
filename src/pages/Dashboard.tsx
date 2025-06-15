@@ -20,27 +20,27 @@ const Dashboard = () => {
   } = useAuth();
   const {
     users,
-    loading: loadingUsers
+    loading: usersLoading
   } = useUsers();
   const {
     delegations,
-    loading: loadingDelegations
+    loading: delegationsLoading
   } = useDelegations();
   const {
     companies,
-    isLoading: loadingCompanies
+    isLoading: companiesLoading
   } = useCompanies();
   const {
     products,
-    isLoading: loadingProducts
+    isLoading: productsLoading
   } = useProducts();
   const {
     departments,
-    loading: loadingDepartments
+    loading: departmentsLoading
   } = useDepartments();
   const {
     news,
-    loading: loadingNews
+    loading: newsLoading
   } = useNews();
   const {
     config
@@ -52,42 +52,42 @@ const Dashboard = () => {
     icon: Users,
     description: `Total de ${t.user.plural.toLowerCase()} registrados`,
     href: '/users',
-    loading: loadingUsers
+    loading: usersLoading
   }, {
     title: t.delegation.plural,
     value: delegations.length.toString(),
     icon: Building,
     description: `${t.delegation.plural} activas`,
     href: '/delegations',
-    loading: loadingDelegations
+    loading: delegationsLoading
   }, {
     title: t.company.plural,
     value: companies.length.toString(),
     icon: Building2,
     description: `${t.company.plural} registradas`,
     href: '/companies',
-    loading: loadingCompanies
+    loading: companiesLoading
   }, {
     title: t.product.plural,
     value: products.length.toString(),
     icon: Package,
     description: `${t.product.plural} disponibles`,
     href: '/products',
-    loading: loadingProducts
+    loading: productsLoading
   }, {
     title: t.department.plural,
     value: departments.length.toString(),
     icon: Briefcase,
     description: `${t.department.plural} activos`,
     href: '/departments',
-    loading: loadingDepartments
+    loading: departmentsLoading
   }, {
     title: t.news.plural,
     value: news.length.toString(),
     icon: Newspaper,
     description: `${t.news.plural} publicadas`,
     href: '/news',
-    loading: loadingNews
+    loading: newsLoading
   }];
   return <div className="space-y-6">
       <div>

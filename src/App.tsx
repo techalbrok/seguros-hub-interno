@@ -26,6 +26,7 @@ const Departments = lazy(() => import("./pages/Departments"));
 const News = lazy(() => import("./pages/News"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,13 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/update-password" element={<UpdatePassword />} />
                 <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </AuthGuard>
+                } />
                 <Route path="/profile" element={
                   <AuthGuard>
                     <Layout>

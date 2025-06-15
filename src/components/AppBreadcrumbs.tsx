@@ -12,6 +12,7 @@ import {
 import { Home } from 'lucide-react';
 
 const breadcrumbNameMap: Record<string, string> = {
+  'dashboard': 'Inicio',
   'users': 'Usuarios',
   'companies': 'Compañías',
   'products': 'Productos',
@@ -27,7 +28,7 @@ export const AppBreadcrumbs = () => {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter((x) => x);
 
-  if (pathnames.length === 0) {
+  if (pathnames.length === 0 || (pathnames.length === 1 && pathnames[0] === 'dashboard')) {
     return null;
   }
 
