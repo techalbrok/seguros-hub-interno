@@ -1,1 +1,5 @@
+
 project_id = "bwpojmgqqanmwcqcydgn"
+
+[functions.mailrelay-contact]
+verify_jwt = false

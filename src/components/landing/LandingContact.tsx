@@ -1,31 +1,8 @@
 
 import { Mail } from "lucide-react";
-import { useEffect } from "react";
+import { ContactForm } from "./ContactForm";
 
 export const LandingContact = () => {
-  useEffect(() => {
-    const scriptId = 'mailrelay-iframe-script';
-    // Evita añadir el script si ya existe
-    if (document.getElementById(scriptId)) {
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = "https://assets.ipzmarketing.com/assets/signup_form/iframe_v1.js";
-    script.async = true;
-    script.setAttribute('data-cfasync', 'false');
-    document.body.appendChild(script);
-
-    // Limpia el script cuando el componente se desmonte
-    return () => {
-      const scriptElement = document.getElementById(scriptId);
-      if (scriptElement && scriptElement.parentNode) {
-        scriptElement.parentNode.removeChild(scriptElement);
-      }
-    };
-  }, []);
-
   return (
     <section id="contacto" className="py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
       <div className="container">
@@ -50,18 +27,7 @@ export const LandingContact = () => {
             <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
               Formulario de Contacto
             </h3>
-            {/* MailRelay form embedded via iframe */}
-            <div className="min-h-[480px]">
-              <iframe 
-                data-skip-lazy="" 
-                src="https://josebaezfernandez.ipzmarketing.com/f/icZSvTMP8EE" 
-                frameBorder="0"
-                scrolling="no" 
-                width="100%" 
-                className="ipz-iframe"
-                title="Formulario de Contacto MailRelay"
-              ></iframe>
-            </div>
+            <ContactForm />
           </div>
         </div>
       </div>
