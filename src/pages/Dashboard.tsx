@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBrokerageConfig, defaultTerminology } from '@/hooks/useBrokerageConfig';
+import { SystemAlerts } from '@/components/SystemAlerts';
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
@@ -85,6 +86,8 @@ const Dashboard = () => {
           Panel de control del sistema de gestión interno
         </p>
       </div>
+
+      <SystemAlerts />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat, index) => (

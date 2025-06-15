@@ -722,6 +722,45 @@ export type Database = {
           },
         ]
       }
+      system_alerts: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          link: string | null
+          link_text: string | null
+          message: string
+          title: string
+          type: Database["public"]["Enums"]["system_alert_type"]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          link?: string | null
+          link_text?: string | null
+          message: string
+          title: string
+          type?: Database["public"]["Enums"]["system_alert_type"]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          link?: string | null
+          link_text?: string | null
+          message?: string
+          title?: string
+          type?: Database["public"]["Enums"]["system_alert_type"]
+        }
+        Relationships: []
+      }
       user_permissions: {
         Row: {
           can_create: boolean
@@ -810,6 +849,7 @@ export type Database = {
       }
     }
     Enums: {
+      system_alert_type: "info" | "warning" | "error" | "success"
       user_role: "admin" | "user"
     }
     CompositeTypes: {
@@ -926,6 +966,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      system_alert_type: ["info", "warning", "error", "success"],
       user_role: ["admin", "user"],
     },
   },

@@ -1,10 +1,10 @@
-
 import { Settings as SettingsIcon } from "lucide-react";
 import { BrokerageSettings } from "@/components/BrokerageSettings";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
+import { SystemAlertsManager } from "@/components/SystemAlertsManager";
 
 const Settings = () => {
   const { isAdmin, loading } = useAuth();
@@ -38,6 +38,7 @@ const Settings = () => {
           Configuración general de la plataforma y personalización de la correduría
         </p>
       </div>
+      <SystemAlertsManager />
       <BrokerageSettings />
     </div>
   );
