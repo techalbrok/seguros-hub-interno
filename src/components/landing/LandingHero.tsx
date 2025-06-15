@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -30,14 +29,12 @@ export const LandingHero = () => {
           <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
             <Link to="/demo">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                Explorar Demo
+                Demo
               </Button>
             </Link>
-            <Link to="/login">
-              <Button size="lg" variant="outline" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg transition-all duration-300">
-                Solicitar Demo Personalizada
-              </Button>
-            </Link>
+            <Button asChild size="lg" variant="outline" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg transition-all duration-300">
+              <a href="#contacto">Solicitar Demo Personalizada</a>
+            </Button>
           </div>
 
           {/* Trust indicators */}

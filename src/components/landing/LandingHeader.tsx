@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 export const LandingHeader = () => {
@@ -10,11 +11,8 @@ export const LandingHeader = () => {
         <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
           <nav className="flex items-center space-x-2">
             <Link to="/demo">
-              
-            </Link>
-            <Link to="/demo/login">
               <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
-                Probar demo privada
+                Demo
               </Button>
             </Link>
             <Button asChild className="bg-blue-600 hover:bg-blue-700" size="sm">
