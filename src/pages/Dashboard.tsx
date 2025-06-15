@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
@@ -11,6 +10,7 @@ import { StatCard } from '@/components/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useBrokerageConfig, defaultTerminology } from '@/hooks/useBrokerageConfig';
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
@@ -20,53 +20,56 @@ const Dashboard = () => {
   const { products, isLoading: loadingProducts } = useProducts();
   const { departments, loading: loadingDepartments } = useDepartments();
   const { news, loading: loadingNews } = useNews();
+  const { config } = useBrokerageConfig();
+
+  const t = config?.terminology || defaultTerminology;
 
   const stats = [
     {
-      title: 'Usuarios',
+      title: t.user.plural,
       value: users.length.toString(),
       icon: Users,
-      description: 'Total de usuarios registrados',
+      description: `Total de ${t.user.plural.toLowerCase()} registrados`,
       href: '/users',
       loading: loadingUsers
     },
     {
-      title: 'Delegaciones',
+      title: t.delegation.plural,
       value: delegations.length.toString(),
       icon: Building,
-      description: 'Delegaciones activas',
+      description: `${t.delegation.plural} activas`,
       href: '/delegations',
       loading: loadingDelegations
     },
     {
-      title: 'Compañías',
+      title: t.company.plural,
       value: companies.length.toString(),
       icon: Building2,
-      description: 'Compañías registradas',
+      description: `${t.company.plural} registradas`,
       href: '/companies',
       loading: loadingCompanies
     },
     {
-      title: 'Productos',
+      title: t.product.plural,
       value: products.length.toString(),
       icon: Package,
-      description: 'Productos disponibles',
+      description: `${t.product.plural} disponibles`,
       href: '/products',
       loading: loadingProducts
     },
     {
-      title: 'Departamentos',
+      title: t.department.plural,
       value: departments.length.toString(),
       icon: Briefcase,
-      description: 'Departamentos activos',
+      description: `${t.department.plural} activos`,
       href: '/departments',
       loading: loadingDepartments
     },
     {
-      title: 'Noticias',
+      title: t.news.plural,
       value: news.length.toString(),
       icon: Newspaper,
-      description: 'Noticias publicadas',
+      description: `${t.news.plural} publicadas`,
       href: '/news',
       loading: loadingNews
     }
@@ -111,8 +114,8 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Sistema integral para la gestión de usuarios, delegaciones, compañías, productos, 
-            departamentos y noticias de la correduría.
+            Sistema integral para la gestión de {t.user.plural.toLowerCase()}, {t.delegation.plural.toLowerCase()}, {t.company.plural.toLowerCase()}, {t.product.plural.toLowerCase()}, 
+            , {t.department.plural.toLowerCase()} y {t.news.plural.toLowerCase()} de la correduría.
           </p>
         </CardContent>
       </Card>

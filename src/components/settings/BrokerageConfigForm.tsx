@@ -1,14 +1,14 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Palette, Link } from "lucide-react";
+import { Building2, Palette, Link, BookText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
+import { useBrokerageConfig, Terminology, defaultTerminology } from "@/hooks/useBrokerageConfig";
 import { GeneralSettingsTab } from "./GeneralSettingsTab";
 import { AppearanceSettingsTab } from "./AppearanceSettingsTab";
 import { NavigationSettingsTab } from "./NavigationSettingsTab";
+import { TerminologySettingsTab } from "./TerminologySettingsTab";
 
 interface BrokerageConfig {
   id?: string;
@@ -21,6 +21,7 @@ interface BrokerageConfig {
   primary_color_dark: string;
   accent_color_light: string;
   accent_color_dark: string;
+  terminology: Terminology;
 }
 
 export const BrokerageConfigForm = () => {
@@ -37,6 +38,7 @@ export const BrokerageConfigForm = () => {
     primary_color_dark: "#FFFFFF",
     accent_color_light: "#FF0000",
     accent_color_dark: "#FF4444",
+    terminology: defaultTerminology,
   });
 
   useEffect(() => {
@@ -67,6 +69,7 @@ export const BrokerageConfigForm = () => {
           primary_color_dark: data.primary_color_dark || "#FFFFFF",
           accent_color_light: data.accent_color_light || "#FF0000",
           accent_color_dark: data.accent_color_dark || "#FF4444",
+          terminology: (data.terminology as Terminology) || defaultTerminology,
         });
       }
     } catch (error) {
@@ -94,6 +97,7 @@ export const BrokerageConfigForm = () => {
         primary_color_dark: config.primary_color_dark,
         accent_color_light: config.accent_color_light,
         accent_color_dark: config.accent_color_dark,
+        terminology: config.terminology,
         updated_at: new Date().toISOString(),
       };
 
@@ -135,7 +139,7 @@ export const BrokerageConfigForm = () => {
     }
   };
 
-  const updateConfig = (field: keyof BrokerageConfig, value: string) => {
+  const updateConfig = (field: keyof BrokerageConfig, value: any) => {
     setConfig(prev => ({ ...prev, [field]: value }));
   };
 
@@ -153,7 +157,7 @@ export const BrokerageConfigForm = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="general" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
             General
@@ -164,7 +168,11 @@ export const BrokerageConfigForm = () => {
           </TabsTrigger>
           <TabsTrigger value="navigation" className="flex items-center gap-2">
             <Link className="h-4 w-4" />
-            Navegación
+            Accesos directos
+          </TabsTrigger>
+          <TabsTrigger value="terminology" className="flex items-center gap-2">
+            <BookText className="h-4 w-4" />
+            Terminología
           </TabsTrigger>
         </TabsList>
 
@@ -178,6 +186,13 @@ export const BrokerageConfigForm = () => {
 
         <TabsContent value="navigation" className="space-y-6">
           <NavigationSettingsTab />
+        </TabsContent>
+
+        <TabsContent value="terminology" className="space-y-6">
+          <TerminologySettingsTab
+            terminology={config.terminology}
+            onTerminologyChange={(newTerminology) => updateConfig('terminology', newTerminology)}
+          />
         </TabsContent>
       </Tabs>
 

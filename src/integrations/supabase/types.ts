@@ -22,6 +22,7 @@ export type Database = {
           phone: string | null
           primary_color_dark: string
           primary_color_light: string
+          terminology: Json | null
           updated_at: string
         }
         Insert: {
@@ -36,6 +37,7 @@ export type Database = {
           phone?: string | null
           primary_color_dark?: string
           primary_color_light?: string
+          terminology?: Json | null
           updated_at?: string
         }
         Update: {
@@ -50,6 +52,7 @@ export type Database = {
           phone?: string | null
           primary_color_dark?: string
           primary_color_light?: string
+          terminology?: Json | null
           updated_at?: string
         }
         Relationships: []

@@ -1,44 +1,45 @@
 
-import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link, Settings, Briefcase } from "lucide-react";
+import { Users, User, Calendar, Newspaper, Edit, Link, Settings, Briefcase, Building, Building2, Package } from "lucide-react";
+import { Terminology } from "@/hooks/useBrokerageConfig";
 
-export const navigationItems = [
+export const getNavigationItems = (terminology: Terminology) => [
   {
-    title: "Dashboard",
+    title: terminology.dashboard?.singular || "Dashboard",
     url: "/",
     icon: Calendar
   },
   {
-    title: "Usuarios",
+    title: terminology.user?.plural || "Usuarios",
     url: "/users",
     icon: Users
   },
   {
-    title: "Delegaciones",
+    title: terminology.delegation?.plural || "Delegaciones",
     url: "/delegations",
-    icon: User
+    icon: Building
   },
   {
-    title: "Compañías",
+    title: terminology.company?.plural || "Compañías",
     url: "/companies",
-    icon: Link
+    icon: Building2
   },
   {
-    title: "Productos",
+    title: terminology.product?.plural || "Productos",
     url: "/products",
-    icon: Edit
+    icon: Package
   },
   {
-    title: "Departamentos",
+    title: terminology.department?.plural || "Departamentos",
     url: "/departments",
     icon: Briefcase
   },
   {
-    title: "Noticias",
+    title: terminology.news?.plural || "Noticias",
     url: "/news",
     icon: Newspaper
   },
   {
-    title: "Configuración",
+    title: terminology.settings?.plural || "Configuración",
     url: "/settings",
     icon: Settings
   }

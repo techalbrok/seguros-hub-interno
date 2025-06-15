@@ -1,20 +1,23 @@
-import { Users, Calendar, Settings } from "lucide-react";
 import { NavLink, useLocation, Link as RouterLink } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NavigationShortcuts } from "@/components/NavigationShortcuts";
-import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
+import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
 import { useAuth } from "@/hooks/useAuth";
-import { navigationItems } from "./navigationItems";
+import { getNavigationItems } from "./navigationItems";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
-  const { config } = useBrokerageConfig();
+  const { config, loading: configLoading } = useBrokerageConfig();
   const { isAdmin } = useAuth();
   const logoUrl = config?.logo_url;
   const brokerageName = config?.name || "Intranet Correduría";
+
+  const terminology = config?.terminology || defaultTerminology;
+  const navigationItems = getNavigationItems(terminology);
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -33,6 +36,30 @@ export function AppSidebar() {
   const visibleNavigationItems = isAdmin
     ? navigationItems
     : navigationItems.filter(item => item.url !== '/settings');
+
+  const renderMenuItems = () => {
+    if (configLoading) {
+      return Array.from({ length: 8 }).map((_, index) => (
+        <SidebarMenuItem key={index}>
+          <div className="flex items-center w-full h-10 px-3">
+            <Skeleton className="h-5 w-5 rounded-sm" />
+            {!collapsed && <Skeleton className="h-4 w-32 ml-3" />}
+          </div>
+        </SidebarMenuItem>
+      ));
+    }
+
+    return visibleNavigationItems.map(item => (
+      <SidebarMenuItem key={item.title}>
+        <SidebarMenuButton asChild className="h-10">
+          <NavLink to={item.url} className={getNavClass(item.url)}>
+            <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
+            {!collapsed && <span className="truncate">{item.title}</span>}
+          </NavLink>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    ));
+  };
 
   return (
     <Sidebar className={`${collapsed ? "w-14" : "w-64"} transition-all duration-300 border-r border-sidebar-border`} collapsible="icon">
@@ -58,16 +85,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {visibleNavigationItems.map(item => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="h-10">
-                    <NavLink to={item.url} className={getNavClass(item.url)}>
-                      <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
-                      {!collapsed && <span className="truncate">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {renderMenuItems()}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

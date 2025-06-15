@@ -4,10 +4,14 @@ import { BrokerageSettings } from "@/components/BrokerageSettings";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useBrokerageConfig, defaultTerminology } from "@/hooks/useBrokerageConfig";
 
 const Settings = () => {
   const { isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const { config } = useBrokerageConfig();
+
+  const t = config?.terminology || defaultTerminology;
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -28,7 +32,7 @@ const Settings = () => {
       <div>
         <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
           <SettingsIcon className="h-8 w-8" />
-          Configuración
+          {t.settings.singular}
         </h1>
         <p className="text-muted-foreground mt-2">
           Configuración general de la plataforma y personalización de la correduría

@@ -3,6 +3,24 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+export interface Terminology {
+  [key: string]: {
+    singular: string;
+    plural: string;
+  };
+}
+
+export const defaultTerminology: Terminology = {
+  dashboard: { singular: "Dashboard", plural: "Dashboard" },
+  user: { singular: "Usuario", plural: "Usuarios" },
+  delegation: { singular: "Delegación", plural: "Delegaciones" },
+  company: { singular: "Compañía", plural: "Compañías" },
+  product: { singular: "Producto", plural: "Productos" },
+  department: { singular: "Departamento", plural: "Departamentos" },
+  news: { singular: "Noticia", plural: "Noticias" },
+  settings: { singular: "Configuración", plural: "Configuración" },
+};
+
 interface BrokerageConfig {
   id?: string;
   name: string;
@@ -14,6 +32,7 @@ interface BrokerageConfig {
   primary_color_dark: string;
   accent_color_light: string;
   accent_color_dark: string;
+  terminology: Terminology;
 }
 
 export const useBrokerageConfig = () => {
@@ -44,6 +63,7 @@ export const useBrokerageConfig = () => {
           primary_color_dark: data.primary_color_dark || "#FFFFFF",
           accent_color_light: data.accent_color_light || "#FF0000",
           accent_color_dark: data.accent_color_dark || "#FF4444",
+          terminology: data.terminology as Terminology || defaultTerminology,
         });
       } else {
         // Si no hay configuración, usar valores por defecto
@@ -56,6 +76,7 @@ export const useBrokerageConfig = () => {
           primary_color_dark: "#FFFFFF",
           accent_color_light: "#FF0000",
           accent_color_dark: "#FF4444",
+          terminology: defaultTerminology,
         });
       }
     } catch (error) {
@@ -75,6 +96,7 @@ export const useBrokerageConfig = () => {
         primary_color_dark: "#FFFFFF",
         accent_color_light: "#FF0000",
         accent_color_dark: "#FF4444",
+        terminology: defaultTerminology,
       });
     } finally {
       setLoading(false);
