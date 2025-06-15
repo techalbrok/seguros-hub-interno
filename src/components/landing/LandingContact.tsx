@@ -25,7 +25,7 @@ export const LandingContact = ({
         
         <div className="max-w-2xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-700/50">
-            <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Más Información</h3>
+            
             <ContactForm onOpenLegalModal={onOpenLegalModal} />
           </div>
         </div>
