@@ -32,12 +32,11 @@ const fetchNotifications = async (userId: string): Promise<Notification[]> => {
 export const useNotifications = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const isDemo = window.location.pathname.startsWith('/demo');
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications', user?.id],
     queryFn: () => fetchNotifications(user!.id),
-    enabled: !!user && !isDemo,
+    enabled: !!user,
   });
 
   const markAsReadMutation = useMutation({
@@ -76,7 +75,7 @@ export const useNotifications = () => {
   });
 
   useEffect(() => {
-    if (!user || isDemo) return;
+    if (!user) return;
 
     const channel = supabase
       .channel('public:notifications')
@@ -99,7 +98,7 @@ export const useNotifications = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, queryClient, isDemo]);
+  }, [user, queryClient]);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 

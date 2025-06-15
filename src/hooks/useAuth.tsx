@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -24,13 +25,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const isDemo = window.location.pathname.startsWith('/demo');
-
-    const [user, setUser] = useState<User | null>(isDemo ? demoUser : null);
-    const [session, setSession] = useState<Session | null>(isDemo ? demoSession : null);
-    const [profile, setProfile] = useState<Profile | null>(isDemo ? { name: 'Admin Demo', avatarUrl: '/placeholder.svg' } : null);
-    const [role, setRole] = useState<UserRole>(isDemo ? 'admin' : null);
-    const [loading, setLoading] = useState(!isDemo); // No loading in demo
+    const [user, setUser] = useState<User | null>(null);
+    const [session, setSession] = useState<Session | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [role, setRole] = useState<UserRole>(null);
+    const [loading, setLoading] = useState(true);
     const { toast } = useToast();
 
     const fetchProfile = useCallback(async (userId: string) => {
@@ -65,8 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     useEffect(() => {
-        if (isDemo) return;
-
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event, session) => {
                 console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
@@ -91,7 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
 
         return () => subscription.unsubscribe();
-    }, [fetchProfile, isDemo]);
+    }, [fetchProfile]);
 
     const signIn = async (email: string, password: string) => {
         try {
@@ -136,16 +133,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const signOut = async (options?: { quiet?: boolean }) => {
-        if (isDemo) {
-            if (!options?.quiet) {
-                toast({
-                    title: "Sesión cerrada (Demo)",
-                    description: "Has salido del modo demo.",
-                });
-            }
-            window.location.href = '/landing';
-            return true;
-        }
         try {
           const { error } = await supabase.auth.signOut();
           
@@ -181,8 +168,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         session,
         profile,
-        role: isDemo ? 'admin' : role,
-        isAdmin: isDemo ? true : role === 'admin',
+        role,
+        isAdmin: role === 'admin',
         loading,
         signIn,
         signOut,
@@ -197,21 +184,4 @@ export const useAuth = () => {
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
-};
-
-const demoUser: User = {
-    id: 'demo-admin-user',
-    email: 'admin@demo.com',
-    app_metadata: { provider: 'email' },
-    user_metadata: { name: 'Admin Demo', avatar_url: '/placeholder.svg' },
-    aud: 'authenticated',
-    created_at: new Date().toISOString(),
-};
-
-const demoSession: Session = {
-    access_token: 'demo-access-token',
-    refresh_token: 'demo-refresh-token',
-    expires_in: 3600,
-    token_type: 'bearer',
-    user: demoUser,
 };

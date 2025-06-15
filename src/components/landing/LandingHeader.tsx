@@ -13,7 +13,7 @@ export const LandingHeader = () => {
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
-            <Link to="/demo/dashboard">
+            <Link to="/demo">
               <Button variant="outline">Explorar Demo</Button>
             </Link>
             <Button asChild className="bg-blue-600 hover:bg-blue-700">

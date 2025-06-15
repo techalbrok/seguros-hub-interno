@@ -2,8 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, CompanySpecification, SpecificationCategory } from "@/types";
-import { useDemoMode } from "./useDemoMode";
-import { v4 as uuidv4 } from 'uuid';
 
 export interface CreateCompanyData {
   name: string;
@@ -56,23 +54,14 @@ const transformDbRowToCompany = (row: any): Company => ({
 export const useCompanies = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isDemo, demoData, setDemoData } = useDemoMode();
 
   const {
     data: companies = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["companies", isDemo],
+    queryKey: ["companies"],
     queryFn: async () => {
-      if (isDemo) {
-        return demoData.companies.map(c => ({
-          ...c,
-          createdAt: new Date(c.createdAt),
-          updatedAt: new Date(c.updatedAt),
-        }));
-      }
-      
       console.log("Fetching companies...");
       
       const { data: user } = await supabase.auth.getUser();
@@ -101,18 +90,6 @@ export const useCompanies = () => {
 
   const createCompanyMutation = useMutation({
     mutationFn: async (companyData: CreateCompanyData) => {
-      if (isDemo) {
-        const newCompany: Company = {
-          id: `demo-company-${uuidv4()}`,
-          ...companyData,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          specifications: [],
-          specificationCategories: [],
-        };
-        setDemoData({ ...demoData, companies: [...demoData.companies, newCompany] });
-        return newCompany;
-      }
       console.log("Creating company:", companyData);
       
       const { data: user } = await supabase.auth.getUser();
@@ -159,18 +136,6 @@ export const useCompanies = () => {
 
   const updateCompanyMutation = useMutation({
     mutationFn: async (companyData: UpdateCompanyData) => {
-      if (isDemo) {
-        const updatedCompany: Company = {
-          ...(demoData.companies.find(c => c.id === companyData.id) as Company),
-          ...companyData,
-          updatedAt: new Date(),
-        };
-        setDemoData({
-          ...demoData,
-          companies: demoData.companies.map(c => c.id === companyData.id ? updatedCompany : c),
-        });
-        return updatedCompany;
-      }
       const { data, error } = await supabase
         .from("companies")
         .update({
@@ -207,10 +172,6 @@ export const useCompanies = () => {
 
   const deleteCompanyMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (isDemo) {
-        setDemoData({ ...demoData, companies: demoData.companies.filter(c => c.id !== id) });
-        return;
-      }
       const { error } = await supabase
         .from("companies")
         .delete()
@@ -280,14 +241,14 @@ export const useCompanies = () => {
 
   return {
     companies,
-    isLoading: isDemo ? false : isLoading,
+    isLoading,
     error,
     createCompany: createCompanyMutation.mutate,
     updateCompany: updateCompanyMutation.mutate,
     deleteCompany: deleteCompanyMutation.mutate,
     isCreating: createCompanyMutation.isPending,
     isUpdating: updateCompanyMutation.isPending,
-    isDeleting: isDemo ? false : deleteCompanyMutation.isPending,
+    isDeleting: deleteCompanyMutation.isPending,
     bulkCreateCompanies: bulkCreateCompaniesMutation.mutateAsync,
     isBulkCreating: bulkCreateCompaniesMutation.isPending,
   };

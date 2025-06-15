@@ -28,11 +28,7 @@ export const useSystemAlerts = () => {
         queryFn: fetchSystemAlerts,
     });
 
-    const isDemo = window.location.pathname.startsWith('/demo');
-
     useEffect(() => {
-        if (isDemo) return;
-
         const channel = supabase
             .channel('public:system_alerts')
             .on<SystemAlert>(
@@ -47,7 +43,7 @@ export const useSystemAlerts = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [queryClient, isDemo]);
+    }, [queryClient]);
 
     return { alerts, isLoading };
 };
