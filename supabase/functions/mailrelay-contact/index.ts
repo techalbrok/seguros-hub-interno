@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -77,7 +76,7 @@ serve(async (req) => {
       email: email.trim().toLowerCase(),
       name: name.trim(),
       group_ids: [groupId], // array de int
-      status: "pending",
+      status: "active", // Cambiado de "pending" a "active"
       send_confirmation_email: true,
     }
     console.log('Payload para MailRelay (POST /api/v1/subscribers):', subscriberPayload)
