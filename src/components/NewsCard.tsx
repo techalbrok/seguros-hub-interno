@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Edit, Trash2, Eye, User, Calendar, Building2, Package, Tag } from 'lucide-react';
 import { News } from '@/hooks/useNews';
+import { useAuth } from '@/hooks/useAuth';
 
 interface NewsCardProps {
   news: News;
@@ -19,6 +20,10 @@ export const NewsCard: React.FC<NewsCardProps> = ({
   onDelete,
   onView
 }) => {
+  const { permissions } = useAuth();
+  const canEdit = permissions?.news?.canEdit;
+  const canDelete = permissions?.news?.canDelete;
+
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -81,8 +86,16 @@ export const NewsCard: React.FC<NewsCardProps> = ({
             </div>
             <div className="flex flex-wrap gap-2 shrink-0">
               <Button variant="outline" size="sm" onClick={() => onView(news)}><Eye className="h-4 w-4 mr-1" />Ver</Button>
-              <Button variant="outline" size="sm" onClick={() => onEdit(news)}><Edit className="h-4 w-4 mr-1" />Editar</Button>
-              <Button variant="destructive-outline" size="sm" onClick={() => onDelete(news.id)}><Trash2 className="h-4 w-4 mr-1" />Eliminar</Button>
+              {canEdit && (
+                <Button variant="outline" size="sm" onClick={() => onEdit(news)}>
+                  <Edit className="h-4 w-4 mr-1" />Editar
+                </Button>
+              )}
+              {canDelete && (
+                <Button variant="destructive-outline" size="sm" onClick={() => onDelete(news.id)}>
+                  <Trash2 className="h-4 w-4 mr-1" />Eliminar
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -90,3 +103,4 @@ export const NewsCard: React.FC<NewsCardProps> = ({
     </Card>
   );
 };
+
