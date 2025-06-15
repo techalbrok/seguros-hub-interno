@@ -4,11 +4,21 @@ import { User as UserType, Delegation } from "@/types";
 import { UserListPage } from "@/components/users/UserListPage";
 import { useToast } from "@/components/ui/use-toast";
 import { CreateUserData } from "@/hooks/users";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
 
 const CreateUserPage = lazy(() => import('@/components/users/CreateUserPage').then(m => ({ default: m.CreateUserPage })));
 const EditUserPage = lazy(() => import('@/components/users/EditUserPage').then(m => ({ default: m.EditUserPage })));
 const UserDetailPage = lazy(() => import('@/components/users/UserDetailPage').then(m => ({ default: m.UserDetailPage })));
-
 
 type PageMode = 'list' | 'create' | 'detail' | 'edit';
 
@@ -17,6 +27,9 @@ const Users = () => {
   const [pageMode, setPageMode] = useState<PageMode>('list');
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const { toast } = useToast();
+
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | string[] | null>(null);
 
   const handleCreateUser = async (userData: CreateUserData) => {
     const success = await createUser(userData);
@@ -72,17 +85,34 @@ const Users = () => {
     setPageMode('detail');
   };
 
-  const handleDeleteUser = async (userId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-      await deleteUser(userId);
+  const handleDeleteRequest = (userId: string) => {
+    setDeleteTarget(userId);
+    setIsConfirmDeleteDialogOpen(true);
+  };
+  
+  const handleBulkDeleteRequest = (userIds: string[]) => {
+    setDeleteTarget(userIds);
+    setIsConfirmDeleteDialogOpen(true);
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+  
+    if (Array.isArray(deleteTarget)) {
+      await Promise.all(deleteTarget.map(id => deleteUser(id)));
+      toast({
+        title: 'Usuarios eliminados',
+        description: `${deleteTarget.length} usuarios eliminados con éxito.`
+      });
+    } else {
+      await deleteUser(deleteTarget);
+      // Toast for single user deletion is handled in useUsers hook
     }
+  
+    setDeleteTarget(null);
+    setIsConfirmDeleteDialogOpen(false);
   };
 
-  const handleBulkDelete = async (userIds: string[]) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar ${userIds.length} usuarios?`)) {
-      await Promise.all(userIds.map(id => deleteUser(id)));
-    }
-  };
 
   const SuspenseFallback = () => (
     <div className="flex items-center justify-center h-64">
@@ -136,7 +166,7 @@ const Users = () => {
           delegations={delegations}
           onBack={() => setPageMode('list')}
           onEdit={handleEditUser}
-          onDelete={handleDeleteUser}
+          onDelete={handleDeleteRequest}
         />
       );
     }
@@ -149,17 +179,42 @@ const Users = () => {
         onSetPageMode={() => setPageMode('create')}
         onViewUser={handleViewUser}
         onEditUser={handleEditUser}
-        onDeleteUser={handleDeleteUser}
-        onBulkDelete={handleBulkDelete}
+        onDeleteUser={handleDeleteRequest}
+        onBulkDelete={handleBulkDeleteRequest}
         onBulkCreate={handleBulkCreateUsers}
       />
     );
   };
 
   return (
-    <Suspense fallback={<SuspenseFallback />}>
-      {pageContent()}
-    </Suspense>
+    <>
+      <Suspense fallback={<SuspenseFallback />}>
+        {pageContent()}
+      </Suspense>
+      <AlertDialog open={isConfirmDeleteDialogOpen} onOpenChange={setIsConfirmDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás realmente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Esta acción no se puede deshacer. Esto eliminará permanentemente ${
+                Array.isArray(deleteTarget)
+                  ? `a ${deleteTarget.length} usuarios`
+                  : 'al usuario'
+              }.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteTarget(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className={buttonVariants({ variant: "destructive" })}
+              onClick={handleConfirmDelete}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
