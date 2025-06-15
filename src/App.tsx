@@ -1,3 +1,5 @@
+
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,19 +8,21 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { AuthGuard } from "@/components/AuthGuard";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import UpdatePassword from "./pages/UpdatePassword";
-import Users from "./pages/Users";
-import Delegations from "./pages/Delegations";
-import NotFound from "./pages/NotFound";
-import Companies from "./pages/Companies";
-import Products from "./pages/Products";
-import Departments from "./pages/Departments";
-import News from "./pages/News";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
+import { PageLoader } from "@/components/PageLoader";
+
+const Index = lazy(() => import("./pages/Index"));
+const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const UpdatePassword = lazy(() => import("./pages/UpdatePassword"));
+const Users = lazy(() => import("./pages/Users"));
+const Delegations = lazy(() => import("./pages/Delegations"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Companies = lazy(() => import("./pages/Companies"));
+const Products = lazy(() => import("./pages/Products"));
+const Departments = lazy(() => import("./pages/Departments"));
+const News = lazy(() => import("./pages/News"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 const queryClient = new QueryClient();
 
@@ -29,69 +33,71 @@ const App = () => (
       <Sonner />
       <ThemeProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
-            <Route path="/" element={<Index />} />
-            <Route path="/profile" element={
-              <AuthGuard>
-                <Layout>
-                  <Profile />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/settings" element={
-              <AuthGuard>
-                <Layout>
-                  <Settings />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/users" element={
-              <AuthGuard>
-                <Layout>
-                  <Users />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/delegations" element={
-              <AuthGuard>
-                <Layout>
-                  <Delegations />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/companies" element={
-              <AuthGuard>
-                <Layout>
-                  <Companies />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/products" element={
-              <AuthGuard>
-                <Layout>
-                  <Products />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/departments" element={
-              <AuthGuard>
-                <Layout>
-                  <Departments />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/news" element={
-              <AuthGuard>
-                <Layout>
-                  <News />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/update-password" element={<UpdatePassword />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/profile" element={
+                <AuthGuard>
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/settings" element={
+                <AuthGuard>
+                  <Layout>
+                    <Settings />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/users" element={
+                <AuthGuard>
+                  <Layout>
+                    <Users />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/delegations" element={
+                <AuthGuard>
+                  <Layout>
+                    <Delegations />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/companies" element={
+                <AuthGuard>
+                  <Layout>
+                    <Companies />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/products" element={
+                <AuthGuard>
+                  <Layout>
+                    <Products />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/departments" element={
+                <AuthGuard>
+                  <Layout>
+                    <Departments />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="/news" element={
+                <AuthGuard>
+                  <Layout>
+                    <News />
+                  </Layout>
+                </AuthGuard>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </ThemeProvider>
     </TooltipProvider>

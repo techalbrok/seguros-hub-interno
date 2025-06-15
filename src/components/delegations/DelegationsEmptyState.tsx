@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Building, Plus } from "lucide-react";
+import { memo } from 'react';
 
 interface DelegationsEmptyStateProps {
   t: { plural: string, singular: string };
@@ -8,7 +9,7 @@ interface DelegationsEmptyStateProps {
   onCreateClick: () => void;
 }
 
-export const DelegationsEmptyState = ({ t, hasSearchTerm, onCreateClick }: DelegationsEmptyStateProps) => (
+export const DelegationsEmptyState = memo(({ t, hasSearchTerm, onCreateClick }: DelegationsEmptyStateProps) => (
   <div className="text-center py-12">
     <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
     <h3 className="text-lg font-medium text-sidebar-primary dark:text-white mb-2">
@@ -27,4 +28,6 @@ export const DelegationsEmptyState = ({ t, hasSearchTerm, onCreateClick }: Deleg
       </Button>
     )}
   </div>
-);
+));
+
+DelegationsEmptyState.displayName = "DelegationsEmptyState";

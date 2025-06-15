@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Upload, Plus } from "lucide-react";
+import { memo } from 'react';
 
 interface DelegationsPageHeaderProps {
   t: { plural: string, singular: string };
@@ -8,7 +9,7 @@ interface DelegationsPageHeaderProps {
   onCreateClick: () => void;
 }
 
-export const DelegationsPageHeader = ({ t, onImportClick, onCreateClick }: DelegationsPageHeaderProps) => (
+export const DelegationsPageHeader = memo(({ t, onImportClick, onCreateClick }: DelegationsPageHeaderProps) => (
   <div className="flex items-center justify-between">
     <div>
       <h1 className="text-2xl font-bold text-sidebar-primary dark:text-white">
@@ -29,4 +30,6 @@ export const DelegationsPageHeader = ({ t, onImportClick, onCreateClick }: Deleg
       </Button>
     </div>
   </div>
-);
+));
+
+DelegationsPageHeader.displayName = "DelegationsPageHeader";

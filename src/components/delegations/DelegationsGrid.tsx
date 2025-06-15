@@ -1,6 +1,7 @@
 
 import { Delegation } from "@/types";
 import { DelegationCard } from "@/components/DelegationCard";
+import { memo } from 'react';
 
 interface DelegationsGridProps {
   delegations: Delegation[];
@@ -9,7 +10,7 @@ interface DelegationsGridProps {
   onView: (delegation: Delegation) => void;
 }
 
-export const DelegationsGrid = ({ delegations, onEdit, onDelete, onView }: DelegationsGridProps) => (
+export const DelegationsGrid = memo(({ delegations, onEdit, onDelete, onView }: DelegationsGridProps) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {delegations.map((delegation) => (
       <DelegationCard
@@ -21,4 +22,6 @@ export const DelegationsGrid = ({ delegations, onEdit, onDelete, onView }: Deleg
       />
     ))}
   </div>
-);
+));
+
+DelegationsGrid.displayName = "DelegationsGrid";
