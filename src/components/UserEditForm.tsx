@@ -1,12 +1,11 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { User, Delegation } from "@/types";
+import { PermissionsFormSection, sections } from "./users/PermissionsFormSection";
 
 interface UserEditFormProps {
   user: User;
@@ -19,15 +18,6 @@ interface UserEditFormProps {
   }) => Promise<boolean>;
   onCancel: () => void;
 }
-
-const sections = [
-  { key: 'users', label: 'Usuarios' },
-  { key: 'delegations', label: 'Delegaciones' },
-  { key: 'companies', label: 'Compañías' },
-  { key: 'products', label: 'Productos' },
-  { key: 'department_content', label: 'Contenido por Departamento' },
-  { key: 'news', label: 'Noticias' },
-];
 
 export const UserEditForm = ({ user, delegations, onSubmit, onCancel }: UserEditFormProps) => {
   const [formData, setFormData] = useState({
@@ -70,29 +60,16 @@ export const UserEditForm = ({ user, delegations, onSubmit, onCancel }: UserEdit
   const handleRoleChange = (role: 'admin' | 'user') => {
     setFormData({ ...formData, role });
     
-    // Si es admin, dar todos los permisos
-    if (role === 'admin') {
-      const adminPermissions: Record<string, any> = {};
-      sections.forEach(section => {
-        adminPermissions[section.key] = {
-          canCreate: true,
-          canEdit: true,
-          canDelete: true,
-          canView: true,
-        };
-      });
-      setPermissions(adminPermissions);
-    }
-  };
-
-  const updatePermission = (section: string, permission: string, value: boolean) => {
-    setPermissions(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [permission]: value,
-      },
-    }));
+    const newPermissions: Record<string, any> = {};
+    sections.forEach(section => {
+      newPermissions[section.key] = {
+        canCreate: role === 'admin',
+        canEdit: role === 'admin',
+        canDelete: role === 'admin',
+        canView: true,
+      };
+    });
+    setPermissions(newPermissions);
   };
 
   return (
@@ -160,66 +137,11 @@ export const UserEditForm = ({ user, delegations, onSubmit, onCancel }: UserEdit
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-sidebar-primary dark:text-white">
-              Permisos por Sección
-            </h3>
-            
-            <div className="grid grid-cols-1 gap-4">
-              {sections.map((section) => (
-                <Card key={section.key} className="p-4">
-                  <h4 className="font-medium mb-3 text-sidebar-primary dark:text-white">
-                    {section.label}
-                  </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`${section.key}-view`}
-                        checked={permissions[section.key]?.canView || false}
-                        onCheckedChange={(checked) => updatePermission(section.key, 'canView', checked as boolean)}
-                      />
-                      <Label htmlFor={`${section.key}-view`} className="text-sm">
-                        Ver
-                      </Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`${section.key}-create`}
-                        checked={permissions[section.key]?.canCreate || false}
-                        onCheckedChange={(checked) => updatePermission(section.key, 'canCreate', checked as boolean)}
-                      />
-                      <Label htmlFor={`${section.key}-create`} className="text-sm">
-                        Crear
-                      </Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`${section.key}-edit`}
-                        checked={permissions[section.key]?.canEdit || false}
-                        onCheckedChange={(checked) => updatePermission(section.key, 'canEdit', checked as boolean)}
-                      />
-                      <Label htmlFor={`${section.key}-edit`} className="text-sm">
-                        Editar
-                      </Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`${section.key}-delete`}
-                        checked={permissions[section.key]?.canDelete || false}
-                        onCheckedChange={(checked) => updatePermission(section.key, 'canDelete', checked as boolean)}
-                      />
-                      <Label htmlFor={`${section.key}-delete`} className="text-sm">
-                        Eliminar
-                      </Label>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <PermissionsFormSection
+            permissions={permissions}
+            onPermissionsChange={setPermissions}
+            disabled={formData.role === 'admin'}
+          />
 
           <div className="flex space-x-3">
             <Button type="submit" disabled={loading} className="corporate-button">
