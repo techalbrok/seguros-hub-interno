@@ -18,9 +18,14 @@ serve(async (req) => {
 
     const apiKey = Deno.env.get('MAILRELAY_API_KEY')
     const hostname = Deno.env.get('MAILRELAY_ACCOUNT_HOSTNAME')
+    const groupId = Deno.env.get('MAILRELAY_GROUP_ID')
 
     if (!apiKey || !hostname) {
       throw new Error('MailRelay API key or hostname not configured.')
+    }
+    
+    if (!groupId) {
+      throw new Error('MailRelay Group ID not configured.')
     }
 
     // Clean up hostname to ensure we only have the account part
@@ -41,6 +46,9 @@ serve(async (req) => {
       body: JSON.stringify({
         email: email,
         name: name,
+        groups: [parseInt(groupId, 10)],
+        // By not specifying 'status', MailRelay's default double opt-in is used,
+        // which sends a confirmation email.
       }),
     })
 
