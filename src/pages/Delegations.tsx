@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useDelegations } from "@/hooks/useDelegations";
 import { DelegationForm } from "@/components/DelegationForm";
@@ -59,10 +58,18 @@ const Delegations = () => {
     setDeleteDialogOpen(true);
   };
 
+  const handleBackFromDetail = () => {
+    setSelectedDelegation(null);
+    setShowDetail(false);
+  };
+  
   const confirmDelete = async () => {
     if (delegationToDelete) {
       await deleteDelegation(delegationToDelete);
       setDeleteDialogOpen(false);
+      if (selectedDelegation?.id === delegationToDelete) {
+        handleBackFromDetail();
+      }
       setDelegationToDelete(null);
     }
   };
@@ -92,6 +99,41 @@ const Delegations = () => {
 
   if (loading) {
     return <DelegationsLoading t={t} />;
+  }
+
+  if (showDetail && selectedDelegation) {
+    return (
+      <div className="space-y-6">
+        <DelegationDetail
+          delegation={selectedDelegation}
+          onBack={handleBackFromDetail}
+          onEdit={() => handleEdit(selectedDelegation)}
+          onDelete={() => handleDelete(selectedDelegation.id)}
+        />
+        <DelegationForm
+          delegation={editingDelegation}
+          open={showForm}
+          onOpenChange={setShowForm}
+          onSubmit={handleFormSubmit}
+        />
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Eliminar {t.singular.toLowerCase()}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta acción no se puede deshacer. La {t.singular.toLowerCase()} será eliminada permanentemente.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete}>
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    );
   }
 
   return (
@@ -146,13 +188,6 @@ const Delegations = () => {
         open={showForm}
         onOpenChange={setShowForm}
         onSubmit={handleFormSubmit}
-      />
-
-      <DelegationDetail
-        delegation={selectedDelegation}
-        open={showDetail}
-        onOpenChange={setShowDetail}
-        onEdit={() => handleEdit(selectedDelegation!)}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
