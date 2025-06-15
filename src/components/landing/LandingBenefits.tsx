@@ -5,37 +5,37 @@ const benefits = [
   { 
     icon: DatabaseZap, 
     title: "Centralización de información", 
-    description: "Accede a todos tus datos críticos desde un único lugar seguro y organizado.",
+    description: "Consolida en un solo lugar la información de tus equipos, sucursales, proveedores y productos para un acceso rápido y unificado.",
     gradient: "from-blue-500 to-cyan-500"
   },
   { 
     icon: Zap, 
     title: "Mejora en la productividad", 
-    description: "Automatiza tareas, optimiza flujos de trabajo y potencia el rendimiento de tu equipo.",
+    description: "Reduce el tiempo de búsqueda de información al tener todos los datos de contacto y catálogos en un solo lugar, agilizando la operativa diaria.",
     gradient: "from-yellow-500 to-orange-500"
   },
   { 
     icon: MessagesSquare, 
     title: "Comunicación interna efectiva", 
-    description: "Fomenta la colaboración y mantén a todos informados con herramientas integradas.",
+    description: "Utiliza el portal de noticias para compartir comunicados importantes, manteniendo a toda la organización informada de las últimas novedades.",
     gradient: "from-green-500 to-emerald-500"
   },
   { 
     icon: Scaling, 
     title: "Escalabilidad empresarial", 
-    description: "Una plataforma que crece contigo, adaptándose a tus necesidades futuras.",
+    description: "Añade nuevos usuarios, sucursales o productos a medida que tu empresa crece, sin necesidad de cambiar de sistema.",
     gradient: "from-purple-500 to-indigo-500"
   },
   { 
     icon: ShieldCheck, 
     title: "Seguridad y control de accesos", 
-    description: "Protege tu información con roles, permisos y los más altos estándares de seguridad.",
+    description: "Define roles y permisos específicos para cada usuario, asegurando que cada persona acceda únicamente a la información que le corresponde.",
     gradient: "from-red-500 to-pink-500"
   },
   { 
     icon: GitMerge, 
     title: "Integración de procesos", 
-    description: "Conecta diferentes áreas de tu empresa para una gestión más fluida y eficiente.",
+    description: "Facilita la colaboración entre departamentos al compartir una única fuente de verdad sobre proveedores, productos y estructura organizativa.",
     gradient: "from-teal-500 to-blue-500"
   },
 ];
