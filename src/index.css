@@ -135,7 +135,7 @@
   }
 
   .stat-card {
-    @apply enhanced-card group overflow-hidden relative;
+    @apply enhanced-card overflow-hidden relative;
   }
 
   .stat-card::before {
