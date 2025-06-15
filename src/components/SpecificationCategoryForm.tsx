@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useSpecificationCategories } from "@/hooks/useSpecificationCategories";
 import type { SpecificationCategory } from "@/types";
 
@@ -61,6 +61,9 @@ export const SpecificationCategoryForm = ({
           <DialogTitle>
             {category ? "Editar Categoría" : "Nueva Categoría"}
           </DialogTitle>
+          <DialogDescription>
+            {category ? "Actualiza el nombre de la categoría." : "Crea una nueva categoría para agrupar especificaciones."}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import type { Company } from "@/types";
 
 interface CompanyFormProps {
@@ -67,6 +67,9 @@ export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }
           <DialogTitle>
             {company ? "Editar Compañía" : "Nueva Compañía"}
           </DialogTitle>
+          <DialogDescription>
+            {company ? "Actualiza los detalles de la compañía." : "Añade una nueva compañía al sistema."}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
