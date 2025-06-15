@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Users as UsersIcon, Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { UserImportDialog } from './UserImportDialog';
 import { CreateUserData } from '@/hooks/users/types';
 import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
-
 interface UserListPageProps {
   users: User[];
   delegations: Delegation[];
@@ -35,23 +33,21 @@ export const UserListPage = ({
   const {
     permissions
   } = useAuth();
-  const { config: brokerageConfig } = useBrokerageConfig();
+  const {
+    config: brokerageConfig
+  } = useBrokerageConfig();
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const canCreateUsers = permissions?.users?.canCreate ?? false;
   const canEditUsers = permissions?.users?.canEdit ?? false;
   const canDeleteUsers = permissions?.users?.canDelete ?? false;
-
-  const userTerminology = brokerageConfig?.terminology?.user || { singular: "Usuario", plural: "Usuarios" };
-
+  const userTerminology = brokerageConfig?.terminology?.user || {
+    singular: "Usuario",
+    plural: "Usuarios"
+  };
   return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          {brokerageConfig && brokerageConfig.logo_url && (
-            <div className="flex items-center gap-3 mb-2">
-              <img src={brokerageConfig.logo_url} alt={`Logo de ${brokerageConfig.name}`} className="h-8 w-auto object-contain" />
-              <h2 className="text-lg font-semibold text-sidebar-primary dark:text-white">{brokerageConfig.name}</h2>
-            </div>
-          )}
+          {brokerageConfig && brokerageConfig.logo_url}
           <h1 className="text-2xl sm:text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
             <UsersIcon className="h-7 w-7 sm:h-8 sm:w-8" />
             Gestión de {userTerminology.plural}
@@ -74,15 +70,7 @@ export const UserListPage = ({
 
       <UsersStats users={users} />
 
-      <UsersListView 
-        users={users} 
-        delegations={delegations} 
-        loading={loading} 
-        onViewUser={onViewUser} 
-        onEditUser={canEditUsers ? onEditUser : undefined} 
-        onDeleteUser={canDeleteUsers ? onDeleteUser : undefined} 
-        onBulkDelete={canDeleteUsers ? onBulkDelete : undefined} 
-      />
+      <UsersListView users={users} delegations={delegations} loading={loading} onViewUser={onViewUser} onEditUser={canEditUsers ? onEditUser : undefined} onDeleteUser={canDeleteUsers ? onDeleteUser : undefined} onBulkDelete={canDeleteUsers ? onBulkDelete : undefined} />
 
       <UserImportDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onBulkCreate={onBulkCreate} delegations={delegations} />
     </div>;
