@@ -1,8 +1,5 @@
-
 import React from 'react';
-
-export const PrivacyPolicyText = () => (
-  <>
+export const PrivacyPolicyText = () => <>
     <p><strong>Última actualización:</strong> 15 de junio de 2025</p>
     
     <h2>1. Responsable del Tratamiento</h2>
@@ -16,7 +13,7 @@ export const PrivacyPolicyText = () => (
     </ul>
     
     <h2>3. ¿Con qué finalidad tratamos sus datos?</h2>
-    <p>Tratamos los datos que nos proporciona con el fin de enviarle nuestro boletín de noticias, que incluye novedades, consejos y ofertas especiales sobre nuestros productos y servicios.</p>
+    <p>Tratamos los datos que nos proporciona con el fin de enviarle información sobre nuestro HubCore, nuestro boletín de noticias, que incluye novedades, consejos y ofertas especiales sobre nuestros productos y servicios.</p>
     
     <h2>4. Legitimación para el tratamiento de datos</h2>
     <p>La base legal para el tratamiento de sus datos es su consentimiento explícito, que nos otorga al marcar la casilla de aceptación de la política de privacidad y hacer clic en el botón de suscripción.</p>
@@ -29,11 +26,8 @@ export const PrivacyPolicyText = () => (
     
     <h2>7. Sus derechos</h2>
     <p>Usted tiene derecho a acceder, rectificar, suprimir sus datos, así como otros derechos como se explica en la información adicional, contactándonos a través de un correo electrónico a legal@hubcore.com.</p>
-  </>
-);
-
-export const CookiesPolicyText = () => (
-  <>
+  </>;
+export const CookiesPolicyText = () => <>
     <p><strong>Última actualización:</strong> 15 de junio de 2025</p>
     
     <h2>1. ¿Qué son las cookies?</h2>
@@ -55,11 +49,8 @@ export const CookiesPolicyText = () => (
       <li>Internet Explorer</li>
       <li>Safari</li>
     </ul>
-  </>
-);
-
-export const LegalNoticeText = () => (
-  <>
+  </>;
+export const LegalNoticeText = () => <>
     <p><strong>Última actualización:</strong> 15 de junio de 2025</p>
     
     <h2>1. Datos Identificativos</h2>
@@ -80,6 +71,4 @@ export const LegalNoticeText = () => (
     
     <h2>4. Limitación de Responsabilidad</h2>
     <p>HubCore no se hace responsable de los daños y perjuicios de cualquier naturaleza que pudieran ocasionar, a título enunciativo: errores u omisiones en los contenidos, falta de disponibilidad del portal o la transmisión de virus o programas maliciosos en los contenidos, a pesar de haber adoptado todas las medidas tecnológicas necesarias para evitarlo.</p>
-  </>
-);
-
+  </>;
