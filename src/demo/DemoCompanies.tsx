@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CompanyForm } from "@/components/CompanyForm";
@@ -21,18 +20,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { AppPagination } from "@/components/ui/AppPagination";
 import { CompanyCardSkeleton, CompanyListSkeleton } from "@/components/skeletons/CompanySkeletons";
 import { useDemoAuth } from "./DemoAuthContext";
+import type { Company } from "@/types";
 
 // Tipo de compañía para la demo, compatible con los componentes reales
-interface DemoCompany {
-  id: string;
-  name: string;
-  commercialManager: string;
-  managerEmail: string;
-  commercialWebsite: string;
-  brokerAccess: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+type DemoCompany = Company;
 
 // Clave para guardar en localStorage
 const DEMO_COMPANIES_KEY = "demo_companies_list";
@@ -48,6 +39,8 @@ const demoDefaultCompanies: DemoCompany[] = [
     brokerAccess: "Acceso Mediadores A",
     createdAt: new Date(),
     updatedAt: new Date(),
+    specifications: [],
+    specificationCategories: [],
   },
   { 
     id: "2", 
@@ -58,12 +51,14 @@ const demoDefaultCompanies: DemoCompany[] = [
     brokerAccess: "Acceso Mediadores B",
     createdAt: new Date(),
     updatedAt: new Date(),
+    specifications: [],
+    specificationCategories: [],
   },
 ];
 
 type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
-type CompanyFormData = Omit<DemoCompany, "id" | "createdAt" | "updatedAt">;
+type CompanyFormData = Omit<DemoCompany, "id" | "createdAt" | "updatedAt" | "specifications" | "specificationCategories">;
 
 export const DemoCompanies = () => {
   const { user: authUser } = useDemoAuth();
@@ -117,6 +112,8 @@ export const DemoCompanies = () => {
       id: Math.random().toString(36).slice(2),
       createdAt: new Date(),
       updatedAt: new Date(),
+      specifications: [],
+      specificationCategories: [],
     };
     setCompanies(c => [...c, newCompany]);
     setShowForm(false);
