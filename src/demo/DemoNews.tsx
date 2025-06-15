@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import {
   AlertDialog,
@@ -40,6 +39,7 @@ const demoCompanies: Company[] = [
         brokerAccess: 'Acceso Corredores',
         commercialManager: 'Juan Pérez',
         managerEmail: 'juan.perez@lider.com',
+        isFeatured: true,
         specifications: [],
         specificationCategories: [],
         createdAt: new Date('2022-01-01'),
@@ -52,6 +52,7 @@ const demoCompanies: Company[] = [
         brokerAccess: 'Portal Mediadores',
         commercialManager: 'Ana García',
         managerEmail: 'ana.garcia@proteccionglobal.com',
+        isFeatured: false,
         specifications: [],
         specificationCategories: [],
         createdAt: new Date('2021-03-15'),
