@@ -28,7 +28,7 @@ type CurrentView = "main" | "detail";
 type DisplayMode = "list" | "grid";
 
 // Define the type for company data used in forms, excluding auto-generated fields
-type CompanyFormData = Omit<Company, "id" | "createdAt" | "updatedAt">;
+type CompanyFormData = Omit<Company, "id" | "createdAt" | "updatedAt" | "specifications" | "specificationCategories">;
 export default function Companies() {
   const {
     companies,
@@ -194,6 +194,7 @@ export default function Companies() {
           company={editingCompany || undefined}
           onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
           isLoading={isCreating || isUpdating}
+          isAdmin={isAdmin}
         />
         {deleteConfirmationDialog}
       </div>
@@ -265,6 +266,7 @@ export default function Companies() {
         company={editingCompany || undefined}
         onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
         isLoading={isCreating || isUpdating}
+        isAdmin={isAdmin}
       />
       {deleteConfirmationDialog}
       <CompanyImportDialog

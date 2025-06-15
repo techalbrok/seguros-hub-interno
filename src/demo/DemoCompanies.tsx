@@ -41,6 +41,7 @@ const demoDefaultCompanies: DemoCompany[] = [
     updatedAt: new Date(),
     specifications: [],
     specificationCategories: [],
+    isFeatured: true,
   },
   { 
     id: "2", 
@@ -53,6 +54,7 @@ const demoDefaultCompanies: DemoCompany[] = [
     updatedAt: new Date(),
     specifications: [],
     specificationCategories: [],
+    isFeatured: false,
   },
 ];
 
@@ -114,6 +116,7 @@ export const DemoCompanies = () => {
       updatedAt: new Date(),
       specifications: [],
       specificationCategories: [],
+      isFeatured: data.isFeatured || false,
     };
     setCompanies(c => [...c, newCompany]);
     setShowForm(false);
@@ -208,6 +211,7 @@ export const DemoCompanies = () => {
           onOpenChange={onFormOpenChange}
           company={editingCompany || undefined}
           onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
+          isAdmin={isAdmin}
         />}
         {deleteConfirmationDialog}
       </div>
@@ -259,6 +263,7 @@ export const DemoCompanies = () => {
         onOpenChange={onFormOpenChange}
         company={editingCompany || undefined}
         onSubmit={editingCompany ? handleUpdateCompany : handleCreateCompany}
+        isAdmin={isAdmin}
       />}
       {deleteConfirmationDialog}
     </div>

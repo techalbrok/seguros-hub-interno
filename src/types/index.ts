@@ -36,6 +36,7 @@ export interface Company {
   brokerAccess: string;
   commercialManager: string;
   managerEmail: string;
+  isFeatured: boolean;
   specifications: CompanySpecification[];
   specificationCategories: SpecificationCategory[];
   createdAt: Date;

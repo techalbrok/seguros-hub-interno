@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Company } from "@/types";
 
 interface CompanyFormProps {
@@ -16,17 +17,20 @@ interface CompanyFormProps {
     brokerAccess: string;
     commercialManager: string;
     managerEmail: string;
+    isFeatured?: boolean;
   }) => void;
   isLoading?: boolean;
+  isAdmin?: boolean;
 }
 
-export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }: CompanyFormProps) => {
+export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading, isAdmin }: CompanyFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     commercialWebsite: "",
     brokerAccess: "",
     commercialManager: "",
     managerEmail: "",
+    isFeatured: false,
   });
 
   useEffect(() => {
@@ -38,6 +42,7 @@ export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }
           brokerAccess: company.brokerAccess,
           commercialManager: company.commercialManager,
           managerEmail: company.managerEmail,
+          isFeatured: company.isFeatured || false,
         });
       } else {
         setFormData({
@@ -46,6 +51,7 @@ export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }
           brokerAccess: "",
           commercialManager: "",
           managerEmail: "",
+          isFeatured: false,
         });
       }
     }
@@ -56,7 +62,7 @@ export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }
     onSubmit(formData);
   };
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -131,6 +137,19 @@ export const CompanyForm = ({ company, open, onOpenChange, onSubmit, isLoading }
               />
             </div>
           </div>
+          
+          {isAdmin && (
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox
+                id="isFeatured"
+                checked={formData.isFeatured}
+                onCheckedChange={(checked) => handleChange("isFeatured", !!checked)}
+              />
+              <Label htmlFor="isFeatured" className="font-normal">
+                Marcar como compañía destacada para el dashboard
+              </Label>
+            </div>
+          )}
 
           <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>

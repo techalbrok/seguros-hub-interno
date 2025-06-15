@@ -9,6 +9,7 @@ export interface CreateCompanyData {
   brokerAccess: string;
   commercialManager: string;
   managerEmail: string;
+  isFeatured?: boolean;
 }
 
 interface UpdateCompanyData extends CreateCompanyData {
@@ -41,6 +42,7 @@ const transformDbRowToCompany = (row: any): Company => ({
   brokerAccess: row.broker_access,
   commercialManager: row.commercial_manager,
   managerEmail: row.manager_email,
+  isFeatured: row.is_featured,
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
   specifications: Array.isArray(row.company_specifications)
@@ -106,6 +108,7 @@ export const useCompanies = () => {
           broker_access: companyData.brokerAccess,
           commercial_manager: companyData.commercialManager,
           manager_email: companyData.managerEmail,
+          is_featured: companyData.isFeatured,
         }])
         .select()
         .single();
@@ -144,6 +147,7 @@ export const useCompanies = () => {
           broker_access: companyData.brokerAccess,
           commercial_manager: companyData.commercialManager,
           manager_email: companyData.managerEmail,
+          is_featured: companyData.isFeatured,
           updated_at: new Date().toISOString(),
         })
         .eq("id", companyData.id)
@@ -209,6 +213,7 @@ export const useCompanies = () => {
         broker_access: c.brokerAccess,
         commercial_manager: c.commercialManager,
         manager_email: c.managerEmail,
+        is_featured: c.isFeatured,
       }));
 
       const { data, error } = await supabase

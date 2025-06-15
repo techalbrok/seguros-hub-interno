@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 export const FeaturedCompaniesWidget = () => {
     const { companies, isLoading } = useCompanies();
 
-    const featuredCompanies = companies.slice(0, 3);
+    const featuredCompanies = companies.filter(company => company.isFeatured).slice(0, 3);
 
     return (
         <DashboardWidget
@@ -34,7 +34,7 @@ export const FeaturedCompaniesWidget = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-sm text-muted-foreground text-center py-4">No hay compañías para mostrar.</p>
+                    <p className="text-sm text-muted-foreground text-center py-4">No hay compañías destacadas para mostrar.</p>
                 )}
             </div>
         </DashboardWidget>

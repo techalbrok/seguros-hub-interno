@@ -102,6 +102,7 @@ export type Database = {
           commercial_website: string | null
           created_at: string
           id: string
+          is_featured: boolean
           manager_email: string
           name: string
           updated_at: string
@@ -112,6 +113,7 @@ export type Database = {
           commercial_website?: string | null
           created_at?: string
           id?: string
+          is_featured?: boolean
           manager_email: string
           name: string
           updated_at?: string
@@ -122,6 +124,7 @@ export type Database = {
           commercial_website?: string | null
           created_at?: string
           id?: string
+          is_featured?: boolean
           manager_email?: string
           name?: string
           updated_at?: string
