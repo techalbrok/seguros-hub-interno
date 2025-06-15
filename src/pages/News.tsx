@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +14,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { NewsCardSkeleton } from '@/components/skeletons/NewsSkeletons';
 import { AppPagination } from '@/components/ui/AppPagination';
 import { useAuth } from '@/hooks/useAuth';
+import { useBrokerageConfig } from '@/hooks/useBrokerageConfig';
 
 type ViewMode = 'list' | 'create' | 'edit' | 'detail';
 
@@ -41,8 +41,10 @@ const NewsPage = () => {
   const { categories } = useProductCategories();
   const { products } = useProducts();
   const { permissions } = useAuth();
+  const { config: brokerageConfig } = useBrokerageConfig();
 
   const canCreateNews = permissions?.news?.canCreate ?? false;
+  const newsTerminology = brokerageConfig?.terminology?.news || { singular: "Noticia", plural: "Noticias" };
 
   const filteredNews = news.filter(item => {
     const searchTermMatch = !searchTerm ||
@@ -125,15 +127,21 @@ const NewsPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">Noticias</h1>
+          {brokerageConfig && brokerageConfig.logo_url && (
+            <div className="flex items-center gap-3 mb-2">
+              <img src={brokerageConfig.logo_url} alt={`Logo de ${brokerageConfig.name}`} className="h-8 w-auto object-contain" />
+              <h2 className="text-lg font-semibold text-sidebar-primary dark:text-white">{brokerageConfig.name}</h2>
+            </div>
+          )}
+          <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">{newsTerminology.plural}</h1>
           <p className="text-muted-foreground mt-2">
-            Administra las noticias de la correduría
+            Administra las {newsTerminology.plural.toLowerCase()} de la correduría
           </p>
         </div>
         {canCreateNews && (
           <Button onClick={handleCreate} className="shrink-0">
             <Plus className="w-4 h-4 mr-2" />
-            Nueva Noticia
+            Nueva {newsTerminology.singular}
           </Button>
         )}
       </div>

@@ -8,6 +8,8 @@ import { User, Delegation } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import { UserImportDialog } from './UserImportDialog';
 import { CreateUserData } from '@/hooks/users/types';
+import { useBrokerageConfig } from "@/hooks/useBrokerageConfig";
+
 interface UserListPageProps {
   users: User[];
   delegations: Delegation[];
@@ -33,20 +35,29 @@ export const UserListPage = ({
   const {
     permissions
   } = useAuth();
+  const { config: brokerageConfig } = useBrokerageConfig();
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const canCreateUsers = permissions?.users?.canCreate ?? false;
   const canEditUsers = permissions?.users?.canEdit ?? false;
   const canDeleteUsers = permissions?.users?.canDelete ?? false;
 
+  const userTerminology = brokerageConfig?.terminology?.user || { singular: "Usuario", plural: "Usuarios" };
+
   return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
+          {brokerageConfig && brokerageConfig.logo_url && (
+            <div className="flex items-center gap-3 mb-2">
+              <img src={brokerageConfig.logo_url} alt={`Logo de ${brokerageConfig.name}`} className="h-8 w-auto object-contain" />
+              <h2 className="text-lg font-semibold text-sidebar-primary dark:text-white">{brokerageConfig.name}</h2>
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
             <UsersIcon className="h-7 w-7 sm:h-8 sm:w-8" />
-            Gestión de Usuarios
+            Gestión de {userTerminology.plural}
           </h1>
           <p className="text-muted-foreground mt-2">
-            Administra usuarios, roles y permisos del sistema
+            Administra {userTerminology.plural.toLowerCase()}, roles y permisos del sistema
           </p>
         </div>
         {canCreateUsers && <div className="flex flex-col sm:flex-row gap-2 self-start sm:self-auto">
@@ -56,7 +67,7 @@ export const UserListPage = ({
             </Button>
             <Button onClick={onSetPageMode}>
               <Plus className="h-4 w-4 mr-2" />
-              Crear Usuario
+              Crear {userTerminology.singular}
             </Button>
           </div>}
       </div>
