@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 interface DemoUser {
   email: string;
   name: string;
+  role: 'admin' | 'user';
 }
 
 interface DemoAuthContextType {
@@ -25,7 +26,7 @@ export const DemoAuthProvider = ({ children }: { children: React.ReactNode }) =>
   const login = async (email: string, password: string) => {
     // Para la demo, un login fijo
     if (email === "demo@correo.com" && password === "demo123") {
-      const demoUser = { email, name: "Usuario Demo" };
+      const demoUser: DemoUser = { email, name: "Usuario Demo", role: "admin" };
       setUser(demoUser);
       localStorage.setItem("demo_user", JSON.stringify(demoUser));
       return true;
