@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Globe, Mail, User, Eye } from "lucide-react";
 import type { Company } from "@/types";
+import { useAuth } from "@/hooks/useAuth"; // ← Importamos useAuth
 
 /**
  * Props for the CompanyCard component.
@@ -12,9 +13,9 @@ interface CompanyCardProps {
   /** The company object containing details to display. */
   company: Company;
   /** Callback function to handle editing the company. */
-  onEdit: (company: Company) => void;
+  onEdit?: (company: Company) => void;
   /** Callback function to handle deleting the company. */
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
   /** Callback function to handle viewing the company details. */
   onView: (company: Company) => void;
 }
@@ -25,6 +26,7 @@ interface CompanyCardProps {
  * actions to view, edit, or delete the company.
  */
 export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardProps) => {
+  const { isAdmin } = useAuth(); // ← Saber si es admin
 
   return (
     <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/50 flex flex-col h-full animate-fade-in group">
@@ -71,24 +73,28 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
             <Eye className="h-4 w-4 mr-1" />
             Ver
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(company)}
-            className="flex-1 min-w-[80px] h-10"
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            Editar
-          </Button>
-          <Button
-            variant="destructive-outline"
-            size="sm"
-            onClick={() => onDelete(company.id)}
-            className="flex-1 min-w-[80px] h-10"
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Eliminar
-          </Button>
+          {isAdmin && onEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(company)}
+              className="flex-1 min-w-[80px] h-10"
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Editar
+            </Button>
+          )}
+          {isAdmin && onDelete && (
+            <Button
+              variant="destructive-outline"
+              size="sm"
+              onClick={() => onDelete(company.id)}
+              className="flex-1 min-w-[80px] h-10"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Eliminar
+            </Button>
+          )}
         </div>
       </div>
     </Card>

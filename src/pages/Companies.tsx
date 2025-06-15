@@ -42,10 +42,10 @@ export default function Companies() {
     bulkCreateCompanies,
   } = useCompanies();
 
-  const { permissions } = useAuth();
-  const canCreate = permissions?.companies?.canCreate ?? false;
-  const canEdit = permissions?.companies?.canEdit ?? false;
-  const canDelete = permissions?.companies?.canDelete ?? false;
+  const { permissions, isAdmin } = useAuth();
+  const canCreate = isAdmin;
+  const canEdit = isAdmin;
+  const canDelete = isAdmin;
 
   const [currentView, setCurrentView] = useState<CurrentView>("main");
   const [displayMode, setDisplayMode] = useState<DisplayMode>("grid");
