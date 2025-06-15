@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,8 @@ import { DelegationForm } from "@/components/DelegationForm";
 import { DelegationDetail } from "@/components/DelegationDetail";
 import { DelegationCard } from "@/components/DelegationCard";
 import { Delegation } from "@/types";
+import { useToast } from "@/components/ui/use-toast";
+import { DelegationImportDialog, CreateDelegationData } from "@/components/delegations/DelegationImportDialog";
 import { 
   Plus, 
   Search, 
@@ -24,7 +25,8 @@ import {
   User,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Upload
 } from "lucide-react";
 
 const Delegations = () => {
@@ -37,6 +39,8 @@ const Delegations = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [delegationToDelete, setDelegationToDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const { toast } = useToast();
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   const filteredDelegations = delegations.filter(delegation =>
     delegation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,6 +84,21 @@ const Delegations = () => {
     } else {
       return await createDelegation(data);
     }
+  };
+
+  const handleBulkCreateDelegations = async (delegationsData: CreateDelegationData[]) => {
+    const results = await Promise.allSettled(delegationsData.map(delegationData => createDelegation(delegationData)));
+  
+    const successfulCreations = results.filter(r => r.status === 'fulfilled' && r.value).length;
+    const failedCreations = results.length - successfulCreations;
+  
+    toast({
+      title: "Importación completada",
+      description: `${successfulCreations} de ${delegationsData.length} delegaciones creadas exitosamente. ${failedCreations > 0 ? `Fallaron ${failedCreations}.` : ''}`,
+      variant: failedCreations > 0 ? 'destructive' : 'default'
+    });
+  
+    return { successfulCreations, failedCreations };
   };
 
   if (loading) {
@@ -183,10 +202,16 @@ const Delegations = () => {
             Gestiona las delegaciones y su información
           </p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nueva Delegación
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Importar CSV
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nueva Delegación
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -286,6 +311,12 @@ const Delegations = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      <DelegationImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        onBulkCreate={handleBulkCreateDelegations}
+      />
     </div>
   );
 };
