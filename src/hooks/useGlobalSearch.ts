@@ -12,7 +12,6 @@ export interface SearchResult {
 }
 
 const fetchSearchableData = async (): Promise<SearchResult[]> => {
-    console.log("Fetching global search data...");
     try {
         const [usersRes, companiesRes, productsRes, newsRes, delegationsRes] = await Promise.all([
             supabase.from('profiles').select('id, name').limit(100),
@@ -28,8 +27,6 @@ const fetchSearchableData = async (): Promise<SearchResult[]> => {
         if (newsRes.error) throw newsRes.error;
         if (delegationsRes.error) throw delegationsRes.error;
         
-        console.log("Global search data fetched successfully.");
-
         const users = (usersRes.data || []).map((u): SearchResult => ({ id: u.id, title: u.name, type: 'Usuario', url: '/users', icon: Users }));
         const companies = (companiesRes.data || []).map((c): SearchResult => ({ id: c.id, title: c.name, type: 'Compañía', url: '/companies', icon: Building2 }));
         const products = (productsRes.data || []).map((p): SearchResult => ({ id: p.id, title: p.title, type: 'Producto', url: '/products', icon: Package }));
@@ -38,7 +35,6 @@ const fetchSearchableData = async (): Promise<SearchResult[]> => {
 
         return [...users, ...companies, ...products, ...news, ...delegations];
     } catch(error) {
-        console.error("Error fetching global search data:", error);
         return [];
     }
 }

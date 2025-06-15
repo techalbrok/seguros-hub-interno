@@ -11,8 +11,6 @@ export const useProductQueries = () => {
   } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      console.log("Fetching products...");
-      
       const { data, error } = await supabase
         .from("products")
         .select(`
@@ -22,11 +20,9 @@ export const useProductQueries = () => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching products:", error);
         throw error;
       }
 
-      console.log("Products fetched successfully:", data);
       return data.map(transformDbRowToProduct);
     },
   });

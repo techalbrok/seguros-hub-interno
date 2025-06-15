@@ -122,7 +122,6 @@ export const UserProfile = () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
       toast({
         title: "Error",
         description: "No se pudo cargar el perfil de usuario",
@@ -151,7 +150,6 @@ export const UserProfile = () => {
         description: "Tu foto de perfil se ha actualizado.",
       });
     } catch (error) {
-      console.error('Error updating avatar:', error);
       toast({
         title: "Error",
         description: "No se pudo actualizar el avatar",
@@ -184,7 +182,6 @@ export const UserProfile = () => {
         description: "Tu perfil se ha actualizado correctamente",
       });
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "No se pudo actualizar el perfil",

@@ -12,8 +12,6 @@ export const useUserQueries = () => {
   } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      console.log("Fetching users...");
-      
       // Fetch profiles with delegations
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
@@ -26,7 +24,6 @@ export const useUserQueries = () => {
         `);
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
         throw profilesError;
       }
 
@@ -36,7 +33,6 @@ export const useUserQueries = () => {
         .select('*');
 
       if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
         throw rolesError;
       }
 
@@ -46,7 +42,6 @@ export const useUserQueries = () => {
         .select('*');
 
       if (permissionsError) {
-        console.error('Error fetching permissions:', permissionsError);
         throw permissionsError;
       }
 
@@ -91,7 +86,6 @@ export const useUserQueries = () => {
         };
       }) || [];
 
-      console.log('Users fetched successfully:', combinedUsers);
       return combinedUsers;
     },
   });
@@ -107,7 +101,6 @@ export const useUserQueries = () => {
         .order('name');
 
       if (error) {
-        console.error('Error fetching delegations:', error);
         throw error;
       }
 
@@ -125,7 +118,6 @@ export const useUserQueries = () => {
         updatedAt: new Date(delegation.updated_at),
       })) || [];
 
-      console.log('Delegations fetched successfully:', delegationsData);
       return delegationsData;
     },
   });

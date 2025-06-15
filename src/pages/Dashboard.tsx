@@ -10,6 +10,7 @@ import { useNews } from '@/hooks/useNews';
 import { StatCard } from '@/components/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
@@ -25,37 +26,43 @@ const Dashboard = () => {
       title: 'Usuarios',
       value: users.length.toString(),
       icon: Users,
-      description: 'Total de usuarios registrados'
+      description: 'Total de usuarios registrados',
+      href: '/users'
     },
     {
       title: 'Delegaciones',
       value: delegations.length.toString(),
       icon: Building,
-      description: 'Delegaciones activas'
+      description: 'Delegaciones activas',
+      href: '/delegations'
     },
     {
       title: 'Compañías',
       value: companies.length.toString(),
       icon: Building2,
-      description: 'Compañías registradas'
+      description: 'Compañías registradas',
+      href: '/companies'
     },
     {
       title: 'Productos',
       value: products.length.toString(),
       icon: Package,
-      description: 'Productos disponibles'
+      description: 'Productos disponibles',
+      href: '/products'
     },
     {
       title: 'Departamentos',
       value: departments.length.toString(),
       icon: Briefcase,
-      description: 'Departamentos activos'
+      description: 'Departamentos activos',
+      href: '/departments'
     },
     {
       title: 'Noticias',
       value: news.length.toString(),
       icon: Newspaper,
-      description: 'Noticias publicadas'
+      description: 'Noticias publicadas',
+      href: '/news'
     }
   ];
 
@@ -72,13 +79,18 @@ const Dashboard = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
-          <StatCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            description={stat.description}
-          />
+          <Link 
+            to={stat.href} 
+            key={stat.title} 
+            className="block transition-transform duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg"
+          >
+            <StatCard
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              description={stat.description}
+            />
+          </Link>
         ))}
       </div>
 
