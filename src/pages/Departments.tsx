@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -7,6 +8,7 @@ import { DepartmentForm } from '@/components/DepartmentForm';
 import { DepartmentContentForm } from '@/components/DepartmentContentForm';
 import { DepartmentContentDetail } from '@/components/DepartmentContentDetail';
 import { DepartmentsTabs } from './DepartmentsTabs';
+import { useAuth } from '@/hooks/useAuth'; // <--- Nuevo import
 
 type ViewType = 'departments' | 'content' | 'detail';
 
@@ -32,6 +34,8 @@ const Departments = () => {
     updateContent,
     uploadImage
   } = useDepartmentContent();
+
+  const { isAdmin } = useAuth(); // <--- Saber si es admin
 
   const handleDepartmentSubmit = async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
     if (editingDepartment) {
@@ -139,16 +143,18 @@ const Departments = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Departamentos</h1>
         <div className="flex gap-2">
-          {view === 'content' && (
+          {view === 'content' && isAdmin && (
             <Button onClick={() => setShowContentForm(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Nueva Entrada
             </Button>
           )}
-          <Button onClick={() => setShowDepartmentForm(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Departamento
-          </Button>
+          {isAdmin && (
+            <Button onClick={() => setShowDepartmentForm(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Departamento
+            </Button>
+          )}
         </div>
       </div>
 
@@ -158,7 +164,7 @@ const Departments = () => {
         selectedDepartmentId={selectedDepartmentId}
         onClearDepartmentFilter={handleClearDepartmentFilter}
         onViewContent={handleViewContent}
-        onEditDepartment={handleEditDepartment}
+        onEditDepartment={isAdmin ? handleEditDepartment : undefined}  // Solo admins pueden editar departamento
         onEditContent={handleEditContent}
         onViewContentDetail={handleViewContentDetail}
       />
@@ -175,3 +181,4 @@ const Departments = () => {
 };
 
 export default Departments;
+

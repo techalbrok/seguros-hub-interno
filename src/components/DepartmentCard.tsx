@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Mail, Edit, Trash2, FileText } from 'lucide-react';
 import { Department } from '@/hooks/useDepartments';
+import { useAuth } from "@/hooks/useAuth"; // <--- Nuevo import
 
 interface DepartmentCardProps {
   department: Department;
@@ -21,6 +22,8 @@ export const DepartmentCard: React.FC<DepartmentCardProps> = ({
   onViewContent,
   contentCount = 0
 }) => {
+  const { isAdmin } = useAuth();
+
   return (
     <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/50 flex flex-col h-full animate-fade-in group">
       <CardHeader>
@@ -73,26 +76,31 @@ export const DepartmentCard: React.FC<DepartmentCardProps> = ({
             <FileText className="w-4 h-4 mr-1" />
             Contenido
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(department)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Edit className="w-4 h-4 mr-1" />
-            Editar
-          </Button>
-          <Button
-            variant="destructive-outline"
-            size="sm"
-            onClick={() => onDelete(department.id)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Eliminar
-          </Button>
+          {isAdmin && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(department)}
+                className="flex-1 min-w-[80px]"
+              >
+                <Edit className="w-4 h-4 mr-1" />
+                Editar
+              </Button>
+              <Button
+                variant="destructive-outline"
+                size="sm"
+                onClick={() => onDelete(department.id)}
+                className="flex-1 min-w-[80px]"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Eliminar
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </Card>
   );
 };
+
