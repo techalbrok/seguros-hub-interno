@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -32,11 +31,10 @@ export const useNavigationShortcuts = () => {
 
       if (error) throw error;
       setShortcuts((data as unknown as NavigationShortcut[]) || []);
-    } catch (error) {
-      console.error('Error fetching shortcuts:', error);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "No se pudieron cargar los accesos directos",
+        title: "Error de navegación",
+        description: "No se pudieron cargar los accesos directos. Intenta recargar la página o comunícate con soporte.",
         variant: "destructive",
       });
     } finally {
@@ -60,11 +58,10 @@ export const useNavigationShortcuts = () => {
         title: "Acceso directo creado",
         description: "El acceso directo se ha creado correctamente",
       });
-    } catch (error) {
-      console.error('Error creating shortcut:', error);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "No se pudo crear el acceso directo",
+        title: "Error al crear acceso directo",
+        description: error?.message || "No se pudo crear el acceso directo",
         variant: "destructive",
       });
     } finally {
@@ -89,11 +86,10 @@ export const useNavigationShortcuts = () => {
         title: "Acceso directo actualizado",
         description: "El acceso directo se ha actualizado correctamente",
       });
-    } catch (error) {
-      console.error('Error updating shortcut:', error);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "No se pudo actualizar el acceso directo",
+        title: "Error al actualizar acceso directo",
+        description: error?.message || "No se pudo actualizar el acceso directo",
         variant: "destructive",
       });
     } finally {
@@ -115,11 +111,10 @@ export const useNavigationShortcuts = () => {
         title: "Acceso directo eliminado",
         description: "El acceso directo se ha eliminado correctamente",
       });
-    } catch (error) {
-      console.error('Error deleting shortcut:', error);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "No se pudo eliminar el acceso directo",
+        title: "Error al eliminar acceso directo",
+        description: error?.message || "No se pudo eliminar el acceso directo",
         variant: "destructive",
       });
     }
