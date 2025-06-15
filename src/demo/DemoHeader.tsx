@@ -50,7 +50,7 @@ export const DemoHeader = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer" asChild>
-                <Link to="/profile">
+                <Link to="/demo/profile">
                   Mi Perfil
                 </Link>
               </DropdownMenuItem>
