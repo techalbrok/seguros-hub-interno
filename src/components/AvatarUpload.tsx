@@ -5,12 +5,23 @@ import { UploadCloud, Loader2 } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 
+/**
+ * Props for the AvatarUpload component.
+ */
 interface AvatarUploadProps {
+  /** The URL of the current avatar image, if one exists. */
   currentAvatarUrl?: string | null;
+  /** Callback function invoked with the new image URL after a successful upload. */
   onUploadComplete: (url: string) => void;
+  /** The name of the user or entity, used for avatar fallback initials. */
   name: string;
 }
 
+/**
+ * A component for uploading and displaying an avatar image.
+ * It shows a preview of the new image, handles the upload process,
+ * and displays fallback initials if no image is available.
+ */
 export const AvatarUpload = ({ currentAvatarUrl, onUploadComplete, name }: AvatarUploadProps) => {
   const { uploadImage, uploading } = useImageUpload('avatars');
   const [preview, setPreview] = useState<string | null>(currentAvatarUrl || null);

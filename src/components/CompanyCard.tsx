@@ -5,13 +5,25 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Globe, Mail, User, Eye } from "lucide-react";
 import type { Company } from "@/types";
 
+/**
+ * Props for the CompanyCard component.
+ */
 interface CompanyCardProps {
+  /** The company object containing details to display. */
   company: Company;
+  /** Callback function to handle editing the company. */
   onEdit: (company: Company) => void;
+  /** Callback function to handle deleting the company. */
   onDelete: (id: string) => void;
+  /** Callback function to handle viewing the company details. */
   onView: (company: Company) => void;
 }
 
+/**
+ * A card component that displays a summary of a company's information.
+ * It includes the company name, website, contact details, and provides
+ * actions to view, edit, or delete the company.
+ */
 export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardProps) => {
 
   return (

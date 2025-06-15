@@ -5,17 +5,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 
+/**
+ * Props for the EntitySelector component.
+ * @template T - The type of the entity being selected.
+ */
 interface EntitySelectorProps<T> {
+  /** The label for the selector input. */
   label: string;
+  /** The placeholder text for the select trigger. */
   placeholder: string;
+  /** The list of all available entities. */
   entities: T[];
+  /** An array of IDs of the currently selected entities. */
   selectedIds: string[];
+  /** A function to get a unique ID from an entity object. */
   getEntityId: (entity: T) => string;
+  /** A function to get the display name from an entity object. */
   getEntityName: (entity: T) => string;
+  /** Callback function invoked when a new entity is selected from the dropdown. */
   onAdd: (id: string) => void;
+  /** Callback function invoked when a selected entity's remove icon is clicked. */
   onRemove: (id: string) => void;
 }
 
+/**
+ * A generic component for selecting one or more entities from a list.
+ * Displays selected entities as badges with a remove button.
+ * @template T - The type of the entity.
+ */
 export const EntitySelector = <T,>({
   label,
   placeholder,

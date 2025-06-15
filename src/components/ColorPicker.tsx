@@ -4,11 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+/**
+ * Props for the ColorPicker component.
+ */
 interface ColorPickerProps {
+  /** The currently selected color in hex format (e.g., "#RRGGBB"). */
   color: string;
+  /** Callback function invoked when a new color is selected. */
   onChange: (color: string) => void;
 }
 
+/**
+ * A component that allows users to select a color.
+ * It provides a popover with a color palette, a native color picker,
+ * and an input field for manual hex code entry.
+ */
 export const ColorPicker = ({ color, onChange }: ColorPickerProps) => {
   const [open, setOpen] = useState(false);
   const [tempColor, setTempColor] = useState(color);
