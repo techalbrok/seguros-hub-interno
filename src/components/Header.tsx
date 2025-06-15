@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationsDropdown } from "./notifications/NotificationsDropdown";
+import { SidebarTrigger } from "./ui/sidebar";
 
 export const Header = () => {
   const {
@@ -39,7 +40,8 @@ export const Header = () => {
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="flex items-center justify-between h-full px-4 sm:px-6">
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <SidebarTrigger className="h-8 w-8 sm:hidden" />
           {logoUrl && <img src={logoUrl} alt={`Logo de ${brokerageName}`} className="h-8 w-auto object-contain" />}
           <h1 className="text-sidebar-primary dark:text-white text-lg font-thin hidden sm:block">
             {brokerageName}
