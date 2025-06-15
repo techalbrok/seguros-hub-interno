@@ -7,12 +7,19 @@ import { v4 as uuidv4 } from 'uuid';
 export interface Department {
   id: string;
   name: string;
-  responsible_name: string;
-  responsible_email?: string;
+  responsibleName: string;
+  responsibleEmail?: string;
   description?: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+const fromDepartment = (department: Partial<Department>) => ({
+    name: department.name,
+    responsible_name: department.responsibleName,
+    responsible_email: department.responsibleEmail,
+    description: department.description,
+});
 
 export const useDepartments = () => {
   const { toast } = useToast();
@@ -25,7 +32,7 @@ export const useDepartments = () => {
     error,
   } = useQuery({
     queryKey: ["departments", isDemo],
-    queryFn: async () => {
+    queryFn: async (): Promise<Department[]> => {
       if (isDemo) {
         return demoData.departments;
       }
@@ -42,18 +49,26 @@ export const useDepartments = () => {
       }
 
       console.log("Departments fetched successfully:", data);
-      return data as Department[];
+      return data.map(d => ({
+          id: d.id,
+          name: d.name,
+          responsibleName: d.responsible_name,
+          responsibleEmail: d.responsible_email,
+          description: d.description,
+          createdAt: d.created_at,
+          updatedAt: d.updated_at,
+      }));
     },
   });
 
   const createDepartmentMutation = useMutation({
-    mutationFn: async (departmentData: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (departmentData: Omit<Department, 'id' | 'createdAt' | 'updatedAt'>) => {
       if (isDemo) {
         const newDepartment: Department = {
           ...departmentData,
           id: `demo-dept-${uuidv4()}`,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
         setDemoData({ ...demoData, departments: [...demoData.departments, newDepartment] });
         return newDepartment;
@@ -62,7 +77,7 @@ export const useDepartments = () => {
       
       const { data, error } = await supabase
         .from('departments')
-        .insert([departmentData])
+        .insert([fromDepartment(departmentData)])
         .select()
         .single();
 
@@ -93,7 +108,7 @@ export const useDepartments = () => {
   const updateDepartmentMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Department> }) => {
       if (isDemo) {
-        const updatedDepartment = { ...demoData.departments.find(d => d.id === id), ...updates, updated_at: new Date().toISOString() } as Department;
+        const updatedDepartment = { ...demoData.departments.find(d => d.id === id), ...updates, updatedAt: new Date().toISOString() } as Department;
         setDemoData({
           ...demoData,
           departments: demoData.departments.map(d => d.id === id ? updatedDepartment : d),
@@ -102,7 +117,7 @@ export const useDepartments = () => {
       }
       const { data, error } = await supabase
         .from('departments')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...fromDepartment(updates), updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();
@@ -162,7 +177,7 @@ export const useDepartments = () => {
     loading: isDemo ? false : loading,
     error,
     fetchDepartments: () => queryClient.invalidateQueries({ queryKey: ["departments", isDemo] }),
-    createDepartment: async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
+    createDepartment: async (data: Omit<Department, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
         await createDepartmentMutation.mutateAsync(data);
         return true;

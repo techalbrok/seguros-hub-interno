@@ -1,4 +1,3 @@
-
 import { useProductQueries } from './products/useProductQueries';
 import { useProductSubscriptions } from './products/useProductSubscriptions';
 import { useProductMutations } from './products/useProductMutations';
@@ -25,8 +24,8 @@ export const useProducts = () => {
        const newProduct: Product = {
         ...data,
         id: `demo-product-${uuidv4()}`,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         documents: [],
       };
       setDemoData({ ...demoData, products: [...demoData.products, newProduct] });
@@ -36,7 +35,7 @@ export const useProducts = () => {
        setDemoData({
         ...demoData,
         products: demoData.products.map(p =>
-          p.id === data.id ? { ...p, ...data, updated_at: new Date().toISOString() } : p
+          p.id === data.id ? { ...p, ...data, updatedAt: new Date().toISOString() } : p
         ),
       });
     };

@@ -17,8 +17,8 @@ export const useUsers = () => {
         email: data.email,
         delegationId: data.delegationId,
         role: data.role,
-        avatar_url: '/placeholder.svg',
-        created_at: new Date().toISOString(),
+        avatarUrl: '/placeholder.svg',
+        createdAt: new Date().toISOString(),
       };
       setDemoData({ ...demoData, users: [...demoData.users, newUser] });
       return true;

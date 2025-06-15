@@ -1,3 +1,4 @@
+
 import { useNews as useRealNews, CreateNewsData, News } from './news';
 import { useDemoMode } from './useDemoMode';
 import { useToast } from './use-toast';
@@ -11,12 +12,12 @@ export const useNews = () => {
     
     if (isDemo) {
         const createNews = async (data: CreateNewsData) => {
-            const newNews = {
+            const newNews: News = {
                 id: `demo-news-${uuidv4()}`,
                 ...data,
-                author_id: user?.id || 'demo-user-admin',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
+                authorId: user?.id || 'demo-user-admin',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
                 author: { name: profile?.name || 'Admin Demo' }
             };
             setDemoData({ ...demoData, news: [newNews, ...demoData.news] });
@@ -26,7 +27,7 @@ export const useNews = () => {
         const updateNews = async (id: string, data: Partial<News>) => {
             setDemoData({
                 ...demoData,
-                news: demoData.news.map(n => n.id === id ? { ...n, ...data, updated_at: new Date().toISOString() } : n)
+                news: demoData.news.map(n => n.id === id ? { ...n, ...data, updatedAt: new Date().toISOString() } : n)
             });
             return true;
         };
