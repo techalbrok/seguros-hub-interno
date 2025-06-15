@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductForm } from "@/components/ProductForm";
@@ -21,6 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -31,6 +33,10 @@ const Products = () => {
   const [showDetail, setShowDetail] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+
+  const { permissions } = useAuth();
+  // Define los permisos específicos de productos (con fallback por si falta info)
+  const prodPerm = permissions?.products ?? { canCreate: false, canEdit: false, canDelete: false, canView: true };
 
   const {
     products,
@@ -195,6 +201,7 @@ const Products = () => {
                 viewType={viewType}
                 onViewTypeChange={setViewType}
                 onAddNew={handleAddNew}
+                canCreate={prodPerm.canCreate}
               />
 
               <ProductList
@@ -207,6 +214,8 @@ const Products = () => {
                 onDelete={handleDelete}
                 onView={handleView}
                 categories={productCategories}
+                canEdit={prodPerm.canEdit}
+                canDelete={prodPerm.canDelete}
               />
             </div>
           </div>
@@ -230,9 +239,11 @@ const Products = () => {
         onOpenChange={onDetailOpenChange}
         product={selectedProduct}
         onEdit={handleEdit}
+        canEdit={prodPerm.canEdit}
       />
 
       {deleteConfirmationDialog}
     </div>;
 };
 export default Products;
+

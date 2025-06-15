@@ -7,8 +7,8 @@ import type { Product, ProductCategory } from "@/types";
 
 interface ProductListItemProps {
   product: Product;
-  onEdit: (product: Product) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (product: Product) => void;
+  onDelete?: (id: string) => void;
   onView: (product: Product) => void;
   categories: ProductCategory[];
 }
@@ -39,23 +39,27 @@ export const ProductListItem = ({ product, onEdit, onDelete, onView, categories 
             <Eye className="h-4 w-4" />
             <span className="sr-only">Ver</span>
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(product)}
-          >
-            <Edit className="h-4 w-4" />
-            <span className="sr-only">Editar</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(product.id)}
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Eliminar</span>
-          </Button>
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(product)}
+            >
+              <Edit className="h-4 w-4" />
+              <span className="sr-only">Editar</span>
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(product.id)}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Eliminar</span>
+            </Button>
+          )}
         </div>
       </TableCell>
     </TableRow>

@@ -9,6 +9,7 @@ interface ProductControlsProps {
   viewType: 'grid' | 'list';
   onViewTypeChange: (view: 'grid' | 'list') => void;
   onAddNew: () => void;
+  canCreate?: boolean;
 }
 
 export const ProductControls = ({
@@ -17,6 +18,7 @@ export const ProductControls = ({
   viewType,
   onViewTypeChange,
   onAddNew,
+  canCreate,
 }: ProductControlsProps) => {
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -39,10 +41,12 @@ export const ProductControls = ({
         <Button variant={viewType === 'list' ? 'default' : 'outline'} size="sm" onClick={() => onViewTypeChange('list')}>
           <List className="h-4 w-4" />
         </Button>
-        <Button onClick={onAddNew} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nuevo Producto
-        </Button>
+        {canCreate && (
+          <Button onClick={onAddNew} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Nuevo Producto
+          </Button>
+        )}
       </div>
     </div>
   );

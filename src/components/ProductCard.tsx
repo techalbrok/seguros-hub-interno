@@ -7,8 +7,8 @@ import type { Product, ProductCategory } from "@/types";
 
 interface ProductCardProps {
   product: Product;
-  onEdit: (product: Product) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (product: Product) => void;
+  onDelete?: (id: string) => void;
   onView: (product: Product) => void;
   categories: ProductCategory[];
 }
@@ -76,24 +76,28 @@ export const ProductCard = ({
             <Eye className="h-4 w-4 mr-1" />
             Ver
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(product)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            Editar
-          </Button>
-          <Button
-            variant="destructive-outline"
-            size="sm"
-            onClick={() => onDelete(product.id)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Eliminar
-          </Button>
+          {onEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(product)}
+              className="flex-1 min-w-[80px]"
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Editar
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="destructive-outline"
+              size="sm"
+              onClick={() => onDelete(product.id)}
+              className="flex-1 min-w-[80px]"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Eliminar
+            </Button>
+          )}
         </div>
       </div>
     </Card>

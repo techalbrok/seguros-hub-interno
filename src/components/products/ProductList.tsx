@@ -22,6 +22,8 @@ interface ProductListProps {
   onDelete: (id: string) => void;
   onView: (product: Product) => void;
   categories: ProductCategory[];
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
 export const ProductList = ({
@@ -34,6 +36,8 @@ export const ProductList = ({
   onDelete,
   onView,
   categories,
+  canEdit,
+  canDelete,
 }: ProductListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = viewType === 'list' ? 10 : 9;
@@ -99,8 +103,8 @@ export const ProductList = ({
             <ProductListItem
               key={product.id}
               product={product}
-              onEdit={onEdit}
-              onDelete={onDelete}
+              onEdit={canEdit ? onEdit : undefined}
+              onDelete={canDelete ? onDelete : undefined}
               onView={onView}
               categories={categories}
             />
@@ -114,8 +118,8 @@ export const ProductList = ({
         <ProductCard
           key={product.id}
           product={product}
-          onEdit={onEdit}
-          onDelete={onDelete}
+          onEdit={canEdit ? onEdit : undefined}
+          onDelete={canDelete ? onDelete : undefined}
           onView={onView}
           categories={categories}
         />

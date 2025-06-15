@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
@@ -9,9 +10,10 @@ interface ProductDetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit: (product: Product) => void;
+  canEdit?: boolean;
 }
 
-export const ProductDetail = ({ product, open, onOpenChange, onEdit }: ProductDetailProps) => {
+export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: ProductDetailProps) => {
   if (!product) {
     return null;
   }
@@ -24,9 +26,11 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit }: ProductDe
         </DialogHeader>
         <div className="space-y-6 pt-2">
           <div className="flex gap-2">
-            <Button onClick={() => onEdit(product)}>
-              Editar Producto
-            </Button>
+            {canEdit && (
+              <Button onClick={() => onEdit(product)}>
+                Editar Producto
+              </Button>
+            )}
           </div>
 
           <Separator />
@@ -84,3 +88,4 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit }: ProductDe
     </Dialog>
   );
 };
+
