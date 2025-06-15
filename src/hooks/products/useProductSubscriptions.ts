@@ -5,8 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const useProductSubscriptions = () => {
   const queryClient = useQueryClient();
+  const isDemo = window.location.pathname.startsWith('/demo');
 
   useEffect(() => {
+    if (isDemo) return;
+
     const channel = supabase
       .channel('products-realtime')
       .on(
@@ -22,5 +25,5 @@ export const useProductSubscriptions = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [queryClient, isDemo]);
 };

@@ -1,29 +1,52 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useDemoMode } from "./useDemoMode";
+import { v4 as uuidv4 } from 'uuid';
 
 export interface Department {
   id: string;
   name: string;
-  responsible_name: string;
-  responsible_email?: string;
+  responsibleName: string;
+  responsibleEmail?: string;
   description?: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+const fromDepartment = (department: Partial<Department>) => ({
+    name: department.name,
+    responsible_name: department.responsibleName,
+    responsible_email: department.responsibleEmail,
+    description: department.description,
+});
+
+const toDepartment = (dbData: any): Department => ({
+    id: dbData.id,
+    name: dbData.name,
+    responsibleName: dbData.responsible_name,
+    responsibleEmail: dbData.responsible_email,
+    description: dbData.description,
+    createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
+});
+
 
 export const useDepartments = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isDemo, demoData, setDemoData } = useDemoMode();
 
   const {
     data: departments = [],
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["departments"],
-    queryFn: async () => {
+    queryKey: ["departments", isDemo],
+    queryFn: async (): Promise<Department[]> => {
+      if (isDemo) {
+        return demoData.departments;
+      }
       console.log("Fetching departments...");
       
       const { data, error } = await supabase
@@ -37,17 +60,27 @@ export const useDepartments = () => {
       }
 
       console.log("Departments fetched successfully:", data);
-      return data as Department[];
+      return data.map(toDepartment);
     },
   });
 
   const createDepartmentMutation = useMutation({
-    mutationFn: async (departmentData: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (departmentData: Omit<Department, 'id' | 'createdAt' | 'updatedAt'>) => {
+      if (isDemo) {
+        const newDepartment: Department = {
+          ...departmentData,
+          id: `demo-dept-${uuidv4()}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        setDemoData({ ...demoData, departments: [...demoData.departments, newDepartment] });
+        return newDepartment;
+      }
       console.log("Creating department:", departmentData);
       
       const { data, error } = await supabase
         .from('departments')
-        .insert([departmentData])
+        .insert([fromDepartment(departmentData)])
         .select()
         .single();
 
@@ -56,10 +89,10 @@ export const useDepartments = () => {
         throw error;
       }
 
-      return data as Department;
+      return toDepartment(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
       toast({
         title: "Éxito",
         description: "Departamento creado correctamente",
@@ -77,18 +110,26 @@ export const useDepartments = () => {
 
   const updateDepartmentMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Department> }) => {
+      if (isDemo) {
+        const updatedDepartment = { ...demoData.departments.find(d => d.id === id), ...updates, updatedAt: new Date().toISOString() } as Department;
+        setDemoData({
+          ...demoData,
+          departments: demoData.departments.map(d => d.id === id ? updatedDepartment : d),
+        });
+        return updatedDepartment;
+      }
       const { data, error } = await supabase
         .from('departments')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...fromDepartment(updates), updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();
 
       if (error) throw error;
-      return data as Department;
+      return toDepartment(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
       toast({
         title: "Éxito",
         description: "Departamento actualizado correctamente",
@@ -106,6 +147,10 @@ export const useDepartments = () => {
 
   const deleteDepartmentMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (isDemo) {
+        setDemoData({ ...demoData, departments: demoData.departments.filter(d => d.id !== id) });
+        return;
+      }
       const { error } = await supabase
         .from('departments')
         .delete()
@@ -114,7 +159,7 @@ export const useDepartments = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
       toast({
         title: "Éxito",
         description: "Departamento eliminado correctamente",
@@ -132,10 +177,10 @@ export const useDepartments = () => {
 
   return {
     departments,
-    loading,
+    loading: isDemo ? false : loading,
     error,
-    fetchDepartments: () => queryClient.invalidateQueries({ queryKey: ["departments"] }),
-    createDepartment: async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
+    fetchDepartments: () => queryClient.invalidateQueries({ queryKey: ["departments", isDemo] }),
+    createDepartment: async (data: Omit<Department, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
         await createDepartmentMutation.mutateAsync(data);
         return true;
@@ -159,8 +204,8 @@ export const useDepartments = () => {
         return false;
       }
     },
-    isCreating: createDepartmentMutation.isPending,
-    isUpdating: updateDepartmentMutation.isPending,
-    isDeleting: deleteDepartmentMutation.isPending,
+    isCreating: isDemo ? false : createDepartmentMutation.isPending,
+    isUpdating: isDemo ? false : updateDepartmentMutation.isPending,
+    isDeleting: isDemo ? false : deleteDepartmentMutation.isPending,
   };
 };

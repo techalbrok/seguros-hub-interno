@@ -8,11 +8,10 @@ import { useProducts } from '@/hooks/useProducts';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useNews } from '@/hooks/useNews';
 import { StatCard } from '@/components/StatCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, Package, FileText, Briefcase, Newspaper, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBrokerageConfig, defaultTerminology } from '@/hooks/useBrokerageConfig';
-import { SystemAlerts } from '@/components/SystemAlerts';
+
 const Dashboard = () => {
   const {
     user,
@@ -98,8 +97,6 @@ const Dashboard = () => {
           Panel de control del sistema de gestión interno
         </p>
       </div>
-
-      <SystemAlerts />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat, index) => <Link to={stat.href} key={stat.title} className="block transition-transform duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg animate-fade-in" style={{
