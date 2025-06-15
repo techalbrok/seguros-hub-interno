@@ -1,5 +1,5 @@
 
-import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link, Settings } from "lucide-react";
+import { Users, User, Calendar, Bell, Newspaper, Edit, Image, Video, Link, Settings, Briefcase } from "lucide-react";
 
 export const navigationItems = [
   {
@@ -29,8 +29,8 @@ export const navigationItems = [
   },
   {
     title: "Departamentos",
-    url: "/department-content",
-    icon: Image
+    url: "/departments",
+    icon: Briefcase
   },
   {
     title: "Noticias",
