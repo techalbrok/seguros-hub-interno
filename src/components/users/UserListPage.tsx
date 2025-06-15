@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Users as UsersIcon, Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,11 +46,11 @@ export const UserListPage = ({
           </p>
         </div>
         {isAdmin && <div className="flex flex-col sm:flex-row gap-2 self-start sm:self-auto">
-            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="corporate-button bg-red-300 hover:bg-red-200 bg-[ff0000]">
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Importar CSV
             </Button>
-            <Button className="corporate-button" onClick={onSetPageMode}>
+            <Button onClick={onSetPageMode}>
               <Plus className="h-4 w-4 mr-2" />
               Crear Usuario
             </Button>
