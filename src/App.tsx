@@ -9,6 +9,7 @@ import { Layout } from "@/components/Layout";
 import { AuthGuard } from "@/components/AuthGuard";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { PageLoader } from "@/components/PageLoader";
+import { AuthProvider } from "@/hooks/useAuth";
 
 const Index = lazy(() => import("./pages/Index"));
 const Landing = lazy(() => import("./pages/Landing"));
@@ -34,75 +35,77 @@ const App = () => (
       <Toaster />
       <Sonner />
       <ThemeProvider>
-        <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/demo" element={<Demo />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/update-password" element={<UpdatePassword />} />
-              <Route path="/" element={<Index />} />
-              <Route path="/profile" element={
-                <AuthGuard>
-                  <Layout>
-                    <Profile />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/settings" element={
-                <AuthGuard>
-                  <Layout>
-                    <Settings />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/users" element={
-                <AuthGuard>
-                  <Layout>
-                    <Users />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/delegations" element={
-                <AuthGuard>
-                  <Layout>
-                    <Delegations />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/companies" element={
-                <AuthGuard>
-                  <Layout>
-                    <Companies />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/products" element={
-                <AuthGuard>
-                  <Layout>
-                    <Products />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/departments" element={
-                <AuthGuard>
-                  <Layout>
-                    <Departments />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/news" element={
-                <AuthGuard>
-                  <Layout>
-                    <News />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/demo" element={<Demo />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/update-password" element={<UpdatePassword />} />
+                <Route path="/" element={<Index />} />
+                <Route path="/profile" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/settings" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Settings />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/users" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Users />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/delegations" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Delegations />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/companies" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Companies />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/products" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Products />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/departments" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Departments />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/news" element={
+                  <AuthGuard>
+                    <Layout>
+                      <News />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </AuthProvider>
       </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
