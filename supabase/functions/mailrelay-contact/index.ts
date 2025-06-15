@@ -46,9 +46,9 @@ serve(async (req) => {
       body: JSON.stringify({
         email: email,
         name: name,
-        groups: [parseInt(groupId, 10)],
-        // By not specifying 'status', MailRelay's default double opt-in is used,
-        // which sends a confirmation email.
+        group_ids: [parseInt(groupId, 10)],
+        status: "pending", // Usar pending para activar doble opt-in
+        send_confirmation_email: true // Asegurar que se envía el email de confirmación
       }),
     })
 
@@ -59,6 +59,31 @@ serve(async (req) => {
     }
 
     const data = await response.json()
+    console.log('MailRelay response:', data);
+
+    // Si el contacto ya existía y queremos forzar el reenvío del email de confirmación
+    if (data.id) {
+      console.log(`Subscriber created/updated with ID: ${data.id}. Sending confirmation email.`);
+      
+      const confirmationUrl = `https://${account}.ipzmarketing.com/api/v1/confirmation_emails`;
+      
+      const confirmationResponse = await fetch(confirmationUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': apiKey,
+        },
+        body: JSON.stringify({
+          subscriber_id: data.id
+        }),
+      });
+
+      if (confirmationResponse.ok) {
+        console.log('Confirmation email sent successfully');
+      } else {
+        console.log('Note: Could not force confirmation email resend, but initial creation was successful');
+      }
+    }
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
