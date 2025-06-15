@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { LegalContentType } from "./LegalModal"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -31,7 +32,11 @@ const formSchema = z.object({
   }),
 })
 
-export const ContactForm = () => {
+type ContactFormProps = {
+  onOpenLegalModal: (contentKey: LegalContentType) => void;
+}
+
+export const ContactForm = ({ onOpenLegalModal }: ContactFormProps) => {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -111,7 +116,7 @@ export const ContactForm = () => {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>
-                  Acepto la <a href="#" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 hover:text-blue-800">política de privacidad</a>.
+                  Acepto la <button type="button" onClick={() => onOpenLegalModal('privacy')} className="underline text-blue-600 hover:text-blue-800 p-0 h-auto bg-transparent">política de privacidad</button>.
                 </FormLabel>
                 <FormMessage />
               </div>

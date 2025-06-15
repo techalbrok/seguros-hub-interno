@@ -7,8 +7,15 @@ import { LandingBenefits } from "@/components/landing/LandingBenefits";
 import { LandingTech } from "@/components/landing/LandingTech";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingContact } from "@/components/landing/LandingContact";
+import { useState } from "react";
+import { LegalModal, LegalContentType } from "@/components/landing/LegalModal";
 
 const LandingPage = () => {
+    const [modalContentKey, setModalContentKey] = useState<LegalContentType | null>(null);
+    
+    const openModal = (contentKey: LegalContentType) => setModalContentKey(contentKey);
+    const closeModal = () => setModalContentKey(null);
+
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <LandingHeader />
@@ -18,9 +25,10 @@ const LandingPage = () => {
                 <LandingAudience />
                 <LandingBenefits />
                 <LandingTech />
-                <LandingContact />
+                <LandingContact onOpenLegalModal={openModal} />
             </main>
-            <LandingFooter />
+            <LandingFooter onOpenLegalModal={openModal} />
+            {modalContentKey && <LegalModal contentKey={modalContentKey} onClose={closeModal} />}
         </div>
     );
 };

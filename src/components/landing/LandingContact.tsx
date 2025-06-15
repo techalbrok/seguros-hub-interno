@@ -1,8 +1,13 @@
 
 import { Mail } from "lucide-react";
 import { ContactForm } from "./ContactForm";
+import { LegalContentType } from "./LegalModal";
 
-export const LandingContact = () => {
+type LandingContactProps = {
+  onOpenLegalModal: (contentKey: LegalContentType) => void;
+}
+
+export const LandingContact = ({ onOpenLegalModal }: LandingContactProps) => {
   return (
     <section id="contacto" className="py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
       <div className="container">
@@ -27,7 +32,7 @@ export const LandingContact = () => {
             <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
               Formulario de Suscripción
             </h3>
-            <ContactForm />
+            <ContactForm onOpenLegalModal={onOpenLegalModal} />
           </div>
         </div>
       </div>
