@@ -93,8 +93,8 @@ export const DemoProducts = () => {
   };
 
   const filteredProducts = products.filter(product =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (product.process && product.process.toLowerCase().includes(searchTerm.toLowerCase()))
+    (product.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.process || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
