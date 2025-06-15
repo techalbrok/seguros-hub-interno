@@ -16,6 +16,11 @@ export const LandingHeader = () => {
             <Link to="/demo">
               <Button variant="outline" size="sm">Explorar Demo</Button>
             </Link>
+            <Link to="/demo/login">
+              <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
+                Probar demo privada
+              </Button>
+            </Link>
             <Button asChild className="bg-blue-600 hover:bg-blue-700" size="sm">
               <a href="#contacto">Hablar con un Experto</a>
             </Button>

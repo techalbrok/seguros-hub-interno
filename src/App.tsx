@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,6 +9,13 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { PageLoader } from "@/components/PageLoader";
 import { AuthProvider } from "@/hooks/useAuth";
+import { DemoAuthProvider } from "./demo/DemoAuthContext";
+import { DemoLayout } from "./demo/DemoLayout";
+import { DemoLogin } from "./demo/DemoLogin";
+import { DemoAuthGuard } from "./demo/DemoAuthGuard";
+import { DemoDashboard } from "./demo/DemoDashboard";
+import { DemoUsers } from "./demo/DemoUsers";
+import { DemoDelegations } from "./demo/DemoDelegations";
 
 const Index = lazy(() => import("./pages/Index"));
 const Landing = lazy(() => import("./pages/Landing"));
@@ -41,6 +47,38 @@ const App = () => (
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/landing" element={<Landing />} />
+                <Route path="/demo/login" element={
+                  <DemoAuthProvider>
+                    <DemoLogin />
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/dashboard" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoDashboard />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/users" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoUsers />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
+                <Route path="/demo/delegations" element={
+                  <DemoAuthProvider>
+                    <DemoAuthGuard>
+                      <DemoLayout>
+                        <DemoDelegations />
+                      </DemoLayout>
+                    </DemoAuthGuard>
+                  </DemoAuthProvider>
+                } />
                 <Route path="/demo" element={<Demo />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
