@@ -1,7 +1,8 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useDemoMode } from "./useDemoMode";
+import { v4 as uuidv4 } from 'uuid';
 
 export interface Department {
   id: string;
@@ -16,14 +17,18 @@ export interface Department {
 export const useDepartments = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isDemo, demoData, setDemoData } = useDemoMode();
 
   const {
     data: departments = [],
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["departments"],
+    queryKey: ["departments", isDemo],
     queryFn: async () => {
+      if (isDemo) {
+        return demoData.departments;
+      }
       console.log("Fetching departments...");
       
       const { data, error } = await supabase
@@ -43,6 +48,16 @@ export const useDepartments = () => {
 
   const createDepartmentMutation = useMutation({
     mutationFn: async (departmentData: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
+      if (isDemo) {
+        const newDepartment: Department = {
+          ...departmentData,
+          id: `demo-dept-${uuidv4()}`,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setDemoData({ ...demoData, departments: [...demoData.departments, newDepartment] });
+        return newDepartment;
+      }
       console.log("Creating department:", departmentData);
       
       const { data, error } = await supabase
@@ -59,7 +74,7 @@ export const useDepartments = () => {
       return data as Department;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
       toast({
         title: "Éxito",
         description: "Departamento creado correctamente",
@@ -77,6 +92,14 @@ export const useDepartments = () => {
 
   const updateDepartmentMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Department> }) => {
+      if (isDemo) {
+        const updatedDepartment = { ...demoData.departments.find(d => d.id === id), ...updates, updated_at: new Date().toISOString() } as Department;
+        setDemoData({
+          ...demoData,
+          departments: demoData.departments.map(d => d.id === id ? updatedDepartment : d),
+        });
+        return updatedDepartment;
+      }
       const { data, error } = await supabase
         .from('departments')
         .update({ ...updates, updated_at: new Date().toISOString() })
@@ -88,7 +111,7 @@ export const useDepartments = () => {
       return data as Department;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
       toast({
         title: "Éxito",
         description: "Departamento actualizado correctamente",
@@ -106,6 +129,10 @@ export const useDepartments = () => {
 
   const deleteDepartmentMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (isDemo) {
+        setDemoData({ ...demoData, departments: demoData.departments.filter(d => d.id !== id) });
+        return;
+      }
       const { error } = await supabase
         .from('departments')
         .delete()
@@ -114,7 +141,7 @@ export const useDepartments = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["departments", isDemo] });
       toast({
         title: "Éxito",
         description: "Departamento eliminado correctamente",
@@ -132,9 +159,9 @@ export const useDepartments = () => {
 
   return {
     departments,
-    loading,
+    loading: isDemo ? false : loading,
     error,
-    fetchDepartments: () => queryClient.invalidateQueries({ queryKey: ["departments"] }),
+    fetchDepartments: () => queryClient.invalidateQueries({ queryKey: ["departments", isDemo] }),
     createDepartment: async (data: Omit<Department, 'id' | 'created_at' | 'updated_at'>) => {
       try {
         await createDepartmentMutation.mutateAsync(data);
@@ -159,8 +186,8 @@ export const useDepartments = () => {
         return false;
       }
     },
-    isCreating: createDepartmentMutation.isPending,
-    isUpdating: updateDepartmentMutation.isPending,
-    isDeleting: deleteDepartmentMutation.isPending,
+    isCreating: isDemo ? false : createDepartmentMutation.isPending,
+    isUpdating: isDemo ? false : updateDepartmentMutation.isPending,
+    isDeleting: isDemo ? false : deleteDepartmentMutation.isPending,
   };
 };

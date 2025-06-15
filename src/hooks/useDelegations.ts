@@ -3,8 +3,56 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useDelegationsQuery } from './delegations/useDelegationsQuery';
 import { useDelegationMutations } from './delegations/useDelegationMutations';
 import { Delegation } from '@/types';
+import { useDemoMode } from "./useDemoMode";
+import { v4 as uuidv4 } from 'uuid';
 
 export const useDelegations = () => {
+  const { isDemo, demoData, setDemoData } = useDemoMode();
+
+  if (isDemo) {
+    const createDelegation = async (data: any) => {
+      const newDelegation: Delegation = {
+        ...data,
+        id: `demo-delegation-${uuidv4()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setDemoData({ ...demoData, delegations: [...demoData.delegations, newDelegation] });
+      return true;
+    };
+
+    const updateDelegation = async (delegationId: string, updates: Partial<Delegation>) => {
+      setDemoData({
+        ...demoData,
+        delegations: demoData.delegations.map(d =>
+          d.id === delegationId ? { ...d, ...updates, updated_at: new Date().toISOString() } : d
+        ),
+      });
+      return true;
+    };
+
+    const deleteDelegation = async (delegationId: string) => {
+      setDemoData({
+        ...demoData,
+        delegations: demoData.delegations.filter(d => d.id !== delegationId),
+      });
+      return true;
+    };
+
+    return {
+      delegations: demoData.delegations,
+      loading: false,
+      error: null,
+      createDelegation,
+      updateDelegation,
+      deleteDelegation,
+      refetch: () => {},
+      isCreating: false,
+      isUpdating: false,
+      isDeleting: false,
+    };
+  }
+
   const queryClient = useQueryClient();
   const { data: delegations, isLoading: loading, error } = useDelegationsQuery();
   const { createDelegationMutation, updateDelegationMutation, deleteDelegationMutation } = useDelegationMutations();
