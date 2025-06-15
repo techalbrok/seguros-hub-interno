@@ -3,6 +3,7 @@ import { Delegation } from "@/types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building, MapPin, Phone, Mail, Globe, User, Edit, Trash2, Eye } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth"; // importamos el hook
 
 interface DelegationCardProps {
   delegation: Delegation;
@@ -12,6 +13,8 @@ interface DelegationCardProps {
 }
 
 export const DelegationCard = ({ delegation, onEdit, onDelete, onView }: DelegationCardProps) => {
+  const { isAdmin } = useAuth(); // obtenemos el flag de admin
+
   return (
     <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/50 flex flex-col h-full animate-fade-in group">
       <CardHeader>
@@ -76,24 +79,28 @@ export const DelegationCard = ({ delegation, onEdit, onDelete, onView }: Delegat
             <Eye className="h-4 w-4 mr-1" />
             Ver
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(delegation)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            Editar
-          </Button>
-          <Button
-            variant="destructive-outline"
-            size="sm"
-            onClick={() => onDelete(delegation.id)}
-            className="flex-1 min-w-[80px]"
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Eliminar
-          </Button>
+          {isAdmin && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(delegation)}
+                className="flex-1 min-w-[80px]"
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Editar
+              </Button>
+              <Button
+                variant="destructive-outline"
+                size="sm"
+                onClick={() => onDelete(delegation.id)}
+                className="flex-1 min-w-[80px]"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Eliminar
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </Card>
