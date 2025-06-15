@@ -20,7 +20,7 @@ export const CompaniesHeader = ({
       <div>
         {brokerageConfig && brokerageConfig.logo_url && <div className="flex items-center gap-3 mb-2">
             
-            <h2 className="text-lg font-semibold text-sidebar-primary dark:text-white">{brokerageConfig.name}</h2>
+            
           </div>}
         <h1 className="text-3xl font-bold text-sidebar-primary dark:text-white">{companyTerminology.plural}</h1>
         <p className="text-muted-foreground mt-1">
