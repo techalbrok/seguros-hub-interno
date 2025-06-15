@@ -46,9 +46,9 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <ThemeProvider>
-        <AuthProvider>
-          <BrokerageConfigProvider>
+      <AuthProvider>
+        <BrokerageConfigProvider>
+          <ThemeProvider>
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -193,9 +193,9 @@ const App = () => (
                 </Routes>
               </Suspense>
             </BrowserRouter>
-          </BrokerageConfigProvider>
-        </AuthProvider>
-      </ThemeProvider>
+          </ThemeProvider>
+        </BrokerageConfigProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
