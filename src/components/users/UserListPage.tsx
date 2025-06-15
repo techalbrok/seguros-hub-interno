@@ -49,7 +49,7 @@ export const UserListPage = ({
         <div>
           {brokerageConfig && brokerageConfig.logo_url && <div className="flex items-center gap-3 mb-2">
               
-              <h2 className="text-lg font-semibold text-sidebar-primary dark:text-white">{brokerageConfig.name}</h2>
+              
             </div>}
           <h1 className="text-2xl sm:text-3xl font-bold text-sidebar-primary dark:text-white flex items-center gap-3">
             <UsersIcon className="h-7 w-7 sm:h-8 sm:w-8" />
