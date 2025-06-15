@@ -52,20 +52,18 @@ export const AppBreadcrumbs = () => {
             name = 'Detalle';
           }
 
-          return (
-            <React.Fragment key={to}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                {last ? (
-                  <BreadcrumbPage>{name}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link to={to}>{name}</Link>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </React.Fragment>
-          );
+          return [
+            <BreadcrumbSeparator key={`sep-${to}`} />,
+            <BreadcrumbItem key={to}>
+              {last ? (
+                <BreadcrumbPage>{name}</BreadcrumbPage>
+              ) : (
+                <BreadcrumbLink asChild>
+                  <Link to={to}>{name}</Link>
+                </BreadcrumbLink>
+              )}
+            </BreadcrumbItem>
+          ];
         })}
       </BreadcrumbList>
     </Breadcrumb>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
@@ -107,13 +108,6 @@ const Dashboard = () => {
             <StatCard title={stat.title} value={stat.value} icon={stat.icon} description={stat.description} loading={stat.loading} />
           </Link>)}
       </div>
-
-      <Card className="animate-fade-in" style={{
-      animationDelay: `${stats.length * 50}ms`
-    }}>
-        
-        
-      </Card>
     </div>;
 };
 export default Dashboard;
