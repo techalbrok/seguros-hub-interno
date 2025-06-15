@@ -11,9 +11,9 @@ export const LandingFooter = ({ onOpenLegalModal }: LandingFooterProps) => {
 
     return (
         <footer className="border-t">
-            <div className="container flex flex-col sm:flex-row items-center justify-between gap-4 py-6 text-sm text-muted-foreground">
+            <div className="container flex flex-col sm:flex-row items-center justify-between gap-4 py-4 sm:py-6 text-sm text-muted-foreground text-center sm:text-left">
                 <p>&copy; {new Date().getFullYear()} {brokerageName}. Todos los derechos reservados.</p>
-                <div className="flex items-center gap-4 flex-wrap justify-center">
+                <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-center">
                     <a href="#contacto" className="hover:text-blue-600">Hablar con un Experto</a>
                     <Link to="/demo" className="hover:text-blue-600">Demo</Link>
                     <button onClick={() => onOpenLegalModal('privacy')} className="hover:text-blue-600 underline">Política de Privacidad</button>

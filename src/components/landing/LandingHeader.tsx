@@ -11,12 +11,12 @@ export const LandingHeader = () => {
         <Link to="/landing" className="flex items-center space-x-2">
           <span className="font-bold text-lg">{brokerageName}</span>
         </Link>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
           <nav className="flex items-center space-x-2">
             <Link to="/demo">
-              <Button variant="outline">Explorar Demo</Button>
+              <Button variant="outline" size="sm">Explorar Demo</Button>
             </Link>
-            <Button asChild className="bg-blue-600 hover:bg-blue-700">
+            <Button asChild className="bg-blue-600 hover:bg-blue-700" size="sm">
               <a href="#contacto">Hablar con un Experto</a>
             </Button>
           </nav>

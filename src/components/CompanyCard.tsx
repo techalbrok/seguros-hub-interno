@@ -28,7 +28,7 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
 
   return (
     <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/50 flex flex-col h-full animate-fade-in group">
-      <CardHeader className="flex-grow">
+      <CardHeader className="flex-grow p-4 sm:p-6">
         <CardTitle className="text-xl font-bold text-sidebar-primary dark:text-white leading-tight group-hover:text-primary transition-colors">
           {company.name}
         </CardTitle>
@@ -41,7 +41,7 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
           </div>
         )}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 p-4 sm:p-6 pt-0">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <User className="h-4 w-4" />
           <span className="truncate">{company.commercialManager}</span>
@@ -58,13 +58,13 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
           </Badge>
         </div>
       </CardContent>
-      <div className="p-6 pt-0 mt-auto">
+      <div className="p-4 sm:p-6 pt-0 mt-auto">
         <div className="flex flex-wrap gap-2 pt-4 mt-4 border-t">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onView(company)}
-            className="flex-1 min-w-[80px]"
+            className="flex-1 min-w-[80px] h-10"
           >
             <Eye className="h-4 w-4 mr-1" />
             Ver
@@ -73,7 +73,7 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
             variant="outline"
             size="sm"
             onClick={() => onEdit(company)}
-            className="flex-1 min-w-[80px]"
+            className="flex-1 min-w-[80px] h-10"
           >
             <Edit className="h-4 w-4 mr-1" />
             Editar
@@ -82,7 +82,7 @@ export const CompanyCard = ({ company, onEdit, onDelete, onView }: CompanyCardPr
             variant="destructive-outline"
             size="sm"
             onClick={() => onDelete(company.id)}
-            className="flex-1 min-w-[80px]"
+            className="flex-1 min-w-[80px] h-10"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             Eliminar

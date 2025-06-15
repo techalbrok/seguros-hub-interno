@@ -1,3 +1,4 @@
+
 import { NavLink, useLocation, Link as RouterLink } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NavigationShortcuts } from "@/components/NavigationShortcuts";
@@ -66,7 +67,7 @@ export function AppSidebar() {
       <div className={`flex items-center border-b border-sidebar-border ${
           collapsed
           ? 'flex-col justify-center p-2 gap-2'
-          : 'justify-between p-4'
+          : 'justify-between p-2 sm:p-4'
         }`}>
         {logoUrl ? (
           <RouterLink to="/">
@@ -78,9 +79,9 @@ export function AppSidebar() {
         <SidebarTrigger className="h-8 w-8 flex-shrink-0" />
       </div>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="px-2 py-2 sm:py-4">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-2">
+          <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-2 mb-1 sm:mb-2">
             {!collapsed && "Navegación Principal"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
