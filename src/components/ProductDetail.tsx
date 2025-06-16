@@ -41,9 +41,24 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
 
           {product.process && (
             <div>
-              <h3 className="text-lg font-semibold mb-2">Proceso</h3>
+              <h3 className="text-lg font-semibold mb-3">Proceso</h3>
               <div 
-                className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:text-foreground prose-code:text-foreground" 
+                className="prose prose-sm max-w-none dark:prose-invert 
+                          prose-headings:text-foreground prose-headings:font-semibold
+                          prose-p:text-foreground prose-p:leading-relaxed
+                          prose-strong:text-foreground prose-strong:font-semibold
+                          prose-em:text-foreground 
+                          prose-ul:text-foreground prose-ol:text-foreground 
+                          prose-li:text-foreground prose-li:my-1
+                          prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80 
+                          prose-blockquote:text-foreground prose-blockquote:border-l-primary
+                          prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded
+                          [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3
+                          [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2
+                          [&_h3]:text-base [&_h3]:font-medium [&_h3]:mb-2
+                          [&_p]:mb-3 [&_p:last-child]:mb-0
+                          [&_ul]:my-3 [&_ol]:my-3
+                          [&_li]:mb-1" 
                 dangerouslySetInnerHTML={createMarkup(product.process)} 
               />
             </div>
@@ -51,9 +66,24 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
 
           {product.strengths && (
             <div>
-              <h3 className="text-lg font-semibold mb-2">Fortalezas</h3>
+              <h3 className="text-lg font-semibold mb-3">Fortalezas</h3>
               <div 
-                className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:text-foreground prose-code:text-foreground" 
+                className="prose prose-sm max-w-none dark:prose-invert 
+                          prose-headings:text-foreground prose-headings:font-semibold
+                          prose-p:text-foreground prose-p:leading-relaxed
+                          prose-strong:text-foreground prose-strong:font-semibold
+                          prose-em:text-foreground 
+                          prose-ul:text-foreground prose-ol:text-foreground 
+                          prose-li:text-foreground prose-li:my-1
+                          prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80 
+                          prose-blockquote:text-foreground prose-blockquote:border-l-primary
+                          prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded
+                          [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3
+                          [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2
+                          [&_h3]:text-base [&_h3]:font-medium [&_h3]:mb-2
+                          [&_p]:mb-3 [&_p:last-child]:mb-0
+                          [&_ul]:my-3 [&_ol]:my-3
+                          [&_li]:mb-1" 
                 dangerouslySetInnerHTML={createMarkup(product.strengths)} 
               />
             </div>
@@ -61,9 +91,24 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
 
           {product.observations && (
             <div>
-              <h3 className="text-lg font-semibold mb-2">Observaciones</h3>
+              <h3 className="text-lg font-semibold mb-3">Observaciones</h3>
               <div 
-                className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:text-foreground prose-code:text-foreground" 
+                className="prose prose-sm max-w-none dark:prose-invert 
+                          prose-headings:text-foreground prose-headings:font-semibold
+                          prose-p:text-foreground prose-p:leading-relaxed
+                          prose-strong:text-foreground prose-strong:font-semibold
+                          prose-em:text-foreground 
+                          prose-ul:text-foreground prose-ol:text-foreground 
+                          prose-li:text-foreground prose-li:my-1
+                          prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80 
+                          prose-blockquote:text-foreground prose-blockquote:border-l-primary
+                          prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded
+                          [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3
+                          [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2
+                          [&_h3]:text-base [&_h3]:font-medium [&_h3]:mb-2
+                          [&_p]:mb-3 [&_p:last-child]:mb-0
+                          [&_ul]:my-3 [&_ol]:my-3
+                          [&_li]:mb-1" 
                 dangerouslySetInnerHTML={createMarkup(product.observations)} 
               />
             </div>
@@ -71,13 +116,13 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
 
           {product.documents && product.documents.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold mb-2">Documentos</h3>
+              <h3 className="text-lg font-semibold mb-3">Documentos</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {product.documents.map((doc) => (
-                  <div key={doc.id} className="p-4 border rounded-md">
+                  <div key={doc.id} className="p-4 border rounded-lg bg-muted/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <FileText className="h-4 w-4 mr-2" />
+                        <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm font-medium">{doc.name}</span>
                       </div>
                       <Button variant="ghost" size="sm" asChild>
@@ -92,7 +137,7 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
             </div>
           )}
 
-          <div className="text-sm text-muted-foreground pt-4">
+          <div className="text-sm text-muted-foreground pt-4 border-t">
             <p>Creado: {new Date(product.createdAt).toLocaleDateString()}</p>
             <p>Actualizado: {new Date(product.updatedAt).toLocaleDateString()}</p>
           </div>

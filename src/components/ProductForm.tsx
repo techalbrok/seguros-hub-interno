@@ -31,19 +31,26 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
   const [existingDocuments, setExistingDocuments] = useState(product?.documents || []);
   const { toast } = useToast();
 
+  // Reset form when dialog opens/closes or product changes
   useEffect(() => {
+    console.log("ProductForm: Dialog state or product changed", { open, product });
+    
     if (open) {
       if (product) {
-        setFormData({
+        console.log("ProductForm: Loading existing product data", product);
+        const newFormData = {
           title: product.title || "",
           process: product.process || "",
           strengths: product.strengths || "",
           observations: product.observations || "",
           categoryId: product.categoryId || "",
           companyId: product.companyId || "",
-        });
+        };
+        console.log("ProductForm: Setting form data", newFormData);
+        setFormData(newFormData);
         setExistingDocuments(product.documents || []);
       } else {
+        console.log("ProductForm: Resetting form for new product");
         setFormData({
           title: "",
           process: "",
@@ -64,7 +71,13 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("ProductForm: Submitting form", formData);
     onSubmit({ ...formData, documents });
+  };
+
+  const handleFormDataChange = (newData: any) => {
+    console.log("ProductForm: Form data changing", newData);
+    setFormData(newData);
   };
 
   return (
@@ -77,7 +90,7 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ProductBasicInfo 
               formData={formData}
-              onFormDataChange={setFormData}
+              onFormDataChange={handleFormDataChange}
             />
             <ProductDocumentUpload
               documents={documents}
@@ -90,7 +103,7 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
 
           <ProductRichTextFields
             formData={formData}
-            onFormDataChange={setFormData}
+            onFormDataChange={handleFormDataChange}
           />
 
           <DialogFooter className="sticky bottom-0 bg-background py-4 -mx-4 px-4 md:-mx-6 md:px-6 border-t -mb-4">
