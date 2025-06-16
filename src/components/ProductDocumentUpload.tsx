@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { X, Upload, FileText } from "lucide-react";
@@ -85,7 +86,7 @@ export const ProductDocumentUpload = ({
           <h4 className="text-sm font-medium mb-2">Documentos actuales</h4>
           <div className="space-y-2">
             {existingDocuments.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between bg-blue-50 p-2 rounded border">
+              <div key={doc.id} className="flex items-center justify-between bg-blue-50 dark:bg-blue-950/20 p-2 rounded border">
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-blue-600" />
                   <span className="text-sm">{doc.name}</span>
@@ -120,7 +121,7 @@ export const ProductDocumentUpload = ({
       )}
 
       {/* New Documents Upload */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
         <input
           type="file"
           id="documents"
@@ -139,7 +140,7 @@ export const ProductDocumentUpload = ({
           <div className="mt-4 space-y-2">
             <h4 className="text-sm font-medium">Nuevos documentos a subir</h4>
             {documents.map((file, index) => (
-              <div key={index} className="flex items-center justify-between bg-green-50 p-2 rounded border">
+              <div key={index} className="flex items-center justify-between bg-green-50 dark:bg-green-950/20 p-2 rounded border">
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-green-600" />
                   <span className="text-sm">{file.name}</span>

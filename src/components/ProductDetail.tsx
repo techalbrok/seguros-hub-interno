@@ -43,7 +43,7 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
             <div>
               <h3 className="text-lg font-semibold mb-2">Proceso</h3>
               <div 
-                className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80" 
+                className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:text-foreground prose-code:text-foreground" 
                 dangerouslySetInnerHTML={createMarkup(product.process)} 
               />
             </div>
@@ -53,7 +53,7 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
             <div>
               <h3 className="text-lg font-semibold mb-2">Fortalezas</h3>
               <div 
-                className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80" 
+                className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:text-foreground prose-code:text-foreground" 
                 dangerouslySetInnerHTML={createMarkup(product.strengths)} 
               />
             </div>
@@ -63,7 +63,7 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
             <div>
               <h3 className="text-lg font-semibold mb-2">Observaciones</h3>
               <div 
-                className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80" 
+                className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:text-foreground prose-code:text-foreground" 
                 dangerouslySetInnerHTML={createMarkup(product.observations)} 
               />
             </div>
