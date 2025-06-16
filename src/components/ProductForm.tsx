@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { ProductBasicInfo } from "@/components/ProductBasicInfo";
 import { ProductDocumentUpload } from "@/components/ProductDocumentUpload";
 import { ProductRichTextFields } from "@/components/ProductRichTextFields";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/types";
 
 interface ProductFormProps {
@@ -26,6 +28,8 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
   });
 
   const [documents, setDocuments] = useState<File[]>([]);
+  const [existingDocuments, setExistingDocuments] = useState(product?.documents || []);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (open) {
@@ -38,6 +42,7 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
           categoryId: product.categoryId || "",
           companyId: product.companyId || "",
         });
+        setExistingDocuments(product.documents || []);
       } else {
         setFormData({
           title: "",
@@ -47,10 +52,15 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
           categoryId: "",
           companyId: "",
         });
+        setExistingDocuments([]);
       }
       setDocuments([]);
     }
   }, [product, open]);
+
+  const handleExistingDocumentDelete = (documentId: string) => {
+    setExistingDocuments(prev => prev.filter(doc => doc.id !== documentId));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +81,10 @@ export const ProductForm = ({ product, onSubmit, isLoading, open, onOpenChange }
             />
             <ProductDocumentUpload
               documents={documents}
+              existingDocuments={existingDocuments}
+              productId={product?.id}
               onDocumentsChange={setDocuments}
+              onExistingDocumentDelete={handleExistingDocumentDelete}
             />
           </div>
 

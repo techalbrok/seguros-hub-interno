@@ -18,6 +18,10 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
     return null;
   }
 
+  const createMarkup = (htmlContent: string) => {
+    return { __html: htmlContent };
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -38,21 +42,30 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
           {product.process && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Proceso</h3>
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.process }} />
+              <div 
+                className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80" 
+                dangerouslySetInnerHTML={createMarkup(product.process)} 
+              />
             </div>
           )}
 
           {product.strengths && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Fortalezas</h3>
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.strengths }} />
+              <div 
+                className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80" 
+                dangerouslySetInnerHTML={createMarkup(product.strengths)} 
+              />
             </div>
           )}
 
           {product.observations && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Observaciones</h3>
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.observations }} />
+              <div 
+                className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80" 
+                dangerouslySetInnerHTML={createMarkup(product.observations)} 
+              />
             </div>
           )}
 
@@ -88,4 +101,3 @@ export const ProductDetail = ({ product, open, onOpenChange, onEdit, canEdit }: 
     </Dialog>
   );
 };
-

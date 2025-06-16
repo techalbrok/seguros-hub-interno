@@ -13,8 +13,14 @@ interface ProductListItemProps {
   categories: ProductCategory[];
 }
 
+const stripHtmlTags = (html: string) => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || "";
+};
+
 export const ProductListItem = ({ product, onEdit, onDelete, onView, categories }: ProductListItemProps) => {
   const category = categories.find((c) => c.id === product.categoryId);
+  const processText = product.process ? stripHtmlTags(product.process) : "";
 
   return (
     <TableRow key={product.id} className="hover:bg-muted/50 animate-fade-in">
@@ -26,7 +32,7 @@ export const ProductListItem = ({ product, onEdit, onDelete, onView, categories 
       </TableCell>
       <TableCell className="hidden md:table-cell">
         <p className="text-sm text-foreground/80 line-clamp-1">
-          {product.process || <span className="text-muted-foreground">N/A</span>}
+          {processText || <span className="text-muted-foreground">N/A</span>}
         </p>
       </TableCell>
       <TableCell className="text-right">
